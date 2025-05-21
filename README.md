@@ -1,6 +1,6 @@
-# 📘 SISA — Sistema Integrado de Supervisão Acadêmica
+# 📘 SISA
 
-Sistema de gerenciamento com múltiplos perfis de usuários: administradores, colaboradores e professores. O objetivo é organizar informações de participantes, atividades (turmas/matérias) e documentos acadêmicos.
+Sistema de gerenciamento com múltiplos perfis de usuários: administradores, colaboradores e professores. O objetivo é organizar informações de participantes, atividades (turmas/matérias) e documentos do projeto Brota Vida
 
 ---
 
