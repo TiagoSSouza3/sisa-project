@@ -7,13 +7,39 @@ const userRoutes = require("./routes/userRoutes");
 const participanteRoutes = require("./routes/participanteRoute");
 const activityRoutes = require("./routes/activityRoutes");
 const documentRoutes = require("./routes/documentRoutes");
+const http = require('http');
+const https = require('https');
+const fs = require('fs');
 
 dotenv.config();
 const app = express();
 
+const PORT_HTTP = process.env.PORT || 5000;
+const PORT_HTTPS = process.env.HTTPS_PORT || 5001;
+
+if (process.env.NODE_ENV === 'production') {
+  // Em produção, o HTTPS será gerenciado por um proxy reverso (como Nginx)
+  app.listen(PORT_HTTP, () => {
+    console.log(`Server running in production at http://localhost:${PORT_HTTP}`);
+  });
+} else {
+  // Em desenvolvimento, usamos HTTPS local com certificados autoassinados
+  const key = fs.readFileSync('./cert/key.pem');
+  const cert = fs.readFileSync('./cert/cert.pem');
+
+  https.createServer({ key, cert }, app).listen(PORT_HTTPS, () => {
+    console.log(`Dev server running at https://localhost:${PORT_HTTPS}`);
+  });
+}
+
+const options = {
+  key: fs.readFileSync('./cert/key.pem'),
+  cert: fs.readFileSync('./cert/cert.pem')
+};
+
 // Configuração CORS mais detalhada
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  origin: ['https://localhost:3000', 'https://127.0.0.1:3000'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
@@ -49,8 +75,8 @@ const PORT = process.env.PORT || 5000;
 const startServer = (port) => {
   app.listen(port, () => {
     console.log(`Server running on port ${port}`);
-    console.log(`API URL: http://localhost:${port}/api`);
-    console.log(`Test URL: http://localhost:${port}/api/test`);
+    console.log(`API URL: https://localhost:${port}/api`);
+    console.log(`Test URL: https://localhost:${port}/api/test`);
   }).on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
       console.log(`Porta ${port} em uso, tentando porta ${port + 1}`);
@@ -60,5 +86,3 @@ const startServer = (port) => {
     }
   });
 };
-
-startServer(PORT);

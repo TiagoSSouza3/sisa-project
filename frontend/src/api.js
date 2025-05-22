@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: process.env.REACT_APP_API,
   headers: {
     'Content-Type': 'application/json'
   }
@@ -15,7 +15,15 @@ API.interceptors.request.use((config) => {
 
 API.interceptors.response.use(
   (response) => response,
-  (error) => Promise.reject(error)
+  (error) => {
+    // Adicione um log mais detalhado do erro
+    console.error('Erro na requisição:', {
+      config: error.config,
+      response: error.response,
+      message: error.message
+    });
+    return Promise.reject(error);
+  }
 );
 
 export default API;
