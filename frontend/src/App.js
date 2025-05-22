@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users";
-import Participants from "./pages/Participants";
+import Students from "./pages/Students";
 import Activities from "./pages/Activities";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -15,9 +15,9 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-        <Route path="/usuarios" element={<ProtectedRoute><Users /></ProtectedRoute>} />
-        <Route path="/participantes" element={<ProtectedRoute><Participants /></ProtectedRoute>} />
-        <Route path="/atividades" element={<ProtectedRoute><Activities /></ProtectedRoute>} />
+        <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
+        <Route path="/students" element={<ProtectedRoute><Students /></ProtectedRoute>} />
+        <Route path="/subjects" element={<ProtectedRoute><Activities /></ProtectedRoute>} />
       </Routes>
     </Router>
   );

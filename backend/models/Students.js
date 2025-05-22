@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config");
 
-const Participant = sequelize.define("participant", {
+const Students = sequelize.define("students", {
   name: DataTypes.STRING,
   email: DataTypes.STRING,
   phone: DataTypes.STRING,
@@ -10,4 +10,4 @@ const Participant = sequelize.define("participant", {
   notes: DataTypes.TEXT
 });
 
-module.exports = Participant;
+module.exports = Students;

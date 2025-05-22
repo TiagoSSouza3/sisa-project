@@ -1,4 +1,4 @@
-const Participant = require("../models/Participant");
+const Participant = require("../models/Students");
 
 exports.getAllParticipants = async (req, res) => {
   const list = await Participant.findAll();

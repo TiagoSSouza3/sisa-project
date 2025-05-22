@@ -3,6 +3,8 @@ import API from "../api";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
+  localStorage.clear();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
