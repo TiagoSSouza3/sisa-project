@@ -5,7 +5,7 @@ const dotenv = require("dotenv");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const studentsRoutes = require("./routes/studentsRoute");
-const activityRoutes = require("./routes/activityRoutes");
+const subjectRoutes = require("./routes/subjectRoutes");
 const documentRoutes = require("./routes/documentRoutes");
 const http = require('http');
 const https = require('https');
@@ -56,8 +56,8 @@ app.use((req, res, next) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/studants", studentsRoutes);
-app.use("/api/activities", activityRoutes);
+app.use("/api/students", studentsRoutes);
+app.use("/api/subjects", subjectRoutes);
 app.use("/api/documents", documentRoutes);
 
 app.get("/", (req, res) => {

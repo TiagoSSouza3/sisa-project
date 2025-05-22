@@ -13,7 +13,9 @@ export default function Login() {
     e.preventDefault();
     try {
       const res = await API.post("/auth/login", { email, password });
+      console.log(res.data);
       localStorage.setItem("token", res.data.token);
+      localStorage.setItem("occupation_id", res.data.user.occupation_id);
       navigate("/dashboard");
     } catch (error) {
       console.error("Erro detalhado:", error.response?.data || error.message);
