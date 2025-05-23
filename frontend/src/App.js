@@ -7,6 +7,7 @@ import Students from "./pages/Students";
 import Subjects from "./pages/Subjects";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
+import SubjectCreation from "./pages/Subject_creation";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
         <Route path="/students" element={<ProtectedRoute><Students /></ProtectedRoute>} />
         <Route path="/subjects" element={<ProtectedRoute><Subjects /></ProtectedRoute>} />
+        <Route path="/subject_create" element={<ProtectedRoute><SubjectCreation /></ProtectedRoute>} />
       </Routes>
     </Router>
   );

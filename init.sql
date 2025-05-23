@@ -75,3 +75,5 @@ INSERT INTO occupation (name) VALUES
     ('Administrador'),
     ('Colaborador'),
     ('Professor');
+
+INSERT INTO user VALUES (1 ,"Tiago Dos Santos Souza", "tirigopeixe@gmail.com", "$2b$10$Q2WnzVrpRLs.uEDSgZ2WxOn1mPF0eu4aVlZ.Ix2Sy6qxDKnJ/jO8K", 1);

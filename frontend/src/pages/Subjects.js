@@ -1,39 +1,28 @@
 import React, { useEffect, useState } from "react";
 import API from "../api";
 import "../styles.css";
+import { Link } from "react-router-dom";
 
 export default function Subjects() {
   const [subjects, setSubjects] = useState([]);
-  const [newSubject, setNewSubject] = useState({
-    name: "",
-    description: ""
-  });
+  const [isLoading, setIsLoading] = useState(true);
 
   const loadSubjects = async () => {
     try {
-      const res = await API.get("/subjects");
-      setSubjects(res.data);
+      setIsLoading(true);
+      await API.get("/subjects").then((res) => {
+        setSubjects(res.data);
+      });
     } catch (err) {
       console.log("Erro ao carregar disciplinas");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     loadSubjects();
   }, []);
-
-  const handleCreate = async () => {
-    try {
-      const res = await API.post("/subjects", newSubject);
-      setNewSubject({
-        name: "",
-        description: ""
-      });
-      loadSubjects();
-    } catch (err) {
-      console.log("Erro ao criar disciplina");
-    }
-  };
 
   const handleDelete = async (id) => {
     try {
@@ -44,29 +33,21 @@ export default function Subjects() {
     }
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('pt-BR');
-  };
+  if (!isLoading) {
+    (async () => {
+      await loadSubjects();
+    })();
+  }
 
   return (
     <div className="container">
       <h2>Disciplinas</h2>
 
-      <form onSubmit={(e) => { e.preventDefault(); handleCreate(); }}>
-        <input 
-          placeholder="Nome da Disciplina" 
-          value={newSubject.name}
-          onChange={(e) => setNewSubject({ ...newSubject, name: e.target.value })} 
-          required 
-        />
-        <textarea 
-          placeholder="Descrição" 
-          value={newSubject.description}
-          onChange={(e) => setNewSubject({ ...newSubject, description: e.target.value })} 
-          required
-        />
-        <button type="submit">Criar Disciplina</button>
-      </form>
+      <div className="create-subject">
+        <Link to="/subject_create" className="create-subject-btn">
+          Criar Disciplina
+        </Link>
+      </div>
 
       <div className="list">
         {subjects.length === 0 ? (
