@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../config");
 
 const Document = sequelize.define("document", {
-  activity_id: DataTypes.INTEGER,
+  subject_id: DataTypes.INTEGER,
   title: DataTypes.STRING,
   file_name: DataTypes.STRING,
   file_type: DataTypes.STRING,

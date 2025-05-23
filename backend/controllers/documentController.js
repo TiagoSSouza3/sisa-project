@@ -6,11 +6,11 @@ exports.getDocuments = async (req, res) => {
 };
 
 exports.uploadDocument = async (req, res) => {
-  const { title, activity_id, file_name, file_type, file_data, created_by } = req.body;
+  const { title, subject_id, file_name, file_type, file_data, created_by } = req.body;
 
   const document = await Document.create({
     title,
-    activity_id,
+    subject_id,
     file_name,
     file_type,
     file_data: Buffer.from(file_data, "base64"),

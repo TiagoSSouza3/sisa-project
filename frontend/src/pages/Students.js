@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import API from "../api";
 import "../styles.css";
 
-export default function Participants() {
+export default function Students() {
   const [list, setList] = useState([]);
   const [novo, setNovo] = useState({ name: "", email: "", phone: "" });
   const [error, setError] = useState("");
@@ -10,10 +10,10 @@ export default function Participants() {
 
   const load = async () => {
     try {
-      const res = await API.get("/participants");
+      const res = await API.get("/students");
       setList(res.data);
     } catch (err) {
-      setError("Erro ao carregar participantes");
+      setError("Erro ao carregar alunos");
     }
   };
 
@@ -23,28 +23,28 @@ export default function Participants() {
 
   const handleCreate = async () => {
     try {
-      await API.post("/participants", novo);
+      await API.post("/students", novo);
       setNovo({ name: "", email: "", phone: "" });
-      setSuccess("Participante criado com sucesso!");
+      setSuccess("Aluno criado com sucesso!");
       load();
     } catch (err) {
-      setError("Erro ao criar participante");
+      setError("Erro ao criar aluno");
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      await API.delete(`/participants/${id}`);
-      setSuccess("Participante removido com sucesso!");
+      await API.delete(`/students/${id}`);
+      setSuccess("Aluno removido com sucesso!");
       load();
     } catch (err) {
-      setError("Erro ao remover participante");
+      setError("Erro ao remover aluno");
     }
   };
 
   return (
     <div className="container">
-      <h2>Participantes</h2>
+      <h2>Alunos</h2>
       
       {error && <div className="error">{error}</div>}
       {success && <div className="success">{success}</div>}
@@ -67,7 +67,7 @@ export default function Participants() {
           value={novo.phone}
           onChange={(e) => setNovo({ ...novo, phone: e.target.value })} 
         />
-        <button type="submit">Criar Participante</button>
+        <button type="submit">Adicionar Aluno</button>
       </form>
 
       <div className="list">

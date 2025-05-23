@@ -6,20 +6,15 @@ export default function Subjects() {
   const [subjects, setSubjects] = useState([]);
   const [newSubject, setNewSubject] = useState({
     name: "",
-    description: "",
-    start_date: "",
-    end_date: "",
-    status: "active"
+    description: ""
   });
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const loadSubjects = async () => {
     try {
       const res = await API.get("/subjects");
       setSubjects(res.data);
     } catch (err) {
-      setError("Erro ao carregar disciplinas");
+      console.log("Erro ao carregar disciplinas");
     }
   };
 
@@ -29,28 +24,23 @@ export default function Subjects() {
 
   const handleCreate = async () => {
     try {
-      await API.post("/subjects", newSubject);
+      const res = await API.post("/subjects", newSubject);
       setNewSubject({
         name: "",
-        description: "",
-        start_date: "",
-        end_date: "",
-        status: "active"
+        description: ""
       });
-      setSuccess("Disciplina criada com sucesso!");
       loadSubjects();
     } catch (err) {
-      setError("Erro ao criar disciplina");
+      console.log("Erro ao criar disciplina");
     }
   };
 
   const handleDelete = async (id) => {
     try {
       await API.delete(`/subjects/${id}`);
-      setSuccess("Disciplina removida com sucesso!");
       loadSubjects();
     } catch (err) {
-      setError("Erro ao remover disciplina");
+      console.log("Erro ao remover disciplina");
     }
   };
 
@@ -61,9 +51,6 @@ export default function Subjects() {
   return (
     <div className="container">
       <h2>Disciplinas</h2>
-      
-      {error && <div className="error">{error}</div>}
-      {success && <div className="success">{success}</div>}
 
       <form onSubmit={(e) => { e.preventDefault(); handleCreate(); }}>
         <input 
@@ -78,55 +65,25 @@ export default function Subjects() {
           onChange={(e) => setNewSubject({ ...newSubject, description: e.target.value })} 
           required
         />
-        <div className="date-inputs">
-          <input 
-            type="date"
-            placeholder="Data de Início" 
-            value={newSubject.start_date}
-            onChange={(e) => setNewSubject({ ...newSubject, start_date: e.target.value })} 
-            required
-          />
-          <input 
-            type="date"
-            placeholder="Data de Término" 
-            value={newSubject.end_date}
-            onChange={(e) => setNewSubject({ ...newSubject, end_date: e.target.value })} 
-            required
-          />
-        </div>
-        <select
-          value={newSubject.status}
-          onChange={(e) => setNewSubject({ ...newSubject, status: e.target.value })}
-          required
-        >
-          <option value="active">Ativa</option>
-          <option value="completed">Concluída</option>
-          <option value="cancelled">Cancelada</option>
-        </select>
         <button type="submit">Criar Disciplina</button>
       </form>
 
       <div className="list">
-        {subjects.map(subject => (
-          <div key={subject.id} className="list-item">
-            <div>
-              <strong>{subject.name}</strong>
-              <p>{subject.description}</p>
-              <div className="activity-dates">
-                <span>Início: {formatDate(subject.start_date)}</span>
-                <span>Término: {formatDate(subject.end_date)}</span>
+        {subjects.length === 0 ? (
+          <div className="empty-state">Nenhuma disciplina cadastrada</div>
+        ) : (
+          subjects.map(subject => (
+            <div key={subject.id} className="list-item">
+              <div>
+                <strong>{subject.name}</strong>
+                <p>{subject.description}</p>
               </div>
-              <div className={`status ${subject.status}`}>
-                {subject.status === 'active' && 'Ativa'}
-                {subject.status === 'completed' && 'Concluída'}
-                {subject.status === 'cancelled' && 'Cancelada'}
-              </div>
+              <button onClick={() => handleDelete(subject.id)} className="delete-btn">
+                Excluir
+              </button>
             </div>
-            <button onClick={() => handleDelete(subject.id)} className="delete-btn">
-              Excluir
-            </button>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

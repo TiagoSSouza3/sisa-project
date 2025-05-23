@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import API from "../api";
 
-export default function DocumentUploader({ activityId }) {
+export default function DocumentUploader({ subjectId }) {
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState("");
 
@@ -11,7 +11,7 @@ export default function DocumentUploader({ activityId }) {
       const base64 = reader.result.split(",")[1];
       await API.post("/documents", {
         title,
-        activity_id: activityId,
+        subject_id: subjectId,
         file_name: file.name,
         file_type: file.type,
         file_data: base64,

@@ -301,7 +301,7 @@ textarea {
   line-height: 1.6;
 }
 
-.activity-dates {
+.subject-dates {
   display: flex;
   gap: 2rem;
   margin: 0.5rem 0;
@@ -311,7 +311,7 @@ textarea {
   align-items: center;
 }
 
-.activity-dates span {
+.subject-dates span {
   display: flex;
   align-items: center;
   gap: 0.5rem;

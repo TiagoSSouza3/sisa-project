@@ -1,4 +1,3 @@
-
 -- Database: SISA
 
 CREATE DATABASE IF NOT EXISTS sisa;
@@ -7,69 +6,72 @@ USE sisa;
 -- Ocupações (Tipos de usuários)
 CREATE TABLE occupation (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL
+    name ENUM('Administrador', 'Colaborador', 'Professor') NOT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- Usuários
 CREATE TABLE user (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
-    occupation_id INT,
-    FOREIGN KEY (occupation_id) REFERENCES occupation(id)
+    occupation_id ENUM('Administrador', 'Colaborador', 'Professor')
 );
 
 -- Permissões configuráveis por ocupação
-CREATE TABLE permission (
+CREATE TABLE permissions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     occupation_id INT,
-    can_edit_students BOOLEAN DEFAULT FALSE,
+    can_edit_subjects BOOLEAN DEFAULT FALSE,
     can_edit_activities BOOLEAN DEFAULT FALSE,
     can_upload_documents BOOLEAN DEFAULT FALSE,
     can_edit_permissions BOOLEAN DEFAULT FALSE,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (occupation_id) REFERENCES occupation(id)
 );
 
--- Participantes (Alunos)
-CREATE TABLE participant (
+-- Estudantes
+CREATE TABLE students (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(100),
-    phone VARCHAR(20),
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255),
+    phone VARCHAR(255),
     birth_date DATE,
     address TEXT,
-    notes TEXT
+    notes TEXT,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Atividades (Turmas / Aulas)
-CREATE TABLE activity (
+-- Disciplinas/Matérias
+CREATE TABLE subjects (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
+    name VARCHAR(255) NOT NULL,
     description TEXT,
     professor_id INT,
     FOREIGN KEY (professor_id) REFERENCES user(id)
 );
 
--- Participantes em Atividades
-CREATE TABLE activity_participant (
+-- Documentos
+CREATE TABLE documents (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    activity_id INT,
-    participant_id INT,
-    FOREIGN KEY (activity_id) REFERENCES activity(id),
-    FOREIGN KEY (participant_id) REFERENCES participant(id)
-);
-
--- Documentos ligados às atividades
-CREATE TABLE document (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    activity_id INT,
-    title VARCHAR(100),
+    subject_id INT,
+    title VARCHAR(255),
     file_name VARCHAR(255),
-    file_type VARCHAR(50),
+    file_type VARCHAR(255),
     file_data LONGBLOB,
     created_by INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (activity_id) REFERENCES activity(id),
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (subject_id) REFERENCES subjects(id),
     FOREIGN KEY (created_by) REFERENCES user(id)
 );
+
+-- Inserir ocupações padrão
+INSERT INTO occupation (name) VALUES
+    ('Administrador'),
+    ('Colaborador'),
+    ('Professor');

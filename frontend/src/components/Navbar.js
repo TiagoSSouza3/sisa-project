@@ -9,7 +9,7 @@ export default function Navbar() {
     return location.pathname === path ? "active" : "";
   };
 
-  if (!isLoggedIn || localStorage.length === 0) {
+  if (!isLoggedIn || localStorage.length == 0) {
     return (
       <nav className="navbar">
         <Link to="/" className="navbar-brand">SISA</Link>
@@ -23,7 +23,7 @@ export default function Navbar() {
         <Link to="/dashboard" className="navbar-brand">SISA</Link>
         <div className="navbar-links">
           <Link to="/students" className={isActive("/students")}>
-            Participantes
+            Alunos
           </Link>
           <Link to="/subjects" className={isActive("/subjects")}>
             Atividades
@@ -48,10 +48,10 @@ export default function Navbar() {
           Usuários
         </Link>
         <Link to="/students" className={isActive("/students")}>
-          Participantes
+          Alunos
         </Link>
         <Link to="/subjects" className={isActive("/subjects")}>
-          Atividades
+          Disciplinas
         </Link>
         <Link 
           to="/" 
