@@ -3,9 +3,10 @@ const router = express.Router();
 const controller = require("../controllers/studentsController");
 const authenticateToken = require("../middleware/authMiddleware");
 
-router.get("/", authenticateToken, controller.getAllParticipants);
-router.post("/", authenticateToken, controller.createParticipant);
-router.put("/:id", authenticateToken, controller.updateParticipant);
-router.delete("/:id", authenticateToken, controller.deleteParticipant);
+router.get("/", authenticateToken, controller.getAllStudents);
+router.get("/:id", authenticateToken, controller.getStudentById);
+router.post("/", authenticateToken, controller.createStudent);
+router.put("/:id", authenticateToken, controller.updateStudent);
+router.delete("/:id", authenticateToken, controller.deleteStudent);
 
 module.exports = router;

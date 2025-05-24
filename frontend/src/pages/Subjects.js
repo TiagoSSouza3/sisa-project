@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import API from "../api";
-import "../styles.css";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
+import '../styles/global.css';
+import '../styles/subjects.css';
 
 export default function Subjects() {
   const [subjects, setSubjects] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   const loadSubjects = async () => {
     try {
@@ -40,28 +43,34 @@ export default function Subjects() {
   }
 
   return (
-    <div className="container">
-      <h2>Disciplinas</h2>
-
-      <div className="create-subject">
-        <Link to="/subject_create" className="create-subject-btn">
-          Criar Disciplina
-        </Link>
+    <div className="subjects-container">
+      <div className="subjects-header">
+        <h2>Disciplinas</h2>
+        <button 
+          className="add-subject-button"
+          onClick={() => navigate("/subject_create")}
+        >
+          Adicionar Nova Disciplina
+        </button>
       </div>
 
-      <div className="list">
+      <div className="subjects-list">
         {subjects.length === 0 ? (
           <div className="empty-state">Nenhuma disciplina cadastrada</div>
         ) : (
           subjects.map(subject => (
-            <div key={subject.id} className="list-item">
-              <div>
-                <strong>{subject.name}</strong>
-                <p>{subject.description}</p>
+            <div key={subject.id} className="subject-card">
+              <h3 className="subject-title">{subject.name}</h3>
+              <p className="subject-info">{subject.description}</p>
+              <div className="subject-actions">
+                <button className="edit-button">Editar</button>
+                <button 
+                  className="delete-button"
+                  onClick={() => handleDelete(subject.id)}
+                >
+                  Excluir
+                </button>
               </div>
-              <button onClick={() => handleDelete(subject.id)} className="delete-btn">
-                Excluir
-              </button>
             </div>
           ))
         )}

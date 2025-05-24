@@ -1,0 +1,78 @@
+.subjects-container {
+  padding: 2rem;
+}
+
+.subjects-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.subjects-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.subject-card {
+  background: var(--surface-color);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  transition: var(--transition);
+}
+
+.subject-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+.subject-title {
+  font-size: 1.25rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.subject-info {
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.subject-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.edit-button {
+  background-color: var(--primary-light);
+}
+
+.delete-button {
+  background-color: var(--error-color);
+}
+
+.add-subject-button {
+  background-color: var(--success-color);
+  padding: 0.8rem 1.5rem;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .subjects-list {
+    grid-template-columns: 1fr;
+  }
+  
+  .subjects-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .subject-actions {
+    flex-direction: column;
+  }
+} 

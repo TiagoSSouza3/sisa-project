@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users";
@@ -8,6 +9,8 @@ import Subjects from "./pages/Subjects";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import SubjectCreation from "./pages/Subject_creation";
+
+import './styles/global.css';
 
 function App() {
   return (
@@ -26,3 +29,4 @@ function App() {
 }
 
 export default App;
+
