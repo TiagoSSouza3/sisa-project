@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import API from "../api";
 import SearchBar from "../components/SearchBar";
+import { useNavigate } from "react-router-dom";
 
 import '../styles/global.css';
 import '../styles/students.css';
@@ -9,32 +10,9 @@ export default function Students() {
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [novo, setNovo] = useState({
-    name: "",
-    registration: "",
-    CPF: "",
-    gender: "",
-    skin_color: "",
-    RG: "",
-    email: "",
-    phone: "",
-    second_phone: "",
-    responsable: "",
-    degree_of_kinship: "",
-    UBS: "",
-    is_on_school: false,
-    school_year: "",
-    school_name: "",
-    school_period: "",
-    birth_date: "",
-    address: "",
-    neighborhood: "",
-    cep: "",
-    notes: "",
-    active: true
-  });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadStudents();
@@ -47,7 +25,7 @@ export default function Students() {
       const searchTermLower = searchTerm.toLowerCase();
       const filtered = students.filter(student => 
         student.name.toLowerCase().includes(searchTermLower) ||
-        student.registration.toString().includes(searchTerm) ||
+        String(student.registration).toLowerCase().includes(searchTermLower) ||
         (student.email && student.email.toLowerCase().includes(searchTermLower))
       );
       setFilteredStudents(filtered);
@@ -58,45 +36,13 @@ export default function Students() {
     try {
       const res = await API.get("/students");
       setStudents(res.data);
+      
       setFilteredStudents(res.data);
     } catch (err) {
       setError("Erro ao carregar alunos");
     }
   };
 
-  const handleCreate = async () => {
-    try {
-      await API.post("/students", novo);
-      await loadStudents();
-      setNovo({
-        name: "",
-        registration: "",
-        CPF: "",
-        gender: "",
-        skin_color: "",
-        RG: "",
-        email: "",
-        phone: "",
-        second_phone: "",
-        responsable: "",
-        degree_of_kinship: "",
-        UBS: "",
-        is_on_school: false,
-        school_year: "",
-        school_name: "",
-        school_period: "",
-        birth_date: "",
-        address: "",
-        neighborhood: "",
-        cep: "",
-        notes: "",
-        active: true
-      });
-      setSuccess("Aluno criado com sucesso!");
-    } catch (err) {
-      setError("Erro ao criar aluno");
-    }
-  };
 
   const handleDelete = async (id) => {
     try {
@@ -112,7 +58,7 @@ export default function Students() {
     <div className="students-container">
       <div className="students-header">
         <h2>Alunos</h2>
-        <button className="add-student-button" onClick={() => document.getElementById('studentForm').scrollIntoView({ behavior: 'smooth' })}>
+        <button className="add-student-button" onClick={() => navigate('/student_create')}>
           Adicionar Novo Aluno
         </button>
       </div>
@@ -145,50 +91,6 @@ export default function Students() {
           </div>
         ))}
       </div>
-
-      <form
-        id="studentForm"
-        className="student-form" 
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleCreate();
-        }}
-      >
-        <h3>Adicionar Novo Aluno</h3>
-        <div className="form-group">
-          <label htmlFor="name">Nome</label>
-          <input 
-            id="name"
-            type="text"
-            placeholder="Digite o nome do aluno"
-            value={novo.name}
-            onChange={(e) => setNovo({ ...novo, name: e.target.value })}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="registration">Matrícula</label>
-          <input 
-            id="registration"
-            type="text"
-            placeholder="Digite a matrícula"
-            value={novo.registration}
-            onChange={(e) => setNovo({ ...novo, registration: e.target.value })}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input 
-            id="email"
-            type="email"
-            placeholder="Digite o email"
-            value={novo.email}
-            onChange={(e) => setNovo({ ...novo, email: e.target.value })}
-          />
-        </div>
-        <button type="submit" className="add-student-button">Criar Aluno</button>
-      </form>
     </div>
   );
 }

@@ -61,9 +61,21 @@
   font-weight: 600;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .subjects-list {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .subjects-container {
+    padding: 1rem;
+  }
+  
+  .subjects-list {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
   }
   
   .subjects-header {
@@ -74,5 +86,40 @@
   
   .subject-actions {
     flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .subject-actions button {
+    width: 100%;
+  }
+
+  .subject-card {
+    padding: 1.2rem;
+  }
+
+  .subject-title {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .subjects-container {
+    padding: 0.5rem;
+  }
+
+  .subjects-list {
+    grid-template-columns: 1fr;
+  }
+
+  .subject-card {
+    padding: 1rem;
+  }
+
+  .subject-title {
+    font-size: 1rem;
+  }
+
+  .subject-info {
+    font-size: 0.9rem;
   }
 } 

@@ -3,13 +3,10 @@ const Parent = require("../models/Parent");
 
 exports.getAllStudents = async (req, res) => {
   try {
-    const list = await Student.findAll({
-      include: [
-        { model: Parent, as: 'parent' },
-        { model: Parent, as: 'second_parent' }
-      ]
-    });
+    console.log("getAllStudents");
+    const list = await Student.findAll();
     res.json(list);
+    console.log(list);
   } catch (error) {
     res.status(500).json({ error: "Erro ao buscar alunos" });
   }

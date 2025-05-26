@@ -256,20 +256,77 @@
 }
 
 @media (max-width: 768px) {
+  .students-container {
+    padding: 1rem;
+  }
+
   .students-header {
     flex-direction: column;
     gap: 1rem;
     text-align: center;
   }
 
+  .header-top {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .search-filter-container {
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .filters {
+    padding-left: 0;
+    border-left: none;
+    border-top: 2px solid var(--border-color);
+    padding-top: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
   .student-item {
     flex-direction: column;
     text-align: center;
     gap: 1rem;
+    padding: 1rem;
   }
 
   .student-actions {
     width: 100%;
     justify-content: center;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .student-actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .students-container {
+    padding: 0.5rem;
+  }
+
+  .search-filter-container {
+    padding: 0.8rem;
+  }
+
+  .filter-label {
+    font-size: 0.9rem;
+  }
+
+  .student-name {
+    font-size: 1rem;
+  }
+
+  .student-details {
+    font-size: 0.85rem;
+  }
+
+  .student-status {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
   }
 } 

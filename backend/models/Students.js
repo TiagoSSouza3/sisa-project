@@ -1,6 +1,5 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config");
-const Parent = require("./Parent");
 
 const Students = sequelize.define("students", {
   id: {
@@ -13,8 +12,7 @@ const Students = sequelize.define("students", {
     allowNull: false
   },
   registration: {
-    type: DataTypes.INTEGER,
-    allowNull: false
+    type: DataTypes.INTEGER
   },
   CPF: {
     type: DataTypes.CHAR(15)
@@ -27,20 +25,6 @@ const Students = sequelize.define("students", {
   },
   RG: {
     type: DataTypes.CHAR(12)
-  },
-  parent_id: {
-    type: DataTypes.INTEGER,
-    references: {
-      model: Parent,
-      key: 'id'
-    }
-  },
-  second_parent_id: {
-    type: DataTypes.INTEGER,
-    references: {
-      model: Parent,
-      key: 'id'
-    }
   },
   email: {
     type: DataTypes.STRING
@@ -99,9 +83,5 @@ const Students = sequelize.define("students", {
     defaultValue: DataTypes.NOW
   }
 });
-
-
-Students.belongsTo(Parent, { foreignKey: 'parent_id', as: 'parent' });
-Students.belongsTo(Parent, { foreignKey: 'second_parent_id', as: 'second_parent' });
 
 module.exports = Students;

@@ -6,9 +6,11 @@ import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users";
 import Students from "./pages/Students";
 import Subjects from "./pages/Subjects";
+import SubjectCreation from "./pages/Subject_creation";
+import StudentsCreation from "./pages/Students_creation";
+
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
-import SubjectCreation from "./pages/Subject_creation";
 
 import './styles/global.css';
 
@@ -23,6 +25,7 @@ function App() {
         <Route path="/students" element={<ProtectedRoute><Students /></ProtectedRoute>} />
         <Route path="/subjects" element={<ProtectedRoute><Subjects /></ProtectedRoute>} />
         <Route path="/subject_create" element={<ProtectedRoute><SubjectCreation /></ProtectedRoute>} />
+        <Route path="/student_create" element={<ProtectedRoute><StudentsCreation /></ProtectedRoute>} />
       </Routes>
     </Router>
   );
