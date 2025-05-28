@@ -1,0 +1,81 @@
+import Student from "../models/Students.js";
+import Parent from "../models/Parent.js";
+
+export const getAllStudents = async (req, res) => {
+  try {
+    console.log("getAllStudents");
+    const list = await Student.findAll();
+    res.json(list);
+    console.log(list);
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao buscar alunos" });
+  }
+};
+
+export const createStudent = async (req, res) => {
+  try {
+    const student = await Student.create(req.body);
+    res.status(201).json(student);
+  } catch (error) {
+    res.status(400).json({ error: "Erro ao criar aluno. Verifique se todos os campos obrigatórios foram preenchidos." });
+  }
+};
+
+export const updateStudent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [updated] = await Student.update(req.body, { 
+      where: { id },
+      returning: true
+    });
+    
+    if (updated) {
+      const updatedStudent = await Student.findByPk(id, {
+        include: [
+          { model: Parent, as: 'parent' },
+          { model: Parent, as: 'second_parent' }
+        ]
+      });
+      res.json(updatedStudent);
+    } else {
+      res.status(404).json({ error: "Aluno não encontrado" });
+    }
+  } catch (error) {
+    res.status(400).json({ error: "Erro ao atualizar aluno" });
+  }
+};
+
+export const deleteStudent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await Student.destroy({ where: { id } });
+    
+    if (deleted) {
+      res.status(204).end();
+    } else {
+      res.status(404).json({ error: "Aluno não encontrado" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao excluir aluno" });
+  }
+};
+
+export const getStudentById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const student = await Student.findByPk(id, {
+      include: [
+        { model: Parent, as: 'parent' },
+        { model: Parent, as: 'second_parent' }
+      ]
+    });
+    
+    if (student) {
+      res.json(student);
+    } else {
+      res.status(404).json({ error: "Aluno não encontrado" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao buscar aluno" });
+  }
+};
