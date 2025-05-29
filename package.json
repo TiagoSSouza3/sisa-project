@@ -1,34 +1,12 @@
 {
-  "name": "sisa-project",
-  "version": "1.0.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
-    "client": "react-scripts start",
-    "build": "react-scripts build",
-    "dev:all": "concurrently \"npm run dev\" \"npm run client\""
-  },
   "dependencies": {
-    "axios": "^1.6.0",
+    "@ionic/react": "^8.5.7",
+    "@ionic/react-router": "^8.5.7",
     "bcryptjs": "^3.0.2",
-    "body-parser": "^2.2.0",
-    "cors": "^2.8.5",
-    "cpf-cnpj-validator": "^1.0.3",
-    "dotenv": "^16.5.0",
-    "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "mysql2": "^3.14.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.3.0",
-    "react-scripts": "^5.0.1",
-    "sequelize": "^6.37.7"
+    "cpf-cnpj-validator": "^1.0.3"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2",
-    "nodemon": "^2.0.22"
+    "react-scripts": "^5.0.1"
   },
   "browserslist": {
     "production": [
