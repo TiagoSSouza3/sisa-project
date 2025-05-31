@@ -3,7 +3,8 @@
     "@ionic/react": "^8.5.7",
     "@ionic/react-router": "^8.5.7",
     "bcryptjs": "^3.0.2",
-    "cpf-cnpj-validator": "^1.0.3"
+    "cpf-cnpj-validator": "^1.0.3",
+    "react-icons": "^5.5.0"
   },
   "devDependencies": {
     "react-scripts": "^5.0.1"

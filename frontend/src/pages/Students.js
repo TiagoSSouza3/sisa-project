@@ -119,16 +119,6 @@ export default function Students() {
     }
   };
 
-  const handleDelete = async (id) => {
-    try {
-      await API.delete(`/students/${id}`);
-      setStudents(students.filter(s => s.id !== id));
-      setSuccess("Aluno removido com sucesso!");
-    } catch (err) {
-      setError("Erro ao remover aluno");
-    }
-  };
-
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
   };

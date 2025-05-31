@@ -209,13 +209,4 @@ h2 {
     padding: 0.4rem 0.8rem;
     font-size: 0.9rem;
   }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background-color: #121212;
-    --surface-color: #1e1e1e;
-    --text-color: #ffffff;
-    --text-light: #ffffff;
-  }
 } 
