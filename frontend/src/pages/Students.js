@@ -151,16 +151,11 @@ export default function Students() {
       <div className="students-header">
         <h2>Alunos</h2>
         <div className="header-actions">
-          <div className="filter-actions-group">
-            <button className="filter-button" onClick={handleOpenFilterModal}>
-              Filtros Avançados
-            </button>
-            <button className="clear-button" onClick={handleClearFilters}>
-              Limpar Filtros
-            </button>
-          </div>
           <button className="add-student-button" onClick={() => navigate('/student_create')}>
             Adicionar Novo Aluno
+          </button>
+          <button className="summary-data-button" onClick={() => navigate('/summary_data')}>
+            Dados Resumidos
           </button>
         </div>
       </div>
@@ -172,12 +167,20 @@ export default function Students() {
           placeholder="Pesquisar por nome ou matrícula"
           count={filteredStudents.length}
         />
+        <div className="filter-actions-group">
+            <button className="filter-button" onClick={handleOpenFilterModal}>
+              Filtros Avançados
+            </button>
+            <button className="clear-button" onClick={handleClearFilters}>
+              Limpar Filtros
+            </button>
+          </div>
       </div>
 
       <Modal
         isOpen={isFilterModalOpen}
         onClose={handleCloseFilterModal}
-        title="Filtros Avançados"
+        title="Filtros"
       >
         <Filter 
           onFilterChange={handleFilterChange} 
@@ -197,10 +200,11 @@ export default function Students() {
                 <p>Matrícula: {student.registration}</p>
                 {student.email && <p>Email: {student.email}</p>}
               </div>
-              <span className="student-status">
-                {student.active ? "Ativo" : "Inativo"}
-                {student.is_on_school && " • Estudando"}
-              </span>
+              <div className="student-status">
+                <span className={`status-badge ${student.active ? 'active' : 'inactive'}`}>
+                  {student.active ? "Ativo" : "Inativo"}
+                </span>
+              </div>
             </div>
             <div className="student-actions">
               <button className="edit-button" onClick={() => handleEdit(student.id)}>

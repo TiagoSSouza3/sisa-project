@@ -7,6 +7,7 @@ const userRoutes = require("./routes/userRoutes");
 const studentsRoutes = require("./routes/studentsRoute");
 const subjectRoutes = require("./routes/subjectRoutes");
 const documentRoutes = require("./routes/documentRoutes");
+const summaryDataRoutes = require("./routes/summaryDataRoutes");
 const http = require('http');
 const https = require('https');
 const fs = require('fs');
@@ -59,6 +60,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/students", studentsRoutes);
 app.use("/api/subjects", subjectRoutes);
 app.use("/api/documents", documentRoutes);
+app.use("/api/summary_data", summaryDataRoutes);
 
 app.get("/", (req, res) => {
   res.send("SISA API is running.");

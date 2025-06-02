@@ -70,6 +70,20 @@ CREATE TABLE documents (
     FOREIGN KEY (created_by) REFERENCES user(id)
 );
 
+-- Dados Resumidos
+CREATE TABLE summary_data (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    students_active INT,
+    students_total INT,
+    students_male INT,
+    students_female INT,
+    students_family_income INT,
+    students_with_NIS INT,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
 -- Inserir ocupações padrão
 INSERT INTO occupation (name) VALUES
     ('Administrador'),

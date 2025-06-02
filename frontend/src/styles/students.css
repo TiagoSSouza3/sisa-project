@@ -87,6 +87,18 @@
   padding: 1.5rem;
   border-bottom: 1px solid rgba(0,0,0,0.1);
   transition: var(--transition);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .student-item:last-child {
@@ -118,14 +130,34 @@
 }
 
 .student-status {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.status-badge {
   background-color: var(--primary-light);
-  color: var(--text-light);
+  color: white;
   padding: 0.3rem 0.8rem;
   border-radius: 20px;
   font-size: 0.8rem;
   font-weight: 500;
-  display: inline-block;
-  margin-top: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: var(--transition);
+}
+
+.status-badge.active {
+  background-color: var(--success-color);
+}
+
+.status-badge.inactive {
+  background-color: var(--error-color);
+}
+
+.status-badge.studying {
+  background-color: var(--primary-color);
 }
 
 .student-actions {
@@ -162,6 +194,23 @@
 .delete-button:hover {
   background-color: var(--error-color);
   color: white;
+}
+
+.summary-data-button {
+  background-color: var(--primary-light);
+  padding: 0.8rem 1.5rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--border-radius);
+  color: white;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.summary-data-button:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 @media (max-width: 768px) {
