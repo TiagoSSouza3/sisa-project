@@ -10,10 +10,22 @@ exports.getAll = async (req, res) => {
 };
 
 exports.updateSummaryData = async (req, res) => {
+  console.log("updateSummaryData");
   try {
     const summaryData = await SummaryData.update(req.body);
     res.status(201).json(summaryData);
   } catch (error) {
     res.status(400).json({ error: "Erro ao atualizar dados resumidos" });
+  }
+};
+
+exports.createSummaryData = async (req, res) => {
+  console.log("createSummaryData");
+  try {
+    const summaryData = await SummaryData.create(req.body);
+    res.status(201).json(summaryData);
+  } catch (error) {
+    console.error("Error creating summary data:", error);
+    res.status(400).json({ error: "Erro ao criar dados resumidos" });
   }
 };
