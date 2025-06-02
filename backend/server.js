@@ -2,11 +2,13 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
+const path = require("path");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const studentsRoutes = require("./routes/studentsRoute");
 const subjectRoutes = require("./routes/subjectRoutes");
 const documentRoutes = require("./routes/documentRoutes");
+const documentTemplateRoutes = require("./routes/documentTemplateRoutes");
 const summaryDataRoutes = require("./routes/summaryDataRoutes");
 const http = require('http');
 const https = require('https');
@@ -17,6 +19,12 @@ const app = express();
 
 const PORT_HTTP = process.env.PORT || 5000;
 const PORT_HTTPS = process.env.HTTPS_PORT || 5001;
+
+// Criar diretório de uploads se não existir
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir);
+}
 
 if (process.env.NODE_ENV === 'production') {
   // Em produção, o HTTPS será gerenciado por um proxy reverso (como Nginx)
@@ -55,11 +63,15 @@ app.use((req, res, next) => {
   next();
 });
 
+// Servir arquivos estáticos da pasta uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/students", studentsRoutes);
 app.use("/api/subjects", subjectRoutes);
 app.use("/api/documents", documentRoutes);
+app.use("/api/templates", documentTemplateRoutes);
 app.use("/api/summary_data", summaryDataRoutes);
 
 app.get("/", (req, res) => {
