@@ -1,12 +1,12 @@
-const DocumentTemplate = require('../models/DocumentTemplate');
-const { validateUserPermissions } = require('../middleware/auth');
+const { DocumentTemplate, User, Document } = require('../models');
+const { validateUserPermissions } = require('../middleware/authMiddleware');
 
 // Listar todos os templates
 exports.getAllTemplates = async (req, res) => {
     try {
         const templates = await DocumentTemplate.findAll({
             include: [{
-                model: 'User',
+                model: User,
                 as: 'creator',
                 attributes: ['id', 'name']
             }]
@@ -22,7 +22,7 @@ exports.getTemplate = async (req, res) => {
     try {
         const template = await DocumentTemplate.findByPk(req.params.id, {
             include: [{
-                model: 'User',
+                model: User,
                 as: 'creator',
                 attributes: ['id', 'name']
             }]

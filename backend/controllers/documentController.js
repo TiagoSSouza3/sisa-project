@@ -1,26 +1,24 @@
-const Document = require("../models/Document");
-const DocumentVersion = require("../models/DocumentVersion");
-const DocumentTemplate = require("../models/DocumentTemplate");
-const { validateUserPermissions } = require('../middleware/auth');
+const { Document, DocumentVersion, DocumentTemplate, Subject, User } = require('../models');
+const { validateUserPermissions } = require('../middleware/authMiddleware');
 const PDFDocument = require('pdfkit');
 
-// Listar documentos
+
 exports.getDocuments = async (req, res) => {
     try {
         const docs = await Document.findAll({
             include: [
                 {
-                    model: 'Subject',
+                    model: Subject,
                     as: 'subject',
                     attributes: ['id', 'name']
                 },
                 {
-                    model: 'DocumentTemplate',
+                    model: DocumentTemplate,
                     as: 'template',
                     attributes: ['id', 'name']
                 },
                 {
-                    model: 'User',
+                    model: User,
                     as: 'creator',
                     attributes: ['id', 'name']
                 }
@@ -32,23 +30,23 @@ exports.getDocuments = async (req, res) => {
     }
 };
 
-// Obter documento específico
+    // Obter documento específico
 exports.getDocument = async (req, res) => {
     try {
         const doc = await Document.findByPk(req.params.id, {
             include: [
                 {
-                    model: 'Subject',
+                    model: Subject,
                     as: 'subject',
                     attributes: ['id', 'name']
                 },
                 {
-                    model: 'DocumentTemplate',
+                    model: DocumentTemplate,
                     as: 'template',
                     attributes: ['id', 'name', 'structure']
                 },
                 {
-                    model: 'User',
+                    model: User,
                     as: 'creator',
                     attributes: ['id', 'name']
                 }
@@ -65,10 +63,8 @@ exports.getDocument = async (req, res) => {
     }
 };
 
-// Criar novo documento
 exports.createDocument = async (req, res) => {
     try {
-        // Verificar permissão
         if (!await validateUserPermissions(req.user.id, 'can_upload_documents')) {
             return res.status(403).json({ message: 'Permissão negada' });
         }
@@ -83,18 +79,15 @@ exports.createDocument = async (req, res) => {
             file_data 
         } = req.body;
 
-        // Validar template
         const template = await DocumentTemplate.findByPk(template_id);
         if (!template) {
             return res.status(404).json({ message: 'Template não encontrado' });
         }
 
-        // Validar conteúdo contra estrutura do template
         if (!validateContentAgainstTemplate(content, template.structure)) {
             return res.status(400).json({ message: 'Conteúdo não corresponde à estrutura do template' });
         }
 
-        // Criar documento
         const document = await Document.create({
             title,
             subject_id,
@@ -128,7 +121,7 @@ exports.createDocument = async (req, res) => {
 exports.updateDocument = async (req, res) => {
     try {
         const document = await Document.findByPk(req.params.id, {
-            include: [{ model: 'DocumentTemplate', as: 'template' }]
+            include: [{ model: DocumentTemplate, as: 'template' }]
         });
 
         if (!document) {
@@ -200,7 +193,7 @@ exports.getDocumentVersions = async (req, res) => {
         const versions = await DocumentVersion.findAll({
             where: { document_id: req.params.id },
             include: [{
-                model: 'User',
+                model: User,
                 as: 'modifier',
                 attributes: ['id', 'name']
             }],
@@ -218,8 +211,8 @@ exports.downloadDocument = async (req, res) => {
     try {
         const document = await Document.findByPk(req.params.id, {
             include: [
-                { model: 'DocumentTemplate', as: 'template' },
-                { model: 'Subject', as: 'subject' }
+                { model: DocumentTemplate, as: 'template' },
+                { model: Subject, as: 'subject' }
             ]
         });
 
@@ -272,7 +265,7 @@ async function generateDocumentFile(document) {
                 margin: 50,
                 info: {
                     Title: document.title,
-                    Author: 'SISA - Sistema Acadêmico',
+                    Author: 'SISA',
                     Subject: document.subject ? document.subject.name : '',
                     Keywords: 'documento, acadêmico, sisa',
                     CreationDate: new Date()

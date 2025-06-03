@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const documentTemplateController = require('../controllers/documentTemplateController');
-const auth = require('../middleware/auth');
+const auth = require('../middleware/authMiddleware');
 
-// Rotas para templates de documentos
 router.get('/', auth, documentTemplateController.getAllTemplates);
 router.get('/:id', auth, documentTemplateController.getTemplate);
 router.post('/', auth, documentTemplateController.createTemplate);

@@ -3,17 +3,28 @@ const Permission = require('./Permission');
 const Subject = require('./Subject');
 const Student = require('./Students');
 const Document = require('./Document');
+const DocumentTemplate = require('./DocumentTemplate');
+const DocumentVersion = require('./DocumentVersion');
 const Parent = require('./Parent');
 
 // Definir relacionamentos
 Subject.belongsTo(User, { foreignKey: 'professor_id' });
 User.hasMany(Subject, { foreignKey: 'professor_id' });
 
-Document.belongsTo(Subject);
-Subject.hasMany(Document);
+// Document associations
+Document.belongsTo(Subject, { foreignKey: 'subject_id', as: 'subject' });
+Document.belongsTo(DocumentTemplate, { foreignKey: 'template_id', as: 'template' });
+Document.belongsTo(User, { foreignKey: 'created_by', as: 'creator' });
+Document.belongsTo(User, { foreignKey: 'last_modified_by', as: 'lastModifier' });
+Document.hasMany(DocumentVersion, { foreignKey: 'document_id', as: 'versions' });
 
-Document.belongsTo(User, { foreignKey: 'created_by' });
-User.hasMany(Document, { foreignKey: 'created_by' });
+// DocumentVersion associations
+DocumentVersion.belongsTo(Document, { foreignKey: 'document_id', as: 'document' });
+DocumentVersion.belongsTo(User, { foreignKey: 'modified_by', as: 'modifier' });
+
+// DocumentTemplate associations
+DocumentTemplate.belongsTo(User, { foreignKey: 'created_by', as: 'creator' });
+DocumentTemplate.hasMany(Document, { foreignKey: 'template_id', as: 'documents' });
 
 // Student and Parent relationships
 Student.belongsTo(Parent, { foreignKey: 'parent_id', as: 'parent' });
@@ -27,5 +38,7 @@ module.exports = {
   Subject,
   Student,
   Document,
+  DocumentTemplate,
+  DocumentVersion,
   Parent
 }; 
