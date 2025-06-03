@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const base_url = process.env.NODE_ENV === "development" ? process.env.REACT_APP_API_DEVELOPMENT : process.env.REACT_APP_API_PRODUCTION
+
 const API = axios.create({
-  baseURL: process.env.REACT_APP_API,
+  baseURL: base_url,
   headers: {
     'Content-Type': 'application/json'
   }

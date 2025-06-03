@@ -13,7 +13,7 @@ export default function StudentsCreation() {
     const [cpfError, setCpfError] = useState("");
     const [rgError, setRgError] = useState("");
 
-    const [newStudent, setNewStudent] = useState({
+    const [student, setStudent] = useState({
         name: "",
         registration: "",
         CPF: "",
@@ -45,7 +45,7 @@ export default function StudentsCreation() {
       const loadStudents = async () => {
         try {
           const res = await API.get("/students");
-          setNewStudent(res.data);
+          setStudent(res.data);
         } catch (err) {
           console.error("Erro ao carregar alunos:", {
             message: err.message,
@@ -89,14 +89,14 @@ export default function StudentsCreation() {
         const formattedPhone = formatPhoneNumber(phoneValue);
         
         if (isSecondPhone) {
-            setNewStudent({ ...newStudent, second_phone: formattedPhone });
+            setStudent({ ...student, second_phone: formattedPhone });
             if (phoneValue && !validatePhoneNumber(phoneValue)) {
                 setSecondPhoneError("Telefone inválido. Use um número de telefone brasileiro válido.");
             } else {
                 setSecondPhoneError("");
             }
         } else {
-            setNewStudent({ ...newStudent, phone: formattedPhone });
+            setStudent({ ...student, phone: formattedPhone });
             if (phoneValue && !validatePhoneNumber(phoneValue)) {
                 setPhoneError("Telefone inválido. Use um número de telefone brasileiro válido.");
             } else {
@@ -145,7 +145,7 @@ export default function StudentsCreation() {
         const cpfValue = e.target.value;
         const formattedCPF = formatCPF(cpfValue);
         
-        setNewStudent({ ...newStudent, CPF: formattedCPF });
+        setStudent({ ...student, CPF: formattedCPF });
         
         if (cpfValue && !validateCPF(cpfValue)) {
             setCpfError("CPF inválido");
@@ -158,7 +158,7 @@ export default function StudentsCreation() {
         const rgValue = e.target.value;
         const formattedRG = formatRG(rgValue);
         
-        setNewStudent({ ...newStudent, RG: formattedRG });
+        setStudent({ ...student, RG: formattedRG });
         
         if (rgValue && !validateRG(rgValue)) {
             setRgError("RG inválido. Deve conter entre 8 e 14 caracteres.");
@@ -168,30 +168,30 @@ export default function StudentsCreation() {
     };
 
     const handleCreate = async () => {
-        if (!validateCPF(newStudent.CPF)) {
+        if (!validateCPF(student.CPF)) {
             setCpfError("CPF inválido");
             return;
         }
         
-        if (newStudent.RG && !validateRG(newStudent.RG)) {
+        if (student.RG && !validateRG(student.RG)) {
             setRgError("RG inválido");
             return;
         }
 
-        if (!validatePhoneNumber(newStudent.phone)) {
+        if (!validatePhoneNumber(student.phone)) {
             setPhoneError("Telefone principal inválido");
             return;
         }
         
-        if (newStudent.second_phone && !validatePhoneNumber(newStudent.second_phone)) {
+        if (student.second_phone && !validatePhoneNumber(student.second_phone)) {
             setSecondPhoneError("Telefone secundário inválido");
             return;
         }
 
         try {
-            await API.post("/students", newStudent);
+            await API.post("/students", student);
             await loadStudents();
-            setNewStudent({
+            setStudent({
                 name: "",
                 registration: "",
                 CPF: "",
@@ -242,8 +242,8 @@ export default function StudentsCreation() {
                     id="name"
                     type="text"
                     placeholder="Digite o nome do aluno"
-                    value={newStudent.name}
-                    onChange={(e) => setNewStudent({ ...newStudent, name: e.target.value })}
+                    value={student.name}
+                    onChange={(e) => setStudent({ ...student, name: e.target.value })}
                     required
                 />
                 </div>
@@ -253,7 +253,7 @@ export default function StudentsCreation() {
                     id="CPF"
                     type="text"
                     placeholder="Digite o CPF"
-                    value={newStudent.CPF}
+                    value={student.CPF}
                     onChange={handleCPFChange}
                 />
                 {cpfError && <span className="error-message">{cpfError}</span>}
@@ -264,7 +264,7 @@ export default function StudentsCreation() {
                     id="RG"
                     type="text"
                     placeholder="Digite o RG"
-                    value={newStudent.RG}
+                    value={student.RG}
                     onChange={handleRGChange}
                 />
                 {rgError && <span className="error-message">{rgError}</span>}
@@ -277,8 +277,8 @@ export default function StudentsCreation() {
                       type="radio"
                       name="gender"
                       value="Masculino"
-                      checked={newStudent.gender === "Masculino"}
-                      onChange={(e) => setNewStudent({ ...newStudent, gender: e.target.value })}
+                      checked={student.gender === "Masculino"}
+                      onChange={(e) => setStudent({ ...student, gender: e.target.value })}
                   />
                   <label htmlFor="gender-male">Masculino</label>
                   <input 
@@ -286,8 +286,8 @@ export default function StudentsCreation() {
                       type="radio"
                       name="gender"
                       value="Feminino"
-                      checked={newStudent.gender === "Feminino"}
-                      onChange={(e) => setNewStudent({ ...newStudent, gender: e.target.value })}
+                      checked={student.gender === "Feminino"}
+                      onChange={(e) => setStudent({ ...student, gender: e.target.value })}
                   />
                   <label htmlFor="gender-female">Feminino</label>
                 </div>
@@ -298,8 +298,8 @@ export default function StudentsCreation() {
                     id="skin_color"
                     type="text"
                     placeholder="Digite a cor da pele"
-                    value={newStudent.skin_color}
-                    onChange={(e) => setNewStudent({ ...newStudent, skin_color: e.target.value })}
+                    value={student.skin_color}
+                    onChange={(e) => setStudent({ ...student, skin_color: e.target.value })}
                 />
                 </div>
                 <div className="form-group">
@@ -308,8 +308,8 @@ export default function StudentsCreation() {
                     id="email"
                     type="email"
                     placeholder="Digite o email"
-                    value={newStudent.email}
-                    onChange={(e) => setNewStudent({ ...newStudent, email: e.target.value })}
+                    value={student.email}
+                    onChange={(e) => setStudent({ ...student, email: e.target.value })}
                 />
                 </div>
                 <div className="form-group">
@@ -318,7 +318,7 @@ export default function StudentsCreation() {
                         id="phone"
                         type="text"
                         placeholder="Digite o telefone"
-                        value={newStudent.phone}
+                        value={student.phone}
                         onChange={(e) => handlePhoneChange(e, false)}
                     />
                     {phoneError && <span className="error-message">{phoneError}</span>}
@@ -329,7 +329,7 @@ export default function StudentsCreation() {
                         id="second_phone"
                         type="text"
                         placeholder="Digite o telefone"
-                        value={newStudent.second_phone}
+                        value={student.second_phone}
                         onChange={(e) => handlePhoneChange(e, true)}
                     />
                     {secondPhoneError && <span className="error-message">{secondPhoneError}</span>}

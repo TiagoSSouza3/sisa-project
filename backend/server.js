@@ -13,21 +13,70 @@ const summaryDataRoutes = require("./routes/summaryDataRoutes");
 const http = require('http');
 const https = require('https');
 const fs = require('fs');
+const { Sequelize } = require("sequelize");
+const { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME } = process.env;
+require("dotenv").config();
 
-dotenv.config();
+if (process.env.NODE_ENV === 'production') {
+  if (!DB_HOST || !DB_PORT || !DB_USER || !DB_PASSWORD || !DB_NAME) {
+    console.error("As variáveis de ambiente do banco de dados não estão definidas corretamente");
+    throw new Error("Falta configuração do banco de dados no arquivo .env");
+  }
+
+  const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
+    host: DB_HOST,
+    port: DB_PORT,
+    dialect: "mysql",
+    logging: false,
+    define: {
+    timestamps: true
+    },
+    pool: {
+    max: 5,
+    min: 0,
+    acquire: 30000,
+    idle: 10000
+    } 
+  });
+
+  const connectWithRetry = async (retries = 5) => {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+      await this.sequelize.authenticate();
+      console.log("Conexão com o banco de dados estabelecida com sucesso.");
+      await this.sequelize.sync();
+      return;
+      } catch (error) {
+        console.error(`Erro ao conectar ao banco de dados (tentativa${attempt}/${retries}):`, error.message);
+        if (attempt === retries) {
+        throw new Error("Falha ao conectar ao banco de dados após várias tentativas.");
+        }
+        await new Promise(res => setTimeout(res, 5000)); // Wait 5 seconds before retrying
+      }
+    }
+  }
+} else {
+  const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
+    host: DB_HOST,
+    port: DB_PORT,
+    dialect: "mysql"
+  });
+}
+
+
 const app = express();
 
 const PORT_HTTP = process.env.PORT || 5000;
 const PORT_HTTPS = process.env.HTTPS_PORT || 5001;
 
-// Criar diretório de uploads se não existir
 const uploadsDir = path.join(__dirname, 'uploads');
+
+
 if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir);
 }
 
 if (process.env.NODE_ENV === 'production') {
-  // Em produção, o HTTPS será gerenciado por um proxy reverso (como Nginx)
   app.listen(PORT_HTTP, () => {
     console.log(`Server running in production at http://localhost:${PORT_HTTP}`);
   });
@@ -47,23 +96,31 @@ const options = {
 };
 
 // Configuração CORS mais detalhada
-app.use(cors({
-  origin: ['https://localhost:3000', 'https://127.0.0.1:3000'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
+if (process.env.NODE_ENV === 'production') {
+  app.use(cors({
+    origin: ['https://localhost:3000', 'https://127.0.0.1:3000',
+      'https://amused-friendship-production.up.railway.app'],
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+      credentials: true
+    }));
+} else {	
+  app.use(cors({
+    origin: ['https://localhost:3000', 'https://127.0.0.1:3000'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+  }));
+}
 
 app.use(bodyParser.json({ limit: "10mb" }));
 
-// Log de todas as requisições
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
   console.log('Headers:', req.headers);
   next();
 });
 
-// Servir arquivos estáticos da pasta uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use("/api/auth", authRoutes);
@@ -78,14 +135,12 @@ app.get("/", (req, res) => {
   res.send("SISA API is running.");
 });
 
-// Rota de teste
 app.get("/api/test", (req, res) => {
   res.json({ message: "API está funcionando!" });
 });
 
 const PORT = process.env.PORT || 5000;
 
-// Função para tentar iniciar o servidor em diferentes portas
 const startServer = (port) => {
   app.listen(port, () => {
     console.log(`Server running on port ${port}`);
@@ -100,3 +155,10 @@ const startServer = (port) => {
     }
   });
 };
+
+if (process.env.NODE_ENV == 'production') {
+  this.connectWithRetry();
+
+  module.exports = this.sequelize;
+}
+
