@@ -138,6 +138,11 @@ export default function Students() {
     setFilters(clearedFilters);
   };
 
+  const handleEdit = (studentId) => {
+    const url = '/student_create/' + studentId
+    navigate(url);
+  }
+
   const handleOpenFilterModal = () => {
     setIsFilterModalOpen(true);
   };

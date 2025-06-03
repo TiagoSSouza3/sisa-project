@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import API from "../api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { cpf } from "cpf-cnpj-validator";
 
 import '../styles/global.css';
 import '../styles/students-creation.css';
 
 export default function StudentsCreation() {
+    const { studentId } = useParams();
     const navigate = useNavigate();
     const [phoneError, setPhoneError] = useState("");
     const [secondPhoneError, setSecondPhoneError] = useState("");
@@ -39,21 +40,7 @@ export default function StudentsCreation() {
       });
 
       useEffect(() => {
-        loadStudents();
       }, []);
-
-      const loadStudents = async () => {
-        try {
-          const res = await API.get("/students");
-          setStudent(res.data);
-        } catch (err) {
-          console.error("Erro ao carregar alunos:", {
-            message: err.message,
-            response: err.response?.data,
-            status: err.response?.status
-          });
-        }
-      };
 
       const validatePhoneNumber = (phone) => {
         const cleanPhone = phone.replace(/\D/g, '');
@@ -224,6 +211,10 @@ export default function StudentsCreation() {
             });
         }
     };
+
+    if (studentId) {
+        setStudent = student.id === studentId
+    }
 
     return (
         <div className="student-creation-container">
