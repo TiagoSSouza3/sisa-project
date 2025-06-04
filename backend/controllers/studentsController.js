@@ -22,23 +22,17 @@ exports.createStudent = async (req, res) => {
 exports.updateStudent = async (req, res) => {
   try {
     const { id } = req.params;
-    const [updated] = await Student.update(req.body, { 
-      where: { id },
-      returning: true
-    });
+    const student = await Student.findByPk(id);
     
-    if (updated) {
-      const updatedStudent = await Student.findByPk(id, {
-        include: [
-          { model: Parent, as: 'parent' },
-          { model: Parent, as: 'second_parent' }
-        ]
-      });
-      res.json(updatedStudent);
-    } else {
-      res.status(404).json({ error: "Aluno não encontrado" });
+    if (!student) {
+      return res.status(404).json({ error: "Aluno não encontrado" });
     }
+
+    await student.update(req.body);
+    const updatedStudent = await Student.findByPk(id);
+    res.json(updatedStudent);
   } catch (error) {
+    console.error("Erro ao atualizar aluno:", error);
     res.status(400).json({ error: "Erro ao atualizar aluno" });
   }
 };
@@ -61,12 +55,7 @@ exports.deleteStudent = async (req, res) => {
 exports.getStudentById = async (req, res) => {
   try {
     const { id } = req.params;
-    const student = await Student.findByPk(id, {
-      include: [
-        { model: Parent, as: 'parent' },
-        { model: Parent, as: 'second_parent' }
-      ]
-    });
+    const student = await Student.findOne({where: {id: id}});
     
     if (student) {
       res.json(student);

@@ -7,7 +7,7 @@ import '../styles/global.css';
 import '../styles/students-creation.css';
 
 export default function StudentsCreation() {
-    const { studentId } = useParams();
+    const { id } = useParams();
     const navigate = useNavigate();
     const [phoneError, setPhoneError] = useState("");
     const [secondPhoneError, setSecondPhoneError] = useState("");
@@ -16,7 +16,7 @@ export default function StudentsCreation() {
 
     const [student, setStudent] = useState({
         name: "",
-        registration: "",
+        registration: 0,
         CPF: "",
         gender: "",
         skin_color: "",
@@ -31,18 +31,32 @@ export default function StudentsCreation() {
         school_year: "",
         school_name: "",
         school_period: "",
-        birth_date: "",
+        birth_date: Date,
         address: "",
         neighborhood: "",
         cep: "",
         notes: "",
-        active: true
-      });
+        active: true,
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+    });
 
-      useEffect(() => {
-      }, []);
+    useEffect(() => {
+        if (id) {
+            getStudentById();
+        }
+    }, [id]);
 
-      const validatePhoneNumber = (phone) => {
+    const getStudentById = async () => {
+        try {
+            const response = await API.get(`/students/${id}`);
+            setStudent(response.data);
+        } catch (err) {
+            console.error("Erro ao buscar aluno:", err);
+        }
+    };
+
+    const validatePhoneNumber = (phone) => {
         const cleanPhone = phone.replace(/\D/g, '');
         
         if (!cleanPhone) return true;
@@ -176,45 +190,21 @@ export default function StudentsCreation() {
         }
 
         try {
-            await API.post("/students", student);
-            await loadStudents();
-            setStudent({
-                name: "",
-                registration: "",
-                CPF: "",
-                gender: "",
-                skin_color: "",
-                RG: "",
-                email: "",
-                phone: "",
-                second_phone: "",
-                responsable: "",
-                degree_of_kinship: "",
-                UBS: "",
-                is_on_school: false,
-                school_year: "",
-                school_name: "",
-                school_period: "",
-                birth_date: "",
-                address: "",
-                neighborhood: "",
-                cep: "",
-                notes: "",
-                active: true
-            });
+            if (id) {
+                await API.put(`/students/${id}`, student);
+            } else {
+                console.log(student)
+                await API.post("/students", student);
+            }
             navigate("/students");
         } catch (err) {
-            console.error("Erro ao criar aluno:", {
+            console.error("Erro ao salvar aluno:", {
                 message: err.message,
                 response: err.response?.data,
                 status: err.response?.status
             });
         }
     };
-
-    if (studentId) {
-        setStudent = student.id === studentId
-    }
 
     return (
         <div className="student-creation-container">
@@ -226,14 +216,14 @@ export default function StudentsCreation() {
                     handleCreate();
                 }}
             >
-                <h3>Adicionar Novo Aluno</h3>
+                <h3>{id ? 'Editar Aluno' : 'Adicionar Novo Aluno'}</h3>
                 <div className="form-group">
                 <label htmlFor="name">Nome</label>
                 <input 
                     id="name"
                     type="text"
                     placeholder="Digite o nome do aluno"
-                    value={student.name}
+                    value={student?.name}
                     onChange={(e) => setStudent({ ...student, name: e.target.value })}
                     required
                 />
@@ -325,7 +315,9 @@ export default function StudentsCreation() {
                     />
                     {secondPhoneError && <span className="error-message">{secondPhoneError}</span>}
                 </div>
-                <button type="submit" className="add-student-button">Criar Aluno</button>
+                <button type="submit" className="add-student-button">
+                    {id ? 'Salvar Alterações' : 'Criar Aluno'}
+                </button>
             </form>
         </div>
     );
