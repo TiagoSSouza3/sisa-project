@@ -5,6 +5,21 @@ exports.getAllSubjects = async (req, res) => {
   res.json(subjects);
 };
 
+exports.getSubjectById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(id)
+    const subject = await Subject.findOne({where: {id: id}});
+
+    if (!subject) {
+      return res.status(404).json({ error: "Disciplina não encontrada: " + id });
+    }
+    res.json(subject);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 exports.createSubject = async (req, res) => {
   try {
     const subject = await Subject.create(req.body);

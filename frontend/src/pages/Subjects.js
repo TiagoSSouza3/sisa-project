@@ -7,19 +7,15 @@ import '../styles/subjects.css';
 
 export default function Subjects() {
   const [subjects, setSubjects] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   const loadSubjects = async () => {
     try {
-      setIsLoading(true);
       await API.get("/subjects").then((res) => {
         setSubjects(res.data);
       });
     } catch (err) {
       console.log("Erro ao carregar disciplinas");
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -35,12 +31,6 @@ export default function Subjects() {
       console.log("Erro ao remover disciplina");
     }
   };
-
-  if (!isLoading) {
-    (async () => {
-      await loadSubjects();
-    })();
-  }
 
   return (
     <div className="subjects-container">
@@ -63,7 +53,12 @@ export default function Subjects() {
               <h3 className="subject-title">{subject.name}</h3>
               <p className="subject-info">{subject.description}</p>
               <div className="subject-actions">
-                <button className="edit-button">Editar</button>
+                <button 
+                  className="edit-button"
+                  onClick={() => navigate(`/subject_create/${subject.id}`)}
+                >
+                  Editar
+                </button>
                 <button 
                   className="delete-button"
                   onClick={() => handleDelete(subject.id)}
