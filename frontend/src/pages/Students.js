@@ -202,7 +202,7 @@ export default function Students() {
             <div className="student-info">
               <div className="student-name">{student.name}</div>
               <div className="student-details">
-                <p>Matrícula: {student.registration}</p>
+                <p>Matrícula: {student.id}</p>
                 {student.email && <p>Email: {student.email}</p>}
               </div>
               <div className="student-status">
