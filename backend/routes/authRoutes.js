@@ -26,6 +26,7 @@ router.post("/login", async (req, res) => {
       { expiresIn: '24h' }
     );
 
+    console.log('Generated token:', token); // Log para depuração
     res.json({ token, user });
   } catch (error) {
     res.status(500).json({ 

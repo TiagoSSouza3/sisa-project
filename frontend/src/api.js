@@ -1,7 +1,10 @@
 import axios from "axios";
 
-const base_url = process.env.NODE_ENV === "development" ? process.env.REACT_APP_API_DEVELOPMENT : process.env.REACT_APP_API_PRODUCTION
-
+const base_url = process.env.REACT_APP_API_URL || (
+  process.env.NODE_ENV === "development" 
+    ? "http://localhost:5000" // Local backend URL
+    : "https://sisa-project.up.railway.app" // Correct backend URL without port
+);
 const API = axios.create({
   baseURL: base_url,
   headers: {

@@ -16,6 +16,7 @@ export default function Login() {
     e.preventDefault();
     try {
       const res = await API.post("/auth/login", { email, password });
+      console.log("Login response:", res.data); // Log para depuração
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("occupation_id", res.data.user.occupation_id);
       localStorage.setItem("name", res.data.user.name);
