@@ -4,7 +4,7 @@ const controller = require("../controllers/summaryDataController");
 const authenticateToken = require("../middleware/authMiddleware");
 
 router.get("/", authenticateToken, controller.getAll);
-router.put("/", authenticateToken, controller.updateSummaryData);
 router.post("/", authenticateToken, controller.createSummaryData);
+router.put("/", authenticateToken, controller.updateSummaryData);
 
 module.exports = router;
