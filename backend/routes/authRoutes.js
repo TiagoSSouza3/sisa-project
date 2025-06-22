@@ -14,12 +14,16 @@ router.post("/login", async (req, res) => {
       return res.status(500).json({ error: "Erro de configuração do servidor" });
     }
 
+    console.log("jwt");
+
     const user = await User.findOne({ where: { email } });
     if (!user) return res.status(401).json({ error: "Usuário não encontrado" });
-
+    console.log("user");
+    
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(403).json({ error: "Senha incorreta" });
-
+    console.log("senha");
+    
     const token = jwt.sign(
       { id: user.id, occupation_id: user.occupation_id }, 
       process.env.JWT_SECRET,

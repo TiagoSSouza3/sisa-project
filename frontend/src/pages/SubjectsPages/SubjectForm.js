@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import API from "../api";
+import API from "../../api";
 import { useNavigate, useParams } from "react-router-dom";
 
-import '../styles/global.css';
-import '../styles/subject-creation.css';
+import '../../styles/global.css';
+import '../../styles/subject-creation.css';
 
-export default function SubjectCreation() {
+export default function SubjectForm() {
     const navigate = useNavigate();
     const { id } = useParams();
 

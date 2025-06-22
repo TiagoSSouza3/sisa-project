@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import API from "../api";
+import API from "../../api";
 import { useNavigate } from "react-router-dom";
 
-import '../styles/global.css';
-import '../styles/users-creation.css';
+import '../../styles/global.css';
+import '../../styles/users-creation.css';
 
-export default function UsersCreation() {
+export default function UsersForm() {
     const navigate = useNavigate();
     const [error, setError] = useState("");
 

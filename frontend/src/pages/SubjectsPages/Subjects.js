@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import API from "../api";
+import API from "../../api";
 import { useNavigate } from "react-router-dom";
 
-import '../styles/global.css';
-import '../styles/subjects.css';
+import '../../styles/global.css';
+import '../../styles/subjects.css';
 
 export default function Subjects() {
   const [subjects, setSubjects] = useState([]);
@@ -38,7 +38,7 @@ export default function Subjects() {
         <h2>Disciplinas</h2>
         <button 
           className="add-subject-button"
-          onClick={() => navigate("/subject_create")}
+          onClick={() => navigate("/subject_form")}
         >
           Adicionar Nova Disciplina
         </button>
@@ -55,7 +55,7 @@ export default function Subjects() {
               <div className="subject-actions">
                 <button 
                   className="edit-button"
-                  onClick={() => navigate(`/subject_create/${subject.id}`)}
+                  onClick={() => navigate(`/subject_form/${subject.id}`)}
                 >
                   Editar
                 </button>

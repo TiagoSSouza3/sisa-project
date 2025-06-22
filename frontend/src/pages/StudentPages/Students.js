@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import API from "../api";
-import SearchBar from "../components/SearchBar";
-import Filter from "../components/Filter";
-import Modal from "../components/Modal";
+import API from "../../api";
+import SearchBar from "../../components/SearchBar";
+import Filter from "../../components/Filter";
+import Modal from "../../components/Modal";
 import { useNavigate } from "react-router-dom";
 
-import '../styles/global.css';
-import '../styles/students.css';
+import '../../styles/global.css';
+import '../../styles/students.css';
 
 export default function Students() {
   const [students, setStudents] = useState([]);
@@ -28,7 +28,11 @@ export default function Students() {
     neighborhood: ''
   });
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(token !== null);
     loadStudents();
   }, []);
 
@@ -139,7 +143,7 @@ export default function Students() {
   };
 
   const handleEdit = (studentId) => {
-    const url = '/student_create/' + studentId
+    const url = '/student_form/' + studentId
     navigate(url);
   }
 
@@ -156,7 +160,7 @@ export default function Students() {
       <div className="students-header">
         <h2>Alunos</h2>
         <div className="header-actions">
-          <button className="add-student-button" onClick={() => navigate('/student_create')}>
+          <button className="add-student-button" onClick={() => navigate('/student_form')}>
             Adicionar Novo Aluno
           </button>
           <button className="summary-data-button" onClick={() => navigate('/summary_data')}>
@@ -211,11 +215,14 @@ export default function Students() {
                 </span>
               </div>
             </div>
-            <div className="student-actions">
-              <button className="edit-button" onClick={() => handleEdit(student.id)}>
-                <i className="fas fa-edit"></i> Editar
-              </button>
-            </div>
+            {isLoggedIn && localStorage.getItem("occupation_id") !== "PROFESSOR"
+              ? <div className="student-actions">
+                <button className="edit-button" onClick={() => handleEdit(student.id)}>
+                  <i className="fas fa-edit"></i> Editar
+                </button>
+              </div>
+              : ""
+            }
           </div>
         ))}
       </div>

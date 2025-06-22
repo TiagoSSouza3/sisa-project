@@ -3,13 +3,13 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import Users from "./pages/Users";
-import Students from "./pages/Students";
-import Subjects from "./pages/Subjects";
-import SubjectCreation from "./pages/Subject_creation";
-import StudentsCreation from "./pages/Students_creation";
-import UsersCreation from "./pages/Users_creation";
-import Summary_data from "./pages/Summary_data";
+import Users from "./pages/UserPages/Users";
+import Students from "./pages/StudentPages/Students";
+import StudentsForm from "./pages/StudentPages/StudentsForm";
+import Subjects from "./pages/SubjectsPages/Subjects";
+import SubjectForm from "./pages/SubjectsPages/SubjectForm";
+import UsersForm from "./pages/UserPages/UsersForm";
+import Summary_data from "./pages/StudentPages/SummaryData";
 
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -26,11 +26,11 @@ function App() {
         <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
         <Route path="/students" element={<ProtectedRoute><Students /></ProtectedRoute>} />
         <Route path="/subjects" element={<ProtectedRoute><Subjects /></ProtectedRoute>} />
-        <Route path="/subject_create" element={<ProtectedRoute><SubjectCreation /></ProtectedRoute>} />
-        <Route path="/subject_create/:id" element={<ProtectedRoute><SubjectCreation /></ProtectedRoute>} />
-        <Route path="/student_create" element={<ProtectedRoute><StudentsCreation /></ProtectedRoute>} />
-        <Route path="/student_create/:id" element={<ProtectedRoute><StudentsCreation /></ProtectedRoute>} />
-        <Route path="/users_create" element={<ProtectedRoute><UsersCreation /></ProtectedRoute>} />
+        <Route path="/subject_form" element={<ProtectedRoute><SubjectForm /></ProtectedRoute>} />
+        <Route path="/subject_form/:id" element={<ProtectedRoute><SubjectForm /></ProtectedRoute>} />
+        <Route path="/student_form" element={<ProtectedRoute><StudentsForm /></ProtectedRoute>} />
+        <Route path="/student_form/:id" element={<ProtectedRoute><StudentsForm /></ProtectedRoute>} />
+        <Route path="/users_form" element={<ProtectedRoute><UsersForm /></ProtectedRoute>} />
         <Route path="/summary_data" element={<ProtectedRoute><Summary_data /></ProtectedRoute>} />
       </Routes>
     </Router>

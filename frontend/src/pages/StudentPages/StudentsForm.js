@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import API from "../api";
+import API from "../../api";
 import { useNavigate, useParams } from "react-router-dom";
 import { cpf } from "cpf-cnpj-validator";
 
-import '../styles/global.css';
-import '../styles/students-creation.css';
+import '../../styles/global.css';
+import '../../styles/students-creation.css';
 
-export default function StudentsCreation() {
+export default function StudentsForm() {
     const { id } = useParams();
     const navigate = useNavigate();
     const [phoneError, setPhoneError] = useState("");
@@ -207,7 +207,7 @@ export default function StudentsCreation() {
     };
 
     return (
-        <div className="student-creation-container">
+        <div className="student-form-container">
             <form
                 id="studentForm"
                 className="student-form" 

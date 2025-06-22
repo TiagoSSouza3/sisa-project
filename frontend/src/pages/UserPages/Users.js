@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import API from "../api";
+import API from "../../api";
 import { useNavigate } from "react-router-dom";
-import '../styles/global.css';
-import '../styles/users.css';
+import '../../styles/global.css';
+import '../../styles/users.css';
 
 export default function Users() {
   const [users, setUsers] = useState([]);
@@ -37,7 +37,7 @@ export default function Users() {
     <div className="users-container">
       <div className="users-header">
         <h2>Usuários</h2>
-        <button className="add-user-button" onClick={() => navigate('/users_create')}>
+        <button className="add-user-button" onClick={() => navigate('/users_form')}>
           Adicionar Novo Usuário
         </button>
       </div>

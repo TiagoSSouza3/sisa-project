@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import API from "../api";
+import API from "../../api";
 import { useNavigate } from "react-router-dom";
 
-import '../styles/global.css';
-import '../styles/summary_data.css';
+import '../../styles/global.css';
+import '../../styles/summary_data.css';
 
 export default function Summary_data() {
     const [data, setData] = useState({
@@ -139,7 +139,7 @@ export default function Summary_data() {
 
     return (
         <div className="summary-data-container">
-            <h1>Summary Data</h1>
+            <h1>Dados</h1>
             {error && <div className="error">{error}</div>}
             <div className="summary-data">
                 <p>Total de Alunos: {data.students_total}</p>
