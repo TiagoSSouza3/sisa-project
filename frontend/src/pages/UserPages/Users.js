@@ -3,14 +3,19 @@ import API from "../../api";
 import { useNavigate } from "react-router-dom";
 import '../../styles/global.css';
 import '../../styles/users.css';
+import { occupationEnum } from "../../enums/occupationEnum";
 
 export default function Users() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log(occupationEnum)
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(token !== null);
     loadUsers();
   }, []);
 
@@ -33,13 +38,29 @@ export default function Users() {
     }
   };
 
+  const handleEdit = async (id) => {
+    navigate(`/users_form/${id}`)
+  };
+
+  if(isLoggedIn && localStorage.getItem("occupation_id") === occupationEnum.professor){
+    return (
+      <div className="users-container">
+        access denied
+      </div>
+    );
+  }
+
   return (
     <div className="users-container">
       <div className="users-header">
         <h2>Usuários</h2>
-        <button className="add-user-button" onClick={() => navigate('/users_form')}>
-          Adicionar Novo Usuário
-        </button>
+        {isLoggedIn && localStorage.getItem("occupation_id") === occupationEnum.administrador
+          ? <button className="add-user-button" onClick={() => navigate('/users_form')}>
+            Adicionar Novo Usuário
+          </button>
+          : ""
+        }
+        
       </div>
 
       {error && <div className="error">{error}</div>}
@@ -53,11 +74,17 @@ export default function Users() {
               <div className="user-email">{user.email}</div>
               <span className="user-role">{user.occupation_id}</span>
             </div>
-            <div className="user-actions">
-              <button className="delete-button" onClick={() => handleDelete(user.id)}>
-                Excluir
-              </button>
-            </div>
+            { isLoggedIn && localStorage.getItem("occupation_id") === occupationEnum.administrador
+              ? <div className="user-actions">
+                <button className="delete-button" onClick={() => handleDelete(user.id)}>
+                  Excluir
+                </button>
+                <button className="edit-button" onClick={() => handleEdit(user.id)}>
+                  Editar
+                </button>
+              </div>
+              : ""
+            }
           </div>
         ))}
       </div>

@@ -24,13 +24,14 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
+        <Route path="/users_form" element={<ProtectedRoute><UsersForm /></ProtectedRoute>} />
+        <Route path="/users_form/:id" element={<ProtectedRoute><UsersForm /></ProtectedRoute>} />
         <Route path="/students" element={<ProtectedRoute><Students /></ProtectedRoute>} />
+        <Route path="/student_form" element={<ProtectedRoute><StudentsForm /></ProtectedRoute>} />
+        <Route path="/student_form/:id" element={<ProtectedRoute><StudentsForm /></ProtectedRoute>} />
         <Route path="/subjects" element={<ProtectedRoute><Subjects /></ProtectedRoute>} />
         <Route path="/subject_form" element={<ProtectedRoute><SubjectForm /></ProtectedRoute>} />
         <Route path="/subject_form/:id" element={<ProtectedRoute><SubjectForm /></ProtectedRoute>} />
-        <Route path="/student_form" element={<ProtectedRoute><StudentsForm /></ProtectedRoute>} />
-        <Route path="/student_form/:id" element={<ProtectedRoute><StudentsForm /></ProtectedRoute>} />
-        <Route path="/users_form" element={<ProtectedRoute><UsersForm /></ProtectedRoute>} />
         <Route path="/summary_data" element={<ProtectedRoute><Summary_data /></ProtectedRoute>} />
       </Routes>
     </Router>

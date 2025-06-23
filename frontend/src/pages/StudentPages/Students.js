@@ -9,6 +9,7 @@ import '../../styles/global.css';
 import '../../styles/students.css';
 
 export default function Students() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -28,7 +29,6 @@ export default function Students() {
     neighborhood: ''
   });
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -159,14 +159,17 @@ export default function Students() {
     <div className="students-container">
       <div className="students-header">
         <h2>Alunos</h2>
-        <div className="header-actions">
-          <button className="add-student-button" onClick={() => navigate('/student_form')}>
-            Adicionar Novo Aluno
-          </button>
-          <button className="summary-data-button" onClick={() => navigate('/summary_data')}>
-            Dados Resumidos
-          </button>
-        </div>
+        {isLoggedIn && localStorage.getItem("occupation_id") === "PROFESSOR"
+          ? <div className="header-actions">
+            <button className="add-student-button" onClick={() => navigate('/student_form')}>
+              Adicionar Novo Aluno
+            </button>
+            <button className="summary-data-button" onClick={() => navigate('/summary_data')}>
+              Dados Resumidos
+            </button>
+          </div>
+          : ""
+        }
       </div>
 
       <div className="students-filters">
