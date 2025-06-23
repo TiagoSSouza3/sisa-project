@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import API from "../../api";
 import { useNavigate, useParams } from "react-router-dom";
+import { occupationEnum } from "../../enums/occupationEnum";
 
 import '../../styles/global.css';
 import '../../styles/users-creation.css';
@@ -71,7 +72,7 @@ export default function UsersForm() {
         }
     };
 
-    if(isLoggedIn && localStorage.getItem("occupation_id") === "PROFESSOR"){
+    if(isLoggedIn && localStorage.getItem("occupation_id") === occupationEnum.professor){
         return (
             <div className="users-container">
             access denied

@@ -4,6 +4,7 @@ import SearchBar from "../../components/SearchBar";
 import Filter from "../../components/Filter";
 import Modal from "../../components/Modal";
 import { useNavigate } from "react-router-dom";
+import { occupationEnum } from "../../enums/occupationEnum"
 
 import '../../styles/global.css';
 import '../../styles/students.css';
@@ -159,7 +160,7 @@ export default function Students() {
     <div className="students-container">
       <div className="students-header">
         <h2>Alunos</h2>
-        {isLoggedIn && localStorage.getItem("occupation_id") === "PROFESSOR"
+        {isLoggedIn && localStorage.getItem("occupation_id") === occupationEnum.professor
           ? <div className="header-actions">
             <button className="add-student-button" onClick={() => navigate('/student_form')}>
               Adicionar Novo Aluno
@@ -218,7 +219,7 @@ export default function Students() {
                 </span>
               </div>
             </div>
-            {isLoggedIn && localStorage.getItem("occupation_id") !== "PROFESSOR"
+            {isLoggedIn && localStorage.getItem("occupation_id") !== occupationEnum.professor
               ? <div className="student-actions">
                 <button className="edit-button" onClick={() => handleEdit(student.id)}>
                   <i className="fas fa-edit"></i> Editar

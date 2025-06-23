@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { occupationEnum } from "../enums/occupationEnum"
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -19,7 +20,7 @@ export default function Navbar() {
     setIsLoggedIn(token !== null);
   }, [location]);
 
-  if (isLoggedIn && localStorage.getItem("occupation_id") === "PROFESSOR") {
+  if (isLoggedIn && localStorage.getItem("occupation_id") === occupationEnum.professor) {
     return (
       <nav className="navbar">
         <Link to="/dashboard" className="navbar-brand">SISA</Link>
