@@ -132,10 +132,19 @@
 .student-status {
   display: flex;
   gap: 0.5rem;
-  margin-top: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.status-badge.active {
+  background-color: var(--success-color);
+}
+
+.status-badge.inactive {
+  background-color: var(--error-color);
 }
 
 .status-badge {
+  border: 1px hidden;
   background-color: var(--primary-light);
   color: white;
   padding: 0.3rem 0.8rem;
@@ -148,16 +157,8 @@
   transition: var(--transition);
 }
 
-.status-badge.active {
-  background-color: var(--success-color);
-}
-
-.status-badge.inactive {
-  background-color: var(--error-color);
-}
-
-.status-badge.studying {
-  background-color: var(--primary-color);
+.status-badge:hover{
+  transform: translateY(-1.5px);
 }
 
 .student-actions {

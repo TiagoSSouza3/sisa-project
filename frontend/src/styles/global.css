@@ -71,6 +71,134 @@ body {
   background-color: var(--primary-light);
   transform: translateY(-2px);
 }
+  
+/* Overlay escuro */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 998;
+}
+
+/* Menu lateral */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 260px;
+  background-color: var(--surface-color);
+  box-shadow: var(--box-shadow);
+  transform: translateX(-100%);
+  transition: var(--transition);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0 var(--border-radius) var(--border-radius) 0;
+  overflow-y: auto;
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+/* Cabeçalho do menu */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--primary-color);
+  color: var(--text-light);
+  padding: 0.5rem 1.2rem;
+  border-radius: 0 var(--border-radius) 0 0;
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.sidebar-header h2 {
+  justify-content: center;
+  color: var(--text-light);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.back-button {
+  background: transparent;
+  border: none;
+  color: var(--text-light);
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-right: 0.75rem;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Botão de fechar */
+.close-button {
+  background: transparent;
+  border: none;
+  color: var(--text-light);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.close-button:hover {
+  color: var(--secondary-color);
+  transform: scale(1.2);
+}
+
+.menu-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  flex: 1;
+  text-align: center;
+}
+
+/* Links do menu */
+.sidebar-nav {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.sidebar-nav a {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--primary-dark);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.6rem 1rem;
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+}
+
+.sidebar-nav a:hover,
+.sidebar-nav a.active {
+  background-color: var(--primary-light);
+  color: var(--text-light);
+  transform: translateX(5px);
+}
+
+/* Botão de logout */
+.logout-btn {
+  background-color: var(--error-color);
+  color: var(--text-light) !important;
+  font-weight: 600;
+}
+
+.logout-btn:hover {
+  background-color: #d32f2f;
+  transform: translateX(5px);
+}
 
 /* Container */
 .container {
@@ -166,7 +294,7 @@ h2 {
   }
 
   .navbar-links {
-    width: 100%;
+    height: 100%;
     justify-content: center;
     flex-wrap: wrap;
   }

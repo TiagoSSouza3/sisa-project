@@ -13,7 +13,6 @@ export default function Users() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(occupationEnum)
     const token = localStorage.getItem("token");
     setIsLoggedIn(token !== null);
     loadUsers();

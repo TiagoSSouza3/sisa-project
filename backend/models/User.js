@@ -1,16 +1,11 @@
 const { DataTypes, ENUM } = require("sequelize");
 const sequelize = require("../config");
-import { occupationEnum } from "../enums/occupationEnum"
 
 const User = sequelize.define("user", {
   name: DataTypes.STRING,
   email: { type: DataTypes.STRING, unique: true },
   password: DataTypes.STRING,
-  occupation_id: ENUM(
-    occupationEnum.administrador, 
-    occupationEnum.colaborador, 
-    occupationEnum.professor
-  ),
+  occupation_id: ENUM('ADMINISTRADOR', 'COLABORADOR', 'PROFESSOR'),
 }, {
   tableName: 'user',
   timestamps: false

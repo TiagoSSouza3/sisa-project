@@ -156,11 +156,15 @@ export default function Students() {
     setIsFilterModalOpen(false);
   };
 
+  const changeStudentStatus = (student_id) => {
+
+  }
+
   return (
     <div className="students-container">
       <div className="students-header">
         <h2>Alunos</h2>
-        {isLoggedIn && localStorage.getItem("occupation_id") === occupationEnum.professor
+        {isLoggedIn && localStorage.getItem("occupation_id") !== occupationEnum.professor
           ? <div className="header-actions">
             <button className="add-student-button" onClick={() => navigate('/student_form')}>
               Adicionar Novo Aluno
@@ -214,9 +218,12 @@ export default function Students() {
                 {student.email && <p>Email: {student.email}</p>}
               </div>
               <div className="student-status">
-                <span className={`status-badge ${student.active ? 'active' : 'inactive'}`}>
-                  {student.active ? "Ativo" : "Inativo"}
-                </span>
+                <input
+                  type="button"
+                  value={student.active ? "Ativo" : "Inativo"}
+                  className={`status-badge ${student.active ? 'active' : 'inactive'}`}
+                  onClick={changeStudentStatus(student.id)}
+                />
               </div>
             </div>
             {isLoggedIn && localStorage.getItem("occupation_id") !== occupationEnum.professor

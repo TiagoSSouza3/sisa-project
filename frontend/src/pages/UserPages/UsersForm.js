@@ -8,6 +8,7 @@ import '../../styles/users-creation.css';
 
 export default function UsersForm() {
     const { id } = useParams();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate();
     const [error, setError] = useState("");
     const [user, setUser] = useState({
@@ -18,6 +19,8 @@ export default function UsersForm() {
     });
 
     useEffect(() => {
+        const token = localStorage.getItem("token");
+        setIsLoggedIn(token !== null);
         if (id) {
             getUserById();
         }
