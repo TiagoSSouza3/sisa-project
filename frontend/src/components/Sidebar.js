@@ -43,6 +43,10 @@ export default function Sidebar({ isOpen, onClose }) {
         </div>
 
         <nav className="sidebar-nav">
+            <Link to="/dashboard" className={isActive("/dashboard")}>
+              Inicio
+            </Link>
+
             {isLoggedIn && localStorage.getItem("occupation_id") !== occupationEnum.professor
             ? <Link to="/users" className={isActive("/users")}>
                 Usuarios
