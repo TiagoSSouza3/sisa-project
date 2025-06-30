@@ -6,7 +6,6 @@ export default function Navbar() {
   const [menuAberto, setMenuAberto] = useState(false);
 
   useEffect(() => {
-    console.log("cade")
     const token = localStorage.getItem("token");
     setIsLoggedIn(token !== null);
   }, []);

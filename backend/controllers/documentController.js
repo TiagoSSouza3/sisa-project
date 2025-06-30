@@ -1,29 +1,9 @@
 const { Document, DocumentVersion, DocumentTemplate, Subject, User } = require('../models');
-const { validateUserPermissions } = require('../middleware/authMiddleware');
 const PDFDocument = require('pdfkit');
-
 
 exports.getDocuments = async (req, res) => {
     try {
-        const docs = await Document.findAll({
-            include: [
-                {
-                    model: Subject,
-                    as: 'subject',
-                    attributes: ['id', 'name']
-                },
-                {
-                    model: DocumentTemplate,
-                    as: 'template',
-                    attributes: ['id', 'name']
-                },
-                {
-                    model: User,
-                    as: 'creator',
-                    attributes: ['id', 'name']
-                }
-            ]
-        });
+        const docs = await Document.findAll();
         res.json(docs);
     } catch (error) {
         res.status(500).json({ message: 'Erro ao buscar documentos', error: error.message });
@@ -33,25 +13,7 @@ exports.getDocuments = async (req, res) => {
     // Obter documento específico
 exports.getDocument = async (req, res) => {
     try {
-        const doc = await Document.findByPk(req.params.id, {
-            include: [
-                {
-                    model: Subject,
-                    as: 'subject',
-                    attributes: ['id', 'name']
-                },
-                {
-                    model: DocumentTemplate,
-                    as: 'template',
-                    attributes: ['id', 'name', 'structure']
-                },
-                {
-                    model: User,
-                    as: 'creator',
-                    attributes: ['id', 'name']
-                }
-            ]
-        });
+        const doc = await Document.findByPk(req.params.id);
 
         if (!doc) {
             return res.status(404).json({ message: 'Documento não encontrado' });
@@ -65,10 +27,6 @@ exports.getDocument = async (req, res) => {
 
 exports.createDocument = async (req, res) => {
     try {
-        if (!await validateUserPermissions(req.user.id, 'can_upload_documents')) {
-            return res.status(403).json({ message: 'Permissão negada' });
-        }
-
         const { 
             title, 
             subject_id, 
@@ -81,7 +39,7 @@ exports.createDocument = async (req, res) => {
 
         const template = await DocumentTemplate.findByPk(template_id);
         if (!template) {
-            return res.status(404).json({ message: 'Template não encontrado' });
+            //return res.status(404).json({ message: 'Template não encontrado' });
         }
 
         if (!validateContentAgainstTemplate(content, template.structure)) {
@@ -128,11 +86,6 @@ exports.updateDocument = async (req, res) => {
             return res.status(404).json({ message: 'Documento não encontrado' });
         }
 
-        // Verificar permissão
-        if (!await validateUserPermissions(req.user.id, 'can_edit_documents')) {
-            return res.status(403).json({ message: 'Permissão negada' });
-        }
-
         const { content, status } = req.body;
 
         // Validar conteúdo contra template
@@ -169,11 +122,6 @@ exports.updateDocument = async (req, res) => {
 // Deletar documento
 exports.deleteDocument = async (req, res) => {
     try {
-        // Verificar permissão
-        if (!await validateUserPermissions(req.user.id, 'can_delete_documents')) {
-            return res.status(403).json({ message: 'Permissão negada' });
-        }
-
         const document = await Document.findByPk(req.params.id);
         
         if (!document) {
@@ -232,7 +180,7 @@ exports.downloadDocument = async (req, res) => {
 };
 
 // Função auxiliar para validar conteúdo contra template
-function validateContentAgainstTemplate(content, templateStructure) {
+const validateContentAgainstTemplate = (content, templateStructure) => {
     try {
         // Implementar lógica de validação do conteúdo contra a estrutura do template
         // Esta é uma implementação básica que deve ser adaptada às necessidades específicas
@@ -256,7 +204,7 @@ function validateContentAgainstTemplate(content, templateStructure) {
 }
 
 // Função auxiliar para gerar arquivo do documento
-async function generateDocumentFile(document) {
+const generateDocumentFile = async (document) => {
     return new Promise((resolve, reject) => {
         try {
             // Criar novo documento PDF

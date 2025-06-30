@@ -9,7 +9,7 @@ const Document = sequelize.define("document", {
     },
     subject_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: {
             model: 'subjects',
             key: 'id'

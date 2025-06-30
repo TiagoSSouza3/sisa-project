@@ -3,13 +3,15 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const path = require("path");
+
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const studentsRoutes = require("./routes/studentsRoute");
 const subjectRoutes = require("./routes/subjectRoutes");
+const summaryDataRoutes = require("./routes/summaryDataRoutes");
 const documentRoutes = require("./routes/documentRoutes");
 const documentTemplateRoutes = require("./routes/documentTemplateRoutes");
-const summaryDataRoutes = require("./routes/summaryDataRoutes");
+
 const http = require('http');
 const https = require('https');
 const fs = require('fs');
@@ -127,9 +129,9 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/students", studentsRoutes);
 app.use("/api/subjects", subjectRoutes);
+app.use("/api/summary_data", summaryDataRoutes);
 app.use("/api/documents", documentRoutes);
 app.use("/api/templates", documentTemplateRoutes);
-app.use("/api/summary_data", summaryDataRoutes);
 
 app.get("/", (req, res) => {
   res.send("SISA API is running.");

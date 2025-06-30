@@ -62,6 +62,10 @@ export default function Sidebar({ isOpen, onClose }) {
                 Atividades
             </Link>
 
+            <Link to="/documents" className={isActive("/documents")}>
+                Documentos
+            </Link>
+
             <Link
                 to="/"
                 onClick={handleLogout}

@@ -151,6 +151,8 @@ INSERT INTO occupation (name) VALUES
     ('Professor');
 
 INSERT INTO user VALUES (1 ,"Tiago Dos Santos Souza", "tirigopeixe@gmail.com", "$2b$10$Q2WnzVrpRLs.uEDSgZ2WxOn1mPF0eu4aVlZ.Ix2Sy6qxDKnJ/jO8K", 1);
+INSERT INTO user VALUES(2, 'Felipe souza', 'felipe20@gmail.com', '$2b$10$ENLkVCRPlF13TsPpFzRjCeUbUsc35uDAY2PTpKShRpn19b6/wN5fi', 3);
+INSERT INTO user VALUES(3, 'Rosana', 'rosanamssouza9@gmail.com', '$2b$10$S20LoNUde/3rcHsaIC3mb.1U70JTLzyPcJGpcD6P0hlMUvb5lNOcG', 2);
 
 -- Atualizar permissões do Administrador
 UPDATE permissions 
