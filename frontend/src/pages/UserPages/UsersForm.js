@@ -32,6 +32,7 @@ export default function UsersForm() {
             setUser(response.data);
         } catch (err) {
             console.error("Erro ao buscar aluno:", err);
+            navigate("/users");
         }
     }
 

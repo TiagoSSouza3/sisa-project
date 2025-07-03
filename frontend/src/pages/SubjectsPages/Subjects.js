@@ -55,7 +55,7 @@ export default function Subjects() {
               <div className="subject-actions">
                 <button 
                   className="edit-button"
-                  onClick={() => navigate(`/subject_form/${subject.id}`)}
+                  onClick={() => navigate(`/subject_infos/${subject.id}`)}
                 >
                   Editar
                 </button>

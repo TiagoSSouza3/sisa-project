@@ -8,6 +8,7 @@ import Students from "./pages/StudentPages/Students";
 import StudentsForm from "./pages/StudentPages/StudentsForm";
 import Subjects from "./pages/SubjectsPages/Subjects";
 import SubjectForm from "./pages/SubjectsPages/SubjectForm";
+import SubjectInfos from "./pages/SubjectsPages/SubjectInfos";
 import UsersForm from "./pages/UserPages/UsersForm";
 import Summary_data from "./pages/StudentPages/SummaryData";
 import Documents from "./pages/Documents/Documents";
@@ -23,6 +24,7 @@ function App() {
     <Router future={{ v7_startTransition: true }}>
       <Navbar />
       <Routes>
+        <Route path='*' exact={true} element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/" element={<Login />} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
@@ -34,6 +36,7 @@ function App() {
         <Route path="/subjects" element={<ProtectedRoute><Subjects /></ProtectedRoute>} />
         <Route path="/subject_form" element={<ProtectedRoute><SubjectForm /></ProtectedRoute>} />
         <Route path="/subject_form/:id" element={<ProtectedRoute><SubjectForm /></ProtectedRoute>} />
+        <Route path="/subject_infos/:id" element={<ProtectedRoute><SubjectInfos /></ProtectedRoute>} />
         <Route path="/summary_data" element={<ProtectedRoute><Summary_data /></ProtectedRoute>} />
         <Route path="/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
         <Route path="/documents_edition" element={<ProtectedRoute><DocumentsEdition /></ProtectedRoute>} />

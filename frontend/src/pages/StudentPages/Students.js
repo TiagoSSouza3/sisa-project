@@ -185,13 +185,13 @@ export default function Students() {
           count={filteredStudents.length}
         />
         <div className="filter-actions-group">
-            <button className="filter-button" onClick={handleOpenFilterModal}>
-              Filtros Avançados
-            </button>
-            <button className="clear-button" onClick={handleClearFilters}>
-              Limpar Filtros
-            </button>
-          </div>
+          <button className="filter-button" onClick={handleOpenFilterModal}>
+            Filtros Avançados
+          </button>
+          <button className="clear-button" onClick={handleClearFilters}>
+            Limpar Filtros
+          </button>
+        </div>
       </div>
 
       <Modal
@@ -199,8 +199,8 @@ export default function Students() {
         onClose={handleCloseFilterModal}
         title="Filtros"
       >
-        <Filter 
-          onFilterChange={handleFilterChange} 
+        <Filter
+          onFilterChange={handleFilterChange}
           onFilter={handleCloseFilterModal}
         />
       </Modal>
