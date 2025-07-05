@@ -8,8 +8,7 @@ const Subject = sequelize.define('Subject', {
     autoIncrement: true
   },
   name: DataTypes.STRING,
-  description: DataTypes.TEXT,
-  students: DataTypes.ARRAY
+  description: DataTypes.TEXT
 }, {
   tableName: 'subjects',
   timestamps: false
