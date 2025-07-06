@@ -56,12 +56,6 @@ JWT_SECRET=segredo_super_secreto
 CREATE DATABASE sisa;
 ```
 
-#### Rode o servidor:
-
-```bash
-npm start
-```
-
 > O back-end estará rodando em: http://localhost:5000
 
 ---
@@ -79,13 +73,15 @@ npm install
 REACT_APP_API=http://localhost:5000/api
 ```
 
+> O front-end estará disponível em: http://localhost:3000
+
+---
+
 #### Inicie o servidor de desenvolvimento:
 
 ```bash
 npm start
 ```
-
-> O front-end estará disponível em: http://localhost:3000
 
 ---
 
