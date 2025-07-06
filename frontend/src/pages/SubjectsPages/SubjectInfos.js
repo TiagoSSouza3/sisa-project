@@ -28,7 +28,7 @@ export default function SubjectInfos() {
             try {
                 setStudents(
                     (subject.students).map(async (item) => {
-                        await API.get(`/students/${item}`)
+                        (await API.get(`/students/${item}`)).data
                     })
                 );
             } catch (err) {
@@ -61,6 +61,7 @@ export default function SubjectInfos() {
                 <div className="header-actions">
                     <button
                         className="add-student-button"
+                        onClick={() => navigate(`/subject_incription/${id}`)}
                     >
                         Inscrever Aluno na Disciplina
                     </button>
