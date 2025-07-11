@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import API from "../../api";
 import { useNavigate, useParams } from "react-router-dom";
+import { occupationEnum } from "../../enums/occupationEnum";
 
 import '../../styles/global.css';
 import '../../styles/subject-infos.css';
@@ -8,21 +9,27 @@ import '../../styles/subject-infos.css';
 export default function SubjectInfos() {
     const navigate = useNavigate();
     const { id } = useParams();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [subject, setSubject] = useState({
         name: "",
         description: ""
     });
     const [students, setStudents] = useState([])
+    const [professor, setProfessor] = useState([])
 
     useEffect(() => {
+        const token = localStorage.getItem("token");
+        setIsLoggedIn(token !== null);
         if (id) {
             loadSubject();
+        } else {
+            navigate("/subjects")
         }
     }, [id]);
 
     const loadSubject = async () => {
         try {
-            const response = await API.get(`/subjects/${id}`);
+            const response = await API.get(`/subjects/all/${id}`);
             setSubject(response.data);
 
             try {
@@ -30,6 +37,14 @@ export default function SubjectInfos() {
                     (subject.students).map(async (item) => {
                         (await API.get(`/students/${item}`)).data
                     })
+                );
+            } catch (err) {
+                console.error("Erro ao carregar alunos:", err);
+            }
+
+            try {
+                setProfessor(
+                    ((await API.get("/users")).data)
                 );
             } catch (err) {
                 console.error("Erro ao carregar alunos:", err);
@@ -58,21 +73,29 @@ export default function SubjectInfos() {
             <div className="subject-header">
                 <h2>{subject.name ? subject.name : 'Title'}</h2>
 
-                <div className="header-actions">
-                    <button
-                        className="add-student-button"
-                        onClick={() => navigate(`/subject_incription/${id}`)}
-                    >
-                        Inscrever Aluno na Disciplina
-                    </button>
+                {isLoggedIn && localStorage.getItem("occupation_id") === occupationEnum.administrador && 
+                    <div className="header-actions">
+                        <button
+                            className="add-student-button"
+                            onClick={() => navigate(`/subject_inscription/${id}`)}
+                        >
+                            Inscrever Aluno na Disciplina
+                        </button>
+                    
 
-                    <button
-                        className="summary-data-button"
-                        onClick={() => navigate(`/subject_form/${id}`)}
-                    >
-                        Editar Disciplina
-                    </button>
-                </div>
+                    
+                        <button
+                            className="summary-data-button"
+                            onClick={() => navigate(`/subject_form/${id}`)}
+                        >
+                            Editar Disciplina
+                        </button>
+                    </div>
+                }
+            </div>
+
+            <div className="subject_professor">
+                
             </div>
 
             <div className="students-list">

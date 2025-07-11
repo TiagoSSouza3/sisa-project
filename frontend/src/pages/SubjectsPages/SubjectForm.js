@@ -11,10 +11,15 @@ export default function SubjectForm() {
 
     const [subject, setSubject] = useState({
         name: "",
-        description: ""
+        description: "",
+        professor_id: 0
     });
+    const [professor, setProfessor] = useState([]);
+    const [selectedProfessor, setSelectedProfessor] = useState([]);
 
     useEffect(() => {
+        loadProfessor();
+
         if (id) {
             loadSubject();
         }
@@ -22,21 +27,44 @@ export default function SubjectForm() {
 
     const loadSubject = async () => {
         try {
-            const response = await API.get(`/subjects/${id}`);
+            const response = await API.get(`/subjects/all/${id}`);
             setSubject(response.data);
+
+            if (response.data.professores && response.data.professores.length > 0) {
+                const ids = response.data.professores.map(p => String(p.id));
+                setSelectedProfessor(ids);
+            } else {
+                setSelectedProfessor(['']);
+            }
         } catch (err) {
             console.error("Erro ao carregar disciplina:", err);
             navigate("/subjects");
         }
     };
 
+    const loadProfessor = async () => {
+        try {
+            const response = await API.get(`/users/`);
+            setProfessor(response.data);
+        } catch (err) {
+            console.error("Erro ao carregar professores:", err);
+            navigate("/subjects");
+        }
+    };
+
     const handleSubmit = async () => {
         try {
+            const payload = {
+                ...subject,
+                professor_id: selectedProfessor.filter(p => p !== '')
+            };
+
             if (id) {
-                await API.put(`/subjects/${id}`, subject);
+                await API.put(`/subjects/${id}`, payload);
             } else {
-                await API.post("/subjects", subject);
+                await API.post("/subjects", payload);
             }
+
             navigate("/subjects");
         } catch (err) {
             console.error("Erro ao salvar disciplina:", {
@@ -47,20 +75,31 @@ export default function SubjectForm() {
         }
     };
 
+    const removeProfessor = (index) => {
+        const newProfessor = [...selectedProfessor];
+        newProfessor.splice(index, 1);
+        setSelectedProfessor(newProfessor);
+    };
+
+    const addProfessor = () => {
+        setSelectedProfessor([...selectedProfessor, '']);
+    };
+
+    const changeProfessor = (index, value) => {
+        const newProfessor = [...selectedProfessor];
+        newProfessor[index] = value;
+        setSelectedProfessor(newProfessor);
+    };
+
     return (
         <div className="subject-creation-container">
             <button onClick={() => navigate("/subjects")} className="transparent-button">
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="25"
-                    height="25"
-                    fill="currentColor"
-                    viewBox="0 0 16 16"
-                    >
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" viewBox="0 0 16 16">
                     <path fillRule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
                 </svg>
             </button>
             <h2>{id ? 'Editar Disciplina' : 'Criar Nova Disciplina'}</h2>
+
             <form 
                 className="subject-form"
                 onSubmit={(e) => { 
@@ -90,6 +129,32 @@ export default function SubjectForm() {
                         required
                         maxLength={300}
                     />
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="role">Professores</label>
+                    {selectedProfessor.map((value, index) => (
+                        <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                            <select
+                                value={value}
+                                onChange={(e) => changeProfessor(index, e.target.value)}
+                            >
+                                <option value="">Selecione um Professor</option>
+                                {professor.map((prof) => (
+                                    <option key={prof.id} value={prof.id}>
+                                        {prof.name}
+                                    </option>
+                                ))}
+                            </select>
+                            {selectedProfessor.length > 1 && (
+                                <button type="button" onClick={() => removeProfessor(index)}>
+                                    Remover
+                                </button>
+                            )}
+                        </div>
+                    ))}
+
+                    <button type="button" onClick={addProfessor}>+ Adicionar Professor</button>
                 </div>
 
                 <div className="form-actions">

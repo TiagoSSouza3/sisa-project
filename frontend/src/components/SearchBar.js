@@ -10,7 +10,10 @@ const SearchBar = ({
 }) => {
   return (
     <div className={`search-container ${className}`.trim()}>
-      <div className="student-count">{count} {count === 1 ? "aluno" : "alunos"}</div>
+      { count && <div className="student-count">
+          {count} {count === 1 ? "aluno" : "alunos"}
+        </div>
+      }
       <svg 
         className="search-icon" 
         xmlns="http://www.w3.org/2000/svg" 

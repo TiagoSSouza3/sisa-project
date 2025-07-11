@@ -1,47 +1,48 @@
 import React, { useEffect, useState } from "react";
 import API from "../../api";
 import { useNavigate } from "react-router-dom";
+import { occupationEnum } from "../../enums/occupationEnum";
 
 import '../../styles/global.css';
 import '../../styles/subjects.css';
 
 export default function Subjects() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [subjects, setSubjects] = useState([]);
   const navigate = useNavigate();
 
   const loadSubjects = async () => {
     try {
-      await API.get("/subjects").then((res) => {
-        setSubjects(res.data);
-      });
+
+      const subject = 
+      localStorage.getItem("occupation_id") === occupationEnum.professor 
+        ? await API.get(`subjects/professor/${localStorage.getItem("id")}`)
+        : await API.get(`/subjects`)
+      setSubjects(subject.data);
+
     } catch (err) {
       console.log("Erro ao carregar disciplinas");
     }
   };
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(token !== null);
     loadSubjects();
   }, []);
-
-  const handleDelete = async (id) => {
-    try {
-      await API.delete(`/subjects/${id}`);
-      loadSubjects();
-    } catch (err) {
-      console.log("Erro ao remover disciplina");
-    }
-  };
 
   return (
     <div className="subjects-container">
       <div className="subjects-header">
         <h2>Disciplinas</h2>
-        <button 
-          className="add-subject-button"
-          onClick={() => navigate("/subject_form")}
-        >
-          Adicionar Nova Disciplina
-        </button>
+        { isLoggedIn && localStorage.getItem("occupation_id") === occupationEnum.administrador && 
+          <button 
+            className="add-subject-button"
+            onClick={() => navigate("/subject_form")}
+          >
+            Adicionar Nova Disciplina
+          </button>
+        }
       </div>
 
       <div className="subjects-list">
@@ -58,12 +59,6 @@ export default function Subjects() {
                   onClick={() => navigate(`/subject_infos/${subject.id}`)}
                 >
                   Editar
-                </button>
-                <button 
-                  className="delete-button"
-                  onClick={() => handleDelete(subject.id)}
-                >
-                  Excluir
                 </button>
               </div>
             </div>

@@ -8,8 +8,19 @@ const DocumentVersion = require('./DocumentVersion');
 const Parent = require('./Parent');
 
 // Definir relacionamentos
-Subject.belongsTo(User, { foreignKey: 'professor_id' });
-User.hasMany(Subject, { foreignKey: 'professor_id' });
+Subject.belongsToMany(User, {
+  through: 'subject_professor',
+  as: 'professores',
+  foreignKey: 'subject_id',
+  otherKey: 'professor_id'
+});
+
+User.belongsToMany(Subject, {
+  through: 'subject_professor',
+  as: 'disciplinas',
+  foreignKey: 'professor_id',
+  otherKey: 'subject_id'
+});
 
 // Document associations
 Document.belongsTo(Subject, { foreignKey: 'subject_id', as: 'subject' });

@@ -19,6 +19,7 @@ export default function Login() {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("occupation_id", res.data.user.occupation_id);
       localStorage.setItem("name", res.data.user.name);
+      localStorage.setItem("id", res.data.user.id);
       navigate("/dashboard");
     } catch (error) {
       console.error("Erro detalhado:", error.response?.data || error.message);

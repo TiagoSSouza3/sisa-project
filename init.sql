@@ -55,8 +55,16 @@ CREATE TABLE subjects (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    professor_id INT,
     FOREIGN KEY (professor_id) REFERENCES user(id)
+);
+
+-- Professores das Disciplinas
+CREATE TABLE subject_professor (
+    subject_id INT,
+    professor_id INT,
+    PRIMARY KEY (subject_id, professor_id),
+    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE,
+    FOREIGN KEY (professor_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- Templates de Documentos

@@ -8,9 +8,15 @@ exports.getAllSubjects = async (req, res) => {
 exports.getSubjectById = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log(id)
-    const subject = await Subject.findOne({where: {id: id}});
+    const { type } = req.params;
 
+    const subject = 
+    type === "professor" 
+      ? await Subject.findByPk(req.params.id, {
+        include: [{ model: User, as: 'professores', attributes: ['id', 'name'] }]
+        })
+      : await Subject.findOne({where: {id: id}})
+    
     if (!subject) {
       return res.status(404).json({ error: "Disciplina não encontrada: " + id });
     }
@@ -21,8 +27,14 @@ exports.getSubjectById = async (req, res) => {
 };
 
 exports.createSubject = async (req, res) => {
+  const { name, description, professors } = req.body;
   try {
-    const subject = await Subject.create(req.body);
+    const subject = await Subject.create({ name, description });
+
+    if (Array.isArray(professors)) {
+      await subject.setProfessores(professors);
+    }
+
     res.status(201).json(subject);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -30,12 +42,19 @@ exports.createSubject = async (req, res) => {
 };
 
 exports.updateSubject = async (req, res) => {
+  const { name, description, professores } = req.body;
+  const { id } = req.params;
+
   try {
-    const subject = await Subject.findByPk(req.params.id);
-    if (!subject) {
-      return res.status(404).json({ error: "Disciplina não encontrada" });
+    const subject = await Subject.findByPk(id);
+    if (!subject) return res.status(404).json({ error: "Disciplina não encontrada" });
+
+    await subject.update({ name, description });
+
+    if (Array.isArray(professores)) {
+      await subject.setProfessores(professores); // substitui todos os professores
     }
-    await subject.update(req.body);
+
     res.json(subject);
   } catch (error) {
     res.status(400).json({ error: error.message });
