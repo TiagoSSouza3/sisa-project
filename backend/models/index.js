@@ -8,6 +8,7 @@ const DocumentVersion = require('./DocumentVersion');
 const Parent = require('./Parent');
 const Students = require('./Students');
 const SubjectProfessor = require('./SubjectProfessor');
+const SubjectStudent = require('./SubjectStudent');
 
 Subject.belongsToMany(User, {
   through: SubjectProfessor,
@@ -23,19 +24,13 @@ User.belongsToMany(Subject, {
 });
 
 Subject.belongsToMany(Students, {
-  through: {
-    model: 'subject_students',
-    timestamps: false
-  },
+  through: SubjectStudent,
   as: 'students',
   foreignKey: 'subject_id',
   otherKey: 'students_id'
 });
 Students.belongsToMany(Subject, {
-  through: {
-    model: 'subject_students',
-    timestamps: false
-  },
+  through: SubjectStudent,
   as: 'subjects',
   foreignKey: 'students_id',
   otherKey: 'subject_id'

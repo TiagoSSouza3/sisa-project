@@ -35,6 +35,7 @@ export default function SubjectInscription() {
     const loadData = async () => {
         try {
             const response = await API.get(`/subjects/all/${id}`);
+            console.log(response.data.students);
             setSubject(response.data);
 
             try {
@@ -52,19 +53,32 @@ export default function SubjectInscription() {
 
     const handleAddToSubject = async (student_id) => {
         try {
-            const studentToAdd = students[students.map((item) => item.id).findIndex(student_id)];
+          const currentStudentIds = subject.students?.map(s => s.id) || [];
+      
+          if (currentStudentIds.includes(student_id)) {
+            alert("Aluno já está inscrito na disciplina.");
+            return;
+          }
+      
+          const updatedStudentIds = [...currentStudentIds, student_id];
+      
+          await API.put(`/subjects/${id}`, {
+            name: subject.name,
+            description: subject.description,
+            students: updatedStudentIds
+          });
     
-            setSubject({
-                ...subject,
-                students: subject.students.push(studentToAdd)
-            });
-    
-            await API.put(`/subjects/${id}`, subject);
+          setSubject({
+            ...subject,
+            students: [...(subject.students || []), students.find(s => s.id === student_id)]
+          });
+
+          navigate(`/subject_infos/${id}`);
         } catch (error) {
-            console.log("Nao foi possivel increver o aluno", error);
-            navigate(`/subject_infos/${id}`);
+          console.error("Não foi possível inscrever o aluno", error);
         }
-    }
+      };
+      
 
     return (
         <div className="subject-inscription-container">

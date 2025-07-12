@@ -58,13 +58,13 @@ CREATE TABLE subjects (
     FOREIGN KEY (professor_id) REFERENCES user(id)
 );
 
--- Professor to Subjects
+-- Professores das Disciplinas
 CREATE TABLE subject_professor (
     subject_id INT,
     professor_id INT,
     PRIMARY KEY (subject_id, professor_id),
     FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE,
-    FOREIGN KEY (professor_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (professor_id) REFERENCES user(id) ON DELETE CASCADE
 );
 
 -- Students to Subjects

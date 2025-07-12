@@ -30,30 +30,30 @@ export default function SubjectInfos() {
     const loadSubject = async () => {
         try {
             const response = await API.get(`/subjects/all/${id}`);
-            setSubject(response.data);
-
-            try {
-                setStudents(
-                    (subject.students).map(async (item) => {
-                        (await API.get(`/students/${item}`)).data
-                    })
+            const subjectData = response.data;
+            setSubject(subjectData);
+        
+            if (subjectData.students) {
+                setStudents(subjectData.students);
+            } else if (subjectData.students) {
+                const studentData = await Promise.all(
+                subjectData.students.map(async (studentId) => {
+                    const res = await API.get(`/students/${studentId}`);
+                    return res.data;
+                })
                 );
-            } catch (err) {
-                console.error("Erro ao carregar alunos:", err);
+                setStudents(studentData);
             }
-
-            try {
-                setProfessor(
-                    ((await API.get("/users")).data)
-                );
-            } catch (err) {
-                console.error("Erro ao carregar alunos:", err);
-            }
+        
+            const users = await API.get("/users");
+            setProfessor(users.data);
+      
         } catch (err) {
-            console.error("Erro ao carregar disciplina:", err);
-            navigate("/subjects")
+            console.error("Erro ao carregar disciplina ou alunos:", err);
+            navigate("/subjects");
         }
     };
+      
 
     return (
         <div className="subject-infos-container">

@@ -29,7 +29,7 @@ export default function SubjectForm() {
         try {
             const response = await API.get(`/subjects/professor/${id}`);
             await setSubject(response.data);
-            console.log(subject)
+            console.log(response.data)
 
             if (response.data.professores && response.data.professores.length > 0) {
                 const ids = response.data.professores.map(p => String(p.id));
@@ -62,7 +62,6 @@ export default function SubjectForm() {
             };
 
             if (id) {
-                console.log(payload)
                 await API.put(`/subjects/${id}`, payload);
                 navigate(`/subject_infos/${id}`);
             } else {
@@ -95,13 +94,9 @@ export default function SubjectForm() {
         setSelectedProfessor(newProfessor);
     };
 
-    const getNavegate = () => {
-        return id ? `/subject_infos/${id}` : `/subjects/`
-    }
-
     return (
         <div className="subject-creation-container">
-            <button onClick={() => navigate(getNavegate())} className="transparent-button">
+            <button onClick={() => navigate(id ? `/subject_infos/${id}` : `/subjects/`)} className="transparent-button">
                 <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" viewBox="0 0 16 16">
                     <path fillRule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
                 </svg>
