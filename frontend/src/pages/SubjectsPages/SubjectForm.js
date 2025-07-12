@@ -27,18 +27,20 @@ export default function SubjectForm() {
 
     const loadSubject = async () => {
         try {
-            const response = await API.get(`/subjects/all/${id}`);
-            setSubject(response.data);
+            const response = await API.get(`/subjects/professor/${id}`);
+            await setSubject(response.data);
+            console.log(subject)
 
             if (response.data.professores && response.data.professores.length > 0) {
                 const ids = response.data.professores.map(p => String(p.id));
                 setSelectedProfessor(ids);
+                console.log(ids)
             } else {
                 setSelectedProfessor(['']);
             }
         } catch (err) {
             console.error("Erro ao carregar disciplina:", err);
-            navigate("/subjects");
+            navigate(`/subject_infos/${id}`);
         }
     };
 
@@ -48,7 +50,7 @@ export default function SubjectForm() {
             setProfessor(response.data);
         } catch (err) {
             console.error("Erro ao carregar professores:", err);
-            navigate("/subjects");
+            navigate(`/subject_infos/${id}`);
         }
     };
 
@@ -56,16 +58,18 @@ export default function SubjectForm() {
         try {
             const payload = {
                 ...subject,
-                professor_id: selectedProfessor.filter(p => p !== '')
+                professores: selectedProfessor.filter(p => p !== '')
             };
 
             if (id) {
+                console.log(payload)
                 await API.put(`/subjects/${id}`, payload);
+                navigate(`/subject_infos/${id}`);
             } else {
                 await API.post("/subjects", payload);
+                navigate("/subjects");
             }
 
-            navigate("/subjects");
         } catch (err) {
             console.error("Erro ao salvar disciplina:", {
                 message: err.message,
@@ -91,9 +95,13 @@ export default function SubjectForm() {
         setSelectedProfessor(newProfessor);
     };
 
+    const getNavegate = () => {
+        return id ? `/subject_infos/${id}` : `/subjects/`
+    }
+
     return (
         <div className="subject-creation-container">
-            <button onClick={() => navigate("/subjects")} className="transparent-button">
+            <button onClick={() => navigate(getNavegate())} className="transparent-button">
                 <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" viewBox="0 0 16 16">
                     <path fillRule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
                 </svg>

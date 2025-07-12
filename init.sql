@@ -58,13 +58,22 @@ CREATE TABLE subjects (
     FOREIGN KEY (professor_id) REFERENCES user(id)
 );
 
--- Professores das Disciplinas
+-- Professor to Subjects
 CREATE TABLE subject_professor (
     subject_id INT,
     professor_id INT,
     PRIMARY KEY (subject_id, professor_id),
     FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE,
     FOREIGN KEY (professor_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Students to Subjects
+CREATE TABLE subject_students (
+    subject_id INT,
+    students_id INT,
+    PRIMARY KEY (subject_id, students_id),
+    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE,
+    FOREIGN KEY (students_id) REFERENCES students(id) ON DELETE CASCADE
 );
 
 -- Templates de Documentos

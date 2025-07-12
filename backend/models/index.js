@@ -6,19 +6,38 @@ const Document = require('./Document');
 const DocumentTemplate = require('./DocumentTemplate');
 const DocumentVersion = require('./DocumentVersion');
 const Parent = require('./Parent');
+const Students = require('./Students');
+const SubjectProfessor = require('./SubjectProfessor');
 
-// Definir relacionamentos
 Subject.belongsToMany(User, {
-  through: 'subject_professor',
+  through: SubjectProfessor,
   as: 'professores',
   foreignKey: 'subject_id',
   otherKey: 'professor_id'
 });
-
 User.belongsToMany(Subject, {
-  through: 'subject_professor',
+  through: SubjectProfessor,
   as: 'disciplinas',
   foreignKey: 'professor_id',
+  otherKey: 'subject_id'
+});
+
+Subject.belongsToMany(Students, {
+  through: {
+    model: 'subject_students',
+    timestamps: false
+  },
+  as: 'students',
+  foreignKey: 'subject_id',
+  otherKey: 'students_id'
+});
+Students.belongsToMany(Subject, {
+  through: {
+    model: 'subject_students',
+    timestamps: false
+  },
+  as: 'subjects',
+  foreignKey: 'students_id',
   otherKey: 'subject_id'
 });
 
