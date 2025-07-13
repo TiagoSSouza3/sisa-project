@@ -54,6 +54,28 @@ export default function SubjectInfos() {
         }
     };
       
+    const handleRemoveToSubject = async (student_id) => {
+        try {
+            const currentStudentIds = subject.students?.map(s => s.id) || [];
+        
+            const updatedStudentIds = currentStudentIds.filter(i => i.id !== student_id);
+        
+            await API.put(`/subjects/${id}`, {
+                name: subject.name,
+                description: subject.description,
+                students: updatedStudentIds
+            });
+        
+            setSubject({
+                ...subject,
+                students: subject.students.filter(s => s.id !== student_id)
+            });
+
+            console.log(subject.students)
+        } catch (error) {
+            console.error("Não foi possível desinscrever o aluno", error);
+        }
+    }
 
     return (
         <div className="subject-infos-container">
@@ -107,6 +129,11 @@ export default function SubjectInfos() {
                                 <p>Matrícula: {student.id}</p>
                                 {student.gender && <p>Sexo: {student.gender}</p>}
                             </div>
+                        </div>
+                        <div className="user-actions">
+                            <button className="delete-button" onClick={() => handleRemoveToSubject(student.id)}>
+                                Excluir
+                            </button>
                         </div>
                     </div>
                 ))}

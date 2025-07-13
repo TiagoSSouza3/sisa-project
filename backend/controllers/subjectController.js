@@ -14,7 +14,9 @@ exports.getSubjectById = async (req, res) => {
 
     const subject = 
     type === "professor"
-      ? await Subject.findByPk(req.params.id, {
+      ? await Subject.findByPk(
+        req.params.id, 
+        {
           include: [{
             model: User,
             as: 'professores',
@@ -23,7 +25,9 @@ exports.getSubjectById = async (req, res) => {
             required: false
           }]
         })
-      : await Subject.findByPk(req.params.id, {
+      : await Subject.findByPk(
+        req.params.id, 
+        {
           include: [{
             model: Students,
             as: 'students',

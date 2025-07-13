@@ -1,9 +1,20 @@
 const Student = require("../models/Students");
-const Parent = require("../models/Parent");
+const Subject = require("../models/Subject");
 
 exports.getAllStudents = async (req, res) => {
   try {
-    const list = await Student.findAll();
+    const list = await Student.findAll(
+      {
+        include: [{
+          model: Subject,
+          as: 'subjects',
+          attributes: ['id'],
+          through: { attributes: [] },
+          required: false
+        }]
+      }
+    );
+
     res.json(list);
   } catch (error) {
     res.status(500).json({ error: "Erro ao buscar alunos" });
@@ -54,8 +65,18 @@ exports.deleteStudent = async (req, res) => {
 
 exports.getStudentById = async (req, res) => {
   try {
-    const { id } = req.params;
-    const student = await Student.findOne({where: {id: id}});
+    const student = await Student.findByPk(
+      req.params.id,
+      {
+        include: [{
+          model: Subject,
+          as: 'subjects',
+          attributes: ['id'],
+          through: { attributes: [] },
+          required: false
+        }]
+      }
+    );
     
     if (student) {
       res.json(student);
