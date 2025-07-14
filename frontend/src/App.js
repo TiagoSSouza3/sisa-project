@@ -13,7 +13,7 @@ import SubjectInscription from "./pages/SubjectsPages/SubjectInscription";
 import UsersForm from "./pages/UserPages/UsersForm";
 import Summary_data from "./pages/StudentPages/SummaryData";
 import Documents from "./pages/Documents/Documents";
-import DocumentsEdition from "./pages/Documents/DocumentEdition";
+
 
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -41,7 +41,6 @@ function App() {
         <Route path="/subject_inscription/:id" element={<ProtectedRoute><SubjectInscription /></ProtectedRoute>} />
         <Route path="/summary_data" element={<ProtectedRoute><Summary_data /></ProtectedRoute>} />
         <Route path="/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
-        <Route path="/documents_edition" element={<ProtectedRoute><DocumentsEdition /></ProtectedRoute>} />
       </Routes>
     </Router>
   );

@@ -150,7 +150,20 @@ CREATE TABLE summary_data (
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
+CREATE TABLE IF NOT EXISTS document_layouts (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  file_path VARCHAR(500) NOT NULL,
+  original_filename VARCHAR(255) NOT NULL,
+  placeholders TEXT,
+  created_by INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (created_by) REFERENCES user(id) ON DELETE CASCADE,
+  INDEX idx_created_by (created_by),
+  INDEX idx_created_at (created_at)
+);
 
 -- Inserir ocupações padrão
 INSERT INTO occupation (name) VALUES
@@ -169,3 +182,6 @@ SET can_manage_templates = TRUE,
     can_edit_documents = TRUE,
     can_delete_documents = TRUE
 WHERE occupation_id = (SELECT id FROM occupation WHERE name = 'Administrador');
+
+ALTER TABLE documents ADD COLUMN placeholders JSON;
+ALTER TABLE documents MODIFY COLUMN status ENUM('draft', 'published', 'archived', 'template') DEFAULT 'draft';
