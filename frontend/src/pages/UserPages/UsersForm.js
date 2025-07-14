@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import API from "../../api";
 import { useNavigate, useParams } from "react-router-dom";
 import { occupationEnum } from "../../enums/occupationEnum";
+import { useLanguage } from '../../components/LanguageContext';
 
 import '../../styles/global.css';
 import '../../styles/users-creation.css';
@@ -10,6 +11,7 @@ export default function UsersForm() {
     const { id } = useParams();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate();
+    const { language } = useLanguage();
     const [error, setError] = useState("");
     const [user, setUser] = useState({
         name: "",
@@ -56,30 +58,10 @@ export default function UsersForm() {
         navigate("/users");
     };
 
-    const getOccupationId = (role) => {
-        console.log(role)
-        switch (role) {
-            case "ADMINISTRADOR":
-                return 1;
-            case "COLABORADOR":
-                return 2;
-            case "PROFESSOR":
-                return 3;
-            case 1:
-                return "ADMINISTRADOR";
-            case 2:
-                return "COLABORADOR";
-            case 3:
-                return "PROFESSOR";
-            default:
-                break;
-        }
-    };
-
     if(isLoggedIn && localStorage.getItem("occupation_id") === occupationEnum.professor){
         return (
             <div className="users-container">
-            access denied
+                access denied
             </div>
         );
     }
@@ -88,18 +70,18 @@ export default function UsersForm() {
         <div className="users-creation-container">
             <div className="users-creation-form">
                 { id != null
-                    ? <h2>Editar Usuário</h2>
-                    : <h2>Criar Novo Usuário</h2> 
+                    ? <h2>{language === "english" ? "Edit User" : "Editar Usuario"}</h2>
+                    : <h2>{language === "english" ? "Create New user" : "Criar Novo Usuário"}</h2> 
                 }
                 
                 {error && <div className="error-message">{error}</div>}
 
                 <div className="form-group">
-                    <label htmlFor="name">Nome</label>
+                    <label htmlFor="name">{language === "english" ? "Name" : "Nome"}</label>
                     <input
                         id="name"
                         type="text"
-                        placeholder="Digite o nome"
+                        placeholder={language === "english" ? "Write the Name" : "Digite o Nome"}
                         value={user.name}
                         onChange={(e) => setUser({ ...user, name: e.target.value })}
                     />
@@ -110,31 +92,31 @@ export default function UsersForm() {
                     <input
                         id="email"
                         type="email"
-                        placeholder="Digite o email"
+                        placeholder={language === "english" ? "Write the Email Address" : "Digite o Email"}
                         value={user.email}
                         onChange={(e) => setUser({ ...user, email: e.target.value })}
                     />
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="password">Senha</label>
+                    <label htmlFor="password">{language === "english" ? "Password" : "Senha"}</label>
                     <input
                         id="password"
                         type="password"
-                        placeholder="Digite a senha"
+                        placeholder={language === "english" ? "Write the Password" : "Digite a Senha"}
                         value={user.password}
                         onChange={(e) => setUser({ ...user, password: e.target.value })}
                     />
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="role">Função</label>
+                    <label htmlFor="role">{language === "english" ? "Occupation" : "Função"}</label>
                     <select
                         id="role"
                         value={user.occupation_id}
                         onChange={(e) => setUser({ ...user, occupation_id: e.target.value})}
                     >
-                        <option value="">Selecione uma função</option>
+                        <option value="">{language === "english" ? "Select the occupation" : "Selecione a função"}</option>
                         <option value="ADMINISTRADOR">Administrador</option>
                         <option value="PROFESSOR">Professor</option>
                         <option value="COLABORADOR">Colaborador</option>
@@ -143,10 +125,13 @@ export default function UsersForm() {
 
                 <div className="form-actions">
                     <button className="cancel-button" onClick={handleCancel}>
-                        Cancelar
+                        {language === "english" ? "Cancel" : "Cancelar"}
                     </button>
                     <button className="submit-button" onClick={handleSave}>
-                        { id ? 'Editar Usuario' : 'Criar Usuário'}
+                        { id 
+                            ? language === "english" ? "Edit User" : "Editar usuário" 
+                            : language === "english" ? "Create User" : "Criar usuário"
+                        }
                     </button>
                 </div>
             </div>

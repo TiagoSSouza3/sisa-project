@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import API from "../../api";
 import { useNavigate, useParams } from "react-router-dom";
+import { useLanguage } from '../../components/LanguageContext';
 
 import '../../styles/global.css';
 import '../../styles/subject-creation.css';
@@ -8,6 +9,7 @@ import '../../styles/subject-creation.css';
 export default function SubjectForm() {
     const navigate = useNavigate();
     const { id } = useParams();
+    const { language } = useLanguage();
 
     const [subject, setSubject] = useState({
         name: "",
@@ -101,7 +103,11 @@ export default function SubjectForm() {
                     <path fillRule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
                 </svg>
             </button>
-            <h2>{id ? 'Editar Disciplina' : 'Criar Nova Disciplina'}</h2>
+            <h2>{id 
+                    ? language === "english" ? "Edit Subject" : "Editar Disciplina"
+                    : language === "english" ? "Create New Subject" : "Criar Nova Disciplina"
+            }
+            </h2>
 
             <form 
                 className="subject-form"
@@ -111,11 +117,11 @@ export default function SubjectForm() {
                 }}
             >
                 <div className="form-group">
-                    <label htmlFor="name">Nome da Disciplina</label>
+                    <label htmlFor="name">{language === "english" ? "Subject's Name" : "Nome da Disciplina"}</label>
                     <input 
                         id="name"
                         type="text"
-                        placeholder="Digite o nome da disciplina" 
+                        placeholder={language === "english" ? "Write Subject's Name" : "Digite o Nome da Disciplina"}
                         value={subject.name}
                         onChange={(e) => setSubject({ ...subject, name: e.target.value })} 
                         required 
@@ -123,10 +129,10 @@ export default function SubjectForm() {
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="description">Descrição</label>
+                    <label htmlFor="description">{language === "english" ? "Description" : "Descrição"}</label>
                     <textarea 
                         id="description"
-                        placeholder="Digite a descrição da disciplina" 
+                        placeholder={language === "english" ? "Write the Description" : "Digite a descrição"}
                         value={subject.description}
                         onChange={(e) => setSubject({ ...subject, description: e.target.value })} 
                         required
@@ -135,14 +141,14 @@ export default function SubjectForm() {
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="role">Professores</label>
+                    <label htmlFor="role">{language === "english" ? "Teachers" : "Professores"}</label>
                     {selectedProfessor.map((value, index) => (
                         <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
                             <select
                                 value={value}
                                 onChange={(e) => changeProfessor(index, e.target.value)}
                             >
-                                <option value="">Selecione um Professor</option>
+                                <option value="">{language === "english" ? "Select a Teacher" : "Selecione o Professor"}</option>
                                 {professor.map((prof) => (
                                     <option key={prof.id} value={prof.id}>
                                         {prof.name}
@@ -151,13 +157,13 @@ export default function SubjectForm() {
                             </select>
                             {selectedProfessor.length > 1 && (
                                 <button type="button" onClick={() => removeProfessor(index)}>
-                                    Remover
+                                    {language === "english" ? "Remove" : "Remover"}
                                 </button>
                             )}
                         </div>
                     ))}
 
-                    <button type="button" onClick={addProfessor}>+ Adicionar Professor</button>
+                    <button type="button" onClick={addProfessor}>{language === "english" ? "Add Teacher" : "Adicionar Professor"}</button>
                 </div>
 
                 <div className="form-actions">
@@ -166,10 +172,13 @@ export default function SubjectForm() {
                         className="cancel-button"
                         onClick={() => navigate("/subjects")}
                     >
-                        Cancelar
+                        {language === "english" ? "Cancel" : "Cancelar"}
                     </button>
                     <button type="submit" className="submit-button">
-                        {id ? 'Salvar Alterações' : 'Criar Disciplina'}
+                        {id 
+                            ? language === "english" ? "Edit Subject" : "Editar Disciplina"
+                            : language === "english" ? "Create Subject" : "Criar Disciplina"
+                        }
                     </button>
                 </div>
             </form>

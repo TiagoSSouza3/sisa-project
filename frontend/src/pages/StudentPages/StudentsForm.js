@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import API from "../../api";
 import { useNavigate, useParams } from "react-router-dom";
 import { cpf } from "cpf-cnpj-validator";
+import { useLanguage } from '../../components/LanguageContext';
 
 import '../../styles/global.css';
 import '../../styles/students-creation.css';
@@ -9,6 +10,7 @@ import '../../styles/students-creation.css';
 export default function StudentsForm() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { language } = useLanguage();
     const [phoneError, setPhoneError] = useState("");
     const [secondPhoneError, setSecondPhoneError] = useState("");
     const [cpfError, setCpfError] = useState("");
@@ -228,13 +230,18 @@ export default function StudentsForm() {
                     handleCreate();
                 }}
             >
-                <h3>{id ? 'Editar Aluno' : 'Adicionar Novo Aluno'}</h3>
+                <h3>{id 
+                    ?  language === "english" ? "Edit Student" : "Editar Aluno"
+                    : language === "english" ? "Create Student" : "Criar Aluno"
+                }
+                </h3>
+
                 <div className="form-group">
-                <label htmlFor="name">Nome</label>
+                <label htmlFor="name">{language === "english" ? "Name" : "Nome"}</label>
                 <input 
                     id="name"
                     type="text"
-                    placeholder="Digite o nome do aluno"
+                    placeholder={language === "english" ? "Write the Student's Name" : "Digite o Nome do Aluno"}
                     value={student?.name}
                     onChange={(e) => setStudent({ ...student, name: e.target.value })}
                     required
@@ -245,7 +252,7 @@ export default function StudentsForm() {
                 <input 
                     id="CPF"
                     type="text"
-                    placeholder="Digite o CPF"
+                    placeholder={language === "english" ? "Write the CPF" : "Digite o CPF"}
                     value={student.CPF}
                     onChange={handleCPFChange}
                 />
@@ -256,14 +263,14 @@ export default function StudentsForm() {
                 <input 
                     id="RG"
                     type="text"
-                    placeholder="Digite o RG"
+                    placeholder={language === "english" ? "Write the RG" : "Digite o RG"}
                     value={student.RG}
                     onChange={handleRGChange}
                 />
                 {rgError && <span className="error-message">{rgError}</span>}
                 </div>
                 <div className="form-group">
-                <label htmlFor="gender">Sexo</label>
+                <label htmlFor="gender">{language === "english" ? "Gender" : "Sexo"}</label>
                 <div className="radio-group">
                   <input 
                       id="gender-male"
@@ -273,7 +280,7 @@ export default function StudentsForm() {
                       checked={student.gender === "Masculino"}
                       onChange={(e) => setStudent({ ...student, gender: e.target.value })}
                   />
-                  <label htmlFor="gender-male">Masculino</label>
+                  <label htmlFor="gender-male">{language === "english" ? "Male" : "Masculino"}</label>
                   <input 
                       id="gender-female"
                       type="radio"
@@ -282,15 +289,15 @@ export default function StudentsForm() {
                       checked={student.gender === "Feminino"}
                       onChange={(e) => setStudent({ ...student, gender: e.target.value })}
                   />
-                  <label htmlFor="gender-female">Feminino</label>
+                  <label htmlFor="gender-female">{language === "english" ? "Female" : "Feminino"}</label>
                 </div>
                 </div>
                 <div className="form-group">
-                <label htmlFor="skin_color">Cor da pele</label>
+                <label htmlFor="skin_color">{language === "english" ? "Skin Color" : "Cor Da Pele"}</label>
                 <input 
                     id="skin_color"
                     type="text"
-                    placeholder="Digite a cor da pele"
+                    placeholder={language === "english" ? "Write the Student's Skin Color" : "Digite a cor da pele"}
                     value={student.skin_color}
                     onChange={(e) => setStudent({ ...student, skin_color: e.target.value })}
                 />
@@ -300,35 +307,38 @@ export default function StudentsForm() {
                 <input 
                     id="email"
                     type="email"
-                    placeholder="Digite o email"
+                    placeholder={language === "english" ? "Write the Email Address" : "Digite o Email"}
                     value={student.email}
                     onChange={(e) => setStudent({ ...student, email: e.target.value })}
                 />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="phone">Telefone</label>
+                    <label htmlFor="phone">{language === "english" ? "Phone Number" : "Telefone"}</label>
                     <input 
                         id="phone"
                         type="text"
-                        placeholder="Digite o telefone"
+                        placeholder={language === "english" ? "Write the Phone Number" : "Digite o Telefone"}
                         value={student.phone}
                         onChange={(e) => handlePhoneChange(e, false)}
                     />
                     {phoneError && <span className="error-message">{phoneError}</span>}
                 </div>
                 <div className="form-group">
-                    <label htmlFor="second_phone">Telefone 2</label>
+                    <label htmlFor="second_phone">{language === "english" ? "Secondary Phone Number" : "Telefone Secundario"}</label>
                     <input 
                         id="second_phone"
                         type="text"
-                        placeholder="Digite o telefone"
+                        placeholder={language === "english" ? "Write the Phone Number" : "Digite o Telefone"}
                         value={student.second_phone}
                         onChange={(e) => handlePhoneChange(e, true)}
                     />
                     {secondPhoneError && <span className="error-message">{secondPhoneError}</span>}
                 </div>
                 <button type="submit" className="add-student-button">
-                    {id ? 'Salvar Alterações' : 'Criar Aluno'}
+                    {id 
+                    ? language === "english" ? "Save changes" : "Salvar Alterações"
+                    : language === "english" ? "Create Student" : "Criar Aluno"
+                    }
                 </button>
             </form>
         </div>

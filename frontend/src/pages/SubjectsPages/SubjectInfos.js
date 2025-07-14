@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import API from "../../api";
 import { useNavigate, useParams } from "react-router-dom";
 import { occupationEnum } from "../../enums/occupationEnum";
+import { useLanguage } from '../../components/LanguageContext';
 
 import '../../styles/global.css';
 import '../../styles/subject-infos.css';
@@ -9,6 +10,7 @@ import '../../styles/subject-infos.css';
 export default function SubjectInfos() {
     const navigate = useNavigate();
     const { id } = useParams();
+    const { language } = useLanguage();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [subject, setSubject] = useState({
         name: "",
@@ -101,16 +103,14 @@ export default function SubjectInfos() {
                             className="add-student-button"
                             onClick={() => navigate(`/subject_inscription/${id}`)}
                         >
-                            Inscrever Aluno na Disciplina
+                            {language === "english" ? "Enroll Student in the Subject" : "Inscrever Aluno na Disciplina"}
                         </button>
-                    
-
                     
                         <button
                             className="summary-data-button"
                             onClick={() => navigate(`/subject_form/${id}`)}
                         >
-                            Editar Disciplina
+                            {language === "english" ? "Edit Subject" : "Editar Disciplina"}
                         </button>
                     </div>
                 }
@@ -126,13 +126,13 @@ export default function SubjectInfos() {
                         <div className="student-info">
                             <div className="student-name">{student.name}</div>
                             <div className="student-details">
-                                <p>Matrícula: {student.id}</p>
+                                <p>{language === "english" ? "Registration" : "Matrícula"}: {student.id}</p>
                                 {student.gender && <p>Sexo: {student.gender}</p>}
                             </div>
                         </div>
                         <div className="user-actions">
                             <button className="delete-button" onClick={() => handleRemoveToSubject(student.id)}>
-                                Excluir
+                            {language === "english" ? "Delete" : "Excluir"}
                             </button>
                         </div>
                     </div>

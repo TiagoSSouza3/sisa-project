@@ -4,9 +4,12 @@ import { useNavigate } from "react-router-dom";
 import '../../styles/global.css';
 import '../../styles/users.css';
 import { occupationEnum } from "../../enums/occupationEnum";
+import { useLanguage } from '../../components/LanguageContext';
+
 
 export default function Users() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { language } = useLanguage();
   const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -52,10 +55,10 @@ export default function Users() {
   return (
     <div className="users-container">
       <div className="users-header">
-        <h2>Usuários</h2>
+        <h2>{language === "english" ? "Users" : "Usuários"}</h2>
         {isLoggedIn && localStorage.getItem("occupation_id") === occupationEnum.administrador
           ? <button className="add-user-button" onClick={() => navigate('/users_form')}>
-            Adicionar Novo Usuário
+            {language === "english" ? "Add New User" : "Adicionar Novo Usuário"}
           </button>
           : ""
         }
@@ -76,10 +79,10 @@ export default function Users() {
             { isLoggedIn && localStorage.getItem("occupation_id") === occupationEnum.administrador
               ? <div className="user-actions">
                 <button className="delete-button" onClick={() => handleDelete(user.id)}>
-                  Excluir
+                  {language === "english" ? "Delete" : "Excluir"}
                 </button>
                 <button className="edit-button" onClick={() => handleEdit(user.id)}>
-                  Editar
+                  {language === "english" ? "Edit" : "Editar"}
                 </button>
               </div>
               : ""

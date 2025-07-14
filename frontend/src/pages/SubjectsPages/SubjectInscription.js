@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import API from "../../api";
 import { useNavigate, useParams } from "react-router-dom";
 import SearchBar from "../../components/SearchBar";
+import { useLanguage } from '../../components/LanguageContext';
 
 import '../../styles/global.css';
 import '../../styles/subject-inscription.css';
@@ -9,6 +10,7 @@ import '../../styles/subject-inscription.css';
 export default function SubjectInscription() {
     const navigate = useNavigate();
     const { id } = useParams();
+    const { language } = useLanguage();
     const [searchTerm, setSearchTerm] = useState("");
     const [subject, setSubject] = useState({
         name: "",
@@ -91,7 +93,7 @@ export default function SubjectInscription() {
                 <SearchBar
                 value={searchTerm}
                 onChange={setSearchTerm}
-                placeholder="Pesquisar por nome ou matrícula"
+                placeholder={language === "english" ? "Search with Name or Registration" : "Procurar por Nome ou Matrícula"}
                 />
             </div>
             <div className="students-list">
@@ -100,19 +102,22 @@ export default function SubjectInscription() {
                     <div className="student-info">
                     <div className="student-name">{student.name}</div>
                     <div className="student-details">
-                        <p>Matrícula: {student.id}</p>
+                        <p>{language === "english" ? "Registration" : "Matrícula"}: {student.id}</p>
                     </div>
                     <div className="student-status">
                         <input
                         type="button"
-                        value={student.active ? "Ativo" : "Inativo"}
+                        value={student.active 
+                            ? language === "english" ? "Active" : "Ativo" 
+                            : language === "english" ? "Inactive" : "Inativo"
+                          }
                         className={`status-badge ${student.active ? 'active' : 'inactive'}`}
                         />
                     </div>
                     </div>
                     <div className="student-actions">
                         <button className="add-button" onClick={() => handleAddToSubject(student.id)}>
-                        <i className="fas fa-edit"></i> Adicionar
+                        <i className="fas fa-edit"></i> {language === "english" ? "Add" : "Adicionar"}
                         </button>
                     </div>
                 </div>

@@ -5,12 +5,14 @@ import Filter from "../../components/Filter";
 import Modal from "../../components/Modal";
 import { useNavigate } from "react-router-dom";
 import { occupationEnum } from "../../enums/occupationEnum"
+import { useLanguage } from '../../components/LanguageContext';
 
 import '../../styles/global.css';
 import '../../styles/students.css';
 
 export default function Students() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { language } = useLanguage();
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -163,17 +165,16 @@ export default function Students() {
   return (
     <div className="students-container">
       <div className="students-header">
-        <h2>Alunos</h2>
-        {isLoggedIn && localStorage.getItem("occupation_id") !== occupationEnum.professor
-          ? <div className="header-actions">
+        <h2>{language === "english" ? "Students" : "Alunos"}</h2>
+        {isLoggedIn && localStorage.getItem("occupation_id") !== occupationEnum.professor &&
+          <div className="header-actions">
             <button className="add-student-button" onClick={() => navigate('/student_form')}>
-              Adicionar Novo Aluno
+              {language === "english" ? "Add New Student" : "Adicionar Novo Aluno"}
             </button>
             <button className="summary-data-button" onClick={() => navigate('/summary_data')}>
-              Dados Resumidos
+              {language === "english" ? "Sumary Data" : "Dados Resumidos"}
             </button>
           </div>
-          : ""
         }
       </div>
 
@@ -181,15 +182,15 @@ export default function Students() {
         <SearchBar
           value={searchTerm}
           onChange={setSearchTerm}
-          placeholder="Pesquisar por nome ou matrícula"
+          placeholder={language === "english" ? "Search with Name or Registration" : "Procurar por Nome ou Matrícula"}
           count={filteredStudents.length}
         />
         <div className="filter-actions-group">
           <button className="filter-button" onClick={handleOpenFilterModal}>
-            Filtros Avançados
+            {language === "english" ? "Filters" : "Filtros"}
           </button>
           <button className="clear-button" onClick={handleClearFilters}>
-            Limpar Filtros
+            {language === "english" ? "Clean Filters" : "Limpar Filtros"}
           </button>
         </div>
       </div>
@@ -214,25 +215,27 @@ export default function Students() {
             <div className="student-info">
               <div className="student-name">{student.name}</div>
               <div className="student-details">
-                <p>Matrícula: {student.id}</p>
+                <p>{language === "english" ? "Registration" : "Matrícula"}: {student.id}</p>
                 {student.email && <p>Email: {student.email}</p>}
               </div>
               <div className="student-status">
                 <input
                   type="button"
-                  value={student.active ? "Ativo" : "Inativo"}
+                  value={student.active 
+                          ? language === "english" ? "Active" : "Ativo" 
+                          : language === "english" ? "Inactive" : "Inativo"
+                        }
                   className={`status-badge ${student.active ? 'active' : 'inactive'}`}
                   onClick={changeStudentStatus(student.id)}
                 />
               </div>
             </div>
-            {isLoggedIn && localStorage.getItem("occupation_id") !== occupationEnum.professor
-              ? <div className="student-actions">
+            {isLoggedIn && localStorage.getItem("occupation_id") !== occupationEnum.professor &&
+              <div className="student-actions">
                 <button className="edit-button" onClick={() => handleEdit(student.id)}>
-                  <i className="fas fa-edit"></i> Editar
+                  <i className="fas fa-edit"></i>{language === "english" ? "Edit" : "Editar"}
                 </button>
               </div>
-              : ""
             }
           </div>
         ))}

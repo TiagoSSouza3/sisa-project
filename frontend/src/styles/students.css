@@ -11,6 +11,7 @@
 
 .header-actions {
   display: flex;
+  flex-direction: column;
   gap: 1rem;
   align-items: center;
 }
@@ -223,10 +224,6 @@
     flex-direction: column;
     gap: 1rem;
     align-items: stretch;
-  }
-
-  .header-actions {
-    flex-direction: column;
   }
 
   .filter-actions-group {

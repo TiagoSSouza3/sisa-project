@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import API from "../../api";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from '../../components/LanguageContext';
 
 import '../../styles/global.css';
 import '../../styles/summary_data.css';
 
 export default function Summary_data() {
+    const { language } = useLanguage();
     const [data, setData] = useState({
         students_active: 0,
         students_total: 0,
@@ -150,15 +152,15 @@ export default function Summary_data() {
                     <path fillRule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
                 </svg>
             </button>
-            <h1>Dados</h1>
+            <h1>{language === "english" ? "Summary Data" : "Dados"}</h1>
             {error && <div className="error">{error}</div>}
             <div className="summary-data">
-                <p>Total de Alunos: {data.students_total}</p>
-                <p>Alunos Ativos: {data.students_active}</p>
-                <p>Alunos do Sexo Masculino: {data.students_male}</p>
-                <p>Alunos do Sexo Feminino: {data.students_female}</p>
-                <p>Familias: {data.students_family_income}</p>
-                <p>Alunos com NIS: {data.students_with_NIS}</p>
+                <p>{language === "english" ? "All Students" : "Todos os Alunos"}: {data.students_total}</p>
+                <p>{language === "english" ? "Active Students" : "Alunos Ativos"}: {data.students_active}</p>
+                <p>{language === "english" ? "Male Students" : "Alunos do Sexo Masculino"}: {data.students_male}</p>
+                <p>{language === "english" ? "Female Students" : "Alunos do Sexo Feminino"}: {data.students_female}</p>
+                <p>{language === "english" ? "Families" : "Familias"}: {data.students_family_income}</p>
+                <p>{language === "english" ? "Students with NIS" : "Alunos com NIS"}: {data.students_with_NIS}</p>
             </div>
         </div>
     );
