@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import API from "../../api";
 import { useNavigate } from "react-router-dom";
 import { occupationEnum } from "../../enums/occupationEnum";
+import { useLanguage } from '../../components/LanguageContext';
 
 import '../../styles/global.css';
 import '../../styles/subjects.css';
 
 export default function Subjects() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { language } = useLanguage();
   const [subjects, setSubjects] = useState([]);
   const navigate = useNavigate();
 
@@ -34,20 +36,20 @@ export default function Subjects() {
   return (
     <div className="subjects-container">
       <div className="subjects-header">
-        <h2>Disciplinas</h2>
+        <h2>{language === "english" ? "Subjects" : "Disciplinas"}</h2>
         { isLoggedIn && localStorage.getItem("occupation_id") === occupationEnum.administrador && 
           <button 
             className="add-subject-button"
             onClick={() => navigate("/subject_form")}
           >
-            Adicionar Nova Disciplina
+            {language === "english" ? "Add New Subject" : "Adicionar nova Disciplina"}
           </button>
         }
       </div>
 
       <div className="subjects-list">
         {subjects.length === 0 ? (
-          <div className="empty-state">Nenhuma disciplina cadastrada</div>
+          <div className="empty-state">{language === "english" ? "No Registered Discipline" : "Nenhuma Disciplina Registrada"}</div>
         ) : (
           subjects.map(subject => (
             <div key={subject.id} className="subject-card">
@@ -58,7 +60,7 @@ export default function Subjects() {
                   className="edit-button"
                   onClick={() => navigate(`/subject_infos/${subject.id}`)}
                 >
-                  Editar
+                  {language === "english" ? "Edit" : "Editar"}
                 </button>
               </div>
             </div>

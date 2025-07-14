@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { occupationEnum } from "../enums/occupationEnum";
+import { useLanguage } from './LanguageContext';
 
 export default function Sidebar({ isOpen, onClose }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const location = useLocation();
+  const { language } = useLanguage();
 
   const isActive = (path) => (location.pathname === path ? "active" : "");
 
@@ -38,26 +40,31 @@ export default function Sidebar({ isOpen, onClose }) {
 
         <nav className="sidebar-nav">
           <Link to="/dashboard" className={isActive("/dashboard")}>
-            <span role="img" aria-label="Início">🏠</span> Início
+            <span role="img" aria-label="Início">🏠</span> 
+            {language === "english" ? "Dashboard" : "Início"}
           </Link>
 
           {isLoggedIn &&
             localStorage.getItem("occupation_id") !== occupationEnum.professor && (
               <Link to="/users" className={isActive("/users")}>
-                <span role="img" aria-label="Usuários">👥</span> Usuários
+                <span role="img" aria-label="Usuários">👥</span> 
+                {language === "english" ? "Users" : "Usuários"}
               </Link>
           )}
 
           <Link to="/students" className={isActive("/students")}>
-            <span role="img" aria-label="Alunos">🎓</span> Alunos
+            <span role="img" aria-label="Alunos">🎓</span> 
+            {language === "english" ? "Students" : "Alunos"}
           </Link>
 
           <Link to="/subjects" className={isActive("/subjects")}>
-            <span role="img" aria-label="Atividades">📚</span> Atividades
+            <span role="img" aria-label="Atividades">📚</span> 
+            {language === "english" ? "Subjects" : "Atividades"}
           </Link>
 
           <Link to="/documents" className={isActive("/documents")}>
-            <span role="img" aria-label="Documentos">📄</span> Documentos
+            <span role="img" aria-label="Documentos">📄</span>
+            {language === "english" ? "Documents" : "Documentos"}
           </Link>
 
           <Link
@@ -65,7 +72,8 @@ export default function Sidebar({ isOpen, onClose }) {
             onClick={handleLogout}
             className="logout-btn"
           >
-            <span role="img" aria-label="Sair">🚪</span> Sair
+            <span role="img" aria-label="Sair">🚪</span>
+            {language === "english" ? "Exit" : "Sair"}
           </Link>
         </nav>
       </aside>

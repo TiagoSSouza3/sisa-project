@@ -1,5 +1,6 @@
 import React from 'react';
 import '../styles/searchbar.css';
+import { useLanguage } from './LanguageContext';
 
 const SearchBar = ({ 
   value, 
@@ -8,10 +9,17 @@ const SearchBar = ({
   className = "",
   count
 }) => {
+  const { language } = useLanguage();
+
   return (
     <div className={`search-container ${className}`.trim()}>
       { count && <div className="student-count">
-          {count} {count === 1 ? "aluno" : "alunos"}
+          {count} 
+          {
+            count === 1 
+            ? language === "english" ? " Student" : " Aluno" 
+            : language === "english" ? " Students" : " Alunos"
+          }
         </div>
       }
       <svg 
