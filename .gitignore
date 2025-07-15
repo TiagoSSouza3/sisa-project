@@ -9,4 +9,3 @@ frontend/node_modules
 backend/cert/cert.pem
 backend/cert/key.pem
 
-init.sql

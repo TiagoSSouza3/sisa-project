@@ -1,22 +1,22 @@
 {
-  "dependencies": {
-    "@ionic/react": "^8.5.7",
-    "@ionic/react-router": "^8.5.7",
-    "bcryptjs": "^3.0.2",
-    "cpf-cnpj-validator": "^1.0.3",
-    "file-saver": "^2.0.5",
-    "jspdf": "^3.0.1",
-    "pdfkit": "^0.17.1",
-    "react-icons": "^5.5.0"
-  },
+  "dependencies": {},
   "scripts": {
+    "install-all": "node install-all.js",
+    "install-backend": "cd backend && npm install",
+    "install-frontend": "cd frontend && npm install",
+    "setup": "node install-all.js",
     "start": "concurrently --kill-others-on-fail \"npm run start-backend\" \"npm run start-frontend\"",
-    "start-backend": "npm --prefix backend start",
-    "start-frontend": "npm --prefix frontend start"
+    "start-backend": "cd backend && npm start",
+    "start-frontend": "cd frontend && npm start",
+    "dev": "concurrently --kill-others-on-fail \"npm run dev-backend\" \"npm run start-frontend\"",
+    "dev-backend": "cd backend && npm run dev",
+    "clean": "rimraf node_modules backend/node_modules frontend/node_modules",
+    "clean-install": "npm run clean && npm run setup"
   },
   "devDependencies": {
     "concurrently": "^9.2.0",
-    "react-scripts": "^5.0.1"
+    "react-scripts": "^5.0.1",
+    "rimraf": "^5.0.5"
   },
   "browserslist": {
     "production": [

@@ -1,8 +1,16 @@
 const express = require("express");
 const router = express.Router();
+const processingController = require("../controllers/documentProcessingController");
+const upload = require('../middleware/upload');
+
+// Rotas de Processamento
+router.post("/analyze", upload.single('file'), processingController.analyzeDocument);
+router.post("/preview", upload.single('file'), processingController.previewDocument);
+router.post("/process", upload.single('file'), processingController.processDocument);
+
+// Rotas de Gerenciamento (opcional)
 const documentController = require("../controllers/documentController");
 const auth = require("../middleware/authMiddleware");
-const upload = require('../middleware/upload').upload;
 
 router.get("/", auth, documentController.getDocuments);
 router.get("/:id", auth, documentController.getDocument);
