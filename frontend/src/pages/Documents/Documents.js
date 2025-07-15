@@ -5,8 +5,10 @@ import LayoutsList from './LayoutsList';
 import DocumentForm from './DocumentForm';
 import AllDocuments from './AllDocuments';
 import '../../styles/Documents.css';
+import { useLanguage } from '../../components/LanguageContext';
 
 export default function Documents() {
+  const { language } = useLanguage();
   const [layouts, setLayouts] = useState([]);
   const [selectedLayout, setSelectedLayout] = useState(null);
   const [activeTab, setActiveTab] = useState('layouts'); // layouts, upload, form, all-documents
@@ -72,10 +74,16 @@ export default function Documents() {
         {/* Header */}
         <div className="documents-header">
           <h1 className="documents-title">
-            Sistema de Gerenciamento de Documentos
+            {language === "english" 
+              ? "Document Management System" 
+              : "Sistema de Gerenciamento de Documentos"
+            }
           </h1>
           <p className="documents-subtitle">
-            Gerencie layouts com placeholders e documentos gerais
+            {language === "english" 
+              ? "Manage layouts with placeholders and general documents" 
+              : "Gerencie layouts com placeholders e documentos gerais"
+            }
           </p>
         </div>
 
@@ -110,7 +118,7 @@ export default function Documents() {
               className={`nav-tab ${activeTab === 'all-documents' ? 'active' : ''}`}
             >
               <span className="nav-tab-icon">📁</span>
-              <span>Todos os Documentos</span>
+              <span>{language === "english" ? "All Documents" : "Todos os Documentos"}</span>
             </button>
             {selectedLayout && (
               <button
@@ -118,7 +126,7 @@ export default function Documents() {
                 className={`nav-tab ${activeTab === 'form' ? 'active' : ''}`}
               >
                 <span className="nav-tab-icon">✏️</span>
-                <span>Preencher Formulário</span>
+                <span>{language === "english" ? "Fill out form" : "Preencher Fomulario"}</span>
               </button>
             )}
           </div>

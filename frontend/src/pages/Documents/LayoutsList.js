@@ -3,8 +3,10 @@ import { createPortal } from 'react-dom';
 import API from '../../api';
 import '../../styles/LayoutsList.css';
 import '../../styles/LayoutsList-modal.css';
+import { useLanguage } from '../../components/LanguageContext';
 
 export default function LayoutsList({ layouts, loading, onSelectLayout, onDeleteLayout, onUseLayout, hasLoaded }) {
+  const { language } = useLanguage();
   const [deletingId, setDeletingId] = useState(null);
   const [previewLayout, setPreviewLayout] = useState(null);
   const [previewHtml, setPreviewHtml] = useState('');
@@ -108,10 +110,10 @@ export default function LayoutsList({ layouts, loading, onSelectLayout, onDelete
         <div className="modal-content" onClick={(e) => e.stopPropagation()}>
           <div className="modal-header">
             <h3 className="modal-title">
-              📄 Preview: {previewLayout.name}
+              📄 {language === "english" ? "Preview" : "Pré-Visualização"}: {previewLayout.name}
             </h3>
             <button onClick={closePreview} className="close-btn">
-              ❌ Fechar
+              ❌ {language === "english" ? "Close" : "Fechar"}
             </button>
           </div>
           <div className="modal-body">
@@ -119,7 +121,7 @@ export default function LayoutsList({ layouts, loading, onSelectLayout, onDelete
               {loadingPreview ? (
                 <div className="preview-loading-state">
                   <div className="loading-spinner-large"></div>
-                  <p>Carregando preview...</p>
+                  <p>{language === "english" ? "loading Preview..." : "Carregando Pré-Visualização..."}</p>
                 </div>
               ) : (
                 <div 
@@ -131,7 +133,7 @@ export default function LayoutsList({ layouts, loading, onSelectLayout, onDelete
           </div>
           <div className="modal-footer">
             <button onClick={closePreview} className="btn btn-secondary">
-              Fechar
+              {language === "english" ? "Close" : "Fechar"}
             </button>
             <button
               onClick={() => {
@@ -141,7 +143,7 @@ export default function LayoutsList({ layouts, loading, onSelectLayout, onDelete
               }}
               className="btn btn-primary"
             >
-              ✏️ Usar Este Layout
+              ✏️ {language === "english" ? "Use This Layout..." : "Usar Este Layout..."}
             </button>
           </div>
         </div>
@@ -154,7 +156,7 @@ export default function LayoutsList({ layouts, loading, onSelectLayout, onDelete
     return (
       <div className="layouts-loading">
         <div className="loading-spinner-large"></div>
-        <p>Carregando layouts...</p>
+        <p>{language === "english" ? "Loading layouts..." : "Carregando layouts..."}</p>
       </div>
     );
   }
@@ -164,19 +166,27 @@ export default function LayoutsList({ layouts, loading, onSelectLayout, onDelete
       <div className="layouts-empty">
         <div className="empty-state">
           <div className="empty-icon">📄</div>
-          <h3 className="empty-title">Nenhum layout encontrado</h3>
+          <h3 className="empty-title">{language === "english" ? "No layouts found" : "Nenhum layout encontrado"}</h3>
           <p className="empty-subtitle">
-            Comece criando seu primeiro layout de documento
+            {language === "english" 
+              ? "Start by creating your first document layout" 
+              : "Comece criando seu primeiro layout de documento"
+            }
           </p>
           <button
             onClick={() => window.dispatchEvent(new CustomEvent('switchToUpload'))}
             className="btn btn-primary"
           >
-            📤 Upload Documento
+            📤 {language === "english" ? "Upload Document" : "Upload Documento"}
           </button>
           <div className="empty-tip">
             <span className="tip-icon">💡</span>
-            <span>Use placeholders como <code>{'{{nome}}'}</code> no seu DOCX</span>
+            <span>
+              {language === "english" 
+                ? "Use placeholders like <code>{'{{nome}}'}</code> in your DOCX" 
+                : "Use placeholders como <code>{'{{nome}}'}</code> no seu DOCX"
+              }
+            </span>
           </div>
         </div>
       </div>
@@ -187,10 +197,13 @@ export default function LayoutsList({ layouts, loading, onSelectLayout, onDelete
     <div className="layouts-list">
       <div className="layouts-header">
         <h2 className="layouts-title">
-          Layouts Disponíveis ({layouts.length})
+          {language === "english" ? "Available Layouts " : "Layouts Disponíveis "}({layouts.length})
         </h2>
         <p className="layouts-subtitle">
-          Clique em "Usar Layout" para preencher um formulário e gerar documento
+          {language === "english" 
+            ? "Click 'Use Layout' to fill out a form and generate a document." 
+            : "Clique em 'Usar Layout' para preencher um formulário e gerar documento "
+          }
         </p>
       </div>
 
@@ -209,7 +222,7 @@ export default function LayoutsList({ layouts, loading, onSelectLayout, onDelete
                   onClick={() => handleDelete(layout.id)}
                   disabled={deletingId === layout.id}
                   className="delete-btn"
-                  title="Excluir layout"
+                  title={language === "english" ? "Delete layout" : "Excluir layout"}
                 >
                   {deletingId === layout.id ? (
                     <span className="loading-spinner-small"></span>
@@ -264,13 +277,13 @@ export default function LayoutsList({ layouts, loading, onSelectLayout, onDelete
                   }}
                   className="btn btn-primary btn-small"
                 >
-                  ✏️ Usar Layout
+                  ✏️ {language === "english" ? "Use Layout" : "Usar Layout"}
                 </button>
                 <button
                   onClick={() => handlePreview(layout)}
                   className="btn btn-secondary btn-small"
                 >
-                  👁️ Visualizar
+                  👁️ {language === "english" ? "View" : "Visualizar"}
                 </button>
               </div>
             </div>

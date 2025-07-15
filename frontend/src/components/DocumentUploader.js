@@ -12,7 +12,6 @@ export default function DocumentUploader() {
   const fileInputRef = useRef();
   const [dragActive, setDragActive] = useState(false);
 
-  // Handlers de drag & drop
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -39,7 +38,6 @@ export default function DocumentUploader() {
     }
   };
 
-  // Analisar documento
   const handleAnalyze = async () => {
     if (!file) return setError("Selecione um arquivo DOCX");
     
@@ -54,7 +52,6 @@ export default function DocumentUploader() {
       
       setPlaceholders(res.data.placeholders);
       
-      // Inicializar campos
       const initialFields = {};
       res.data.placeholders.forEach(ph => {
         initialFields[ph] = "";
@@ -68,7 +65,6 @@ export default function DocumentUploader() {
     }
   };
 
-  // Gerar preview
   const handlePreview = async () => {
     if (!file) return;
     
@@ -90,7 +86,6 @@ export default function DocumentUploader() {
     }
   };
 
-  // Processar documento final
   const handleProcess = async (format) => {
     if (!file) return;
     
@@ -107,7 +102,6 @@ export default function DocumentUploader() {
         responseType: "blob"
       });
       
-      // Download automático
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement("a");
       link.href = url;
@@ -129,7 +123,6 @@ export default function DocumentUploader() {
       
       {error && <div className="mb-3 p-2 bg-red-100 border border-red-400 text-red-700 rounded">{error}</div>}
       
-      {/* Área de Upload */}
       <div
         className={`flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 mb-4 cursor-pointer transition-all ${
           dragActive ? 'border-blue-700 bg-blue-50' : 'border-blue-400 hover:bg-blue-50'
@@ -163,7 +156,6 @@ export default function DocumentUploader() {
         {loading ? "Analisando..." : "Analisar Documento"}
       </button>
       
-      {/* Campos de Preenchimento */}
       {placeholders.length > 0 && (
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-blue-700 mb-2">Preencher Campos</h3>
@@ -207,7 +199,6 @@ export default function DocumentUploader() {
         </div>
       )}
       
-      {/* Visualização do Documento */}
       {previewHtml && (
         <div className="mt-6 border rounded-lg overflow-hidden">
           <h3 className="text-lg font-semibold bg-gray-100 p-3 text-blue-700">Pré-visualização</h3>

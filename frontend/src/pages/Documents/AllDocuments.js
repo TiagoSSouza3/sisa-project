@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import API from '../../api';
 import '../../styles/AllDocuments.css';
+import { useLanguage } from '../../components/LanguageContext';
 
 export default function AllDocuments() {
+  const { language } = useLanguage();
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -14,13 +16,11 @@ export default function AllDocuments() {
   const [uploading, setUploading] = useState(false);
   const [showUploadForm, setShowUploadForm] = useState(false);
 
-  // Estados do formulário de upload
   const [file, setFile] = useState(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [dragActive, setDragActive] = useState(false);
 
-  // Carregar documentos
   const loadDocuments = async () => {
     setLoading(true);
     setError('');
@@ -43,7 +43,6 @@ export default function AllDocuments() {
     loadDocuments();
   }, []);
 
-  // Deletar documento
   const handleDelete = async (documentId) => {
     if (!window.confirm('Tem certeza que deseja excluir este documento?')) {
       return;
@@ -61,7 +60,6 @@ export default function AllDocuments() {
     }
   };
 
-  // Preview do documento
   const handlePreview = async (document) => {
     setPreviewDocument(document);
     setLoadingPreview(true);
@@ -77,7 +75,6 @@ export default function AllDocuments() {
     }
   };
 
-  // Download do documento
   const handleDownload = async (doc, format = 'docx') => {
     try {
       console.log('Iniciando download do documento:', doc.id, 'formato:', format);
@@ -94,31 +91,26 @@ export default function AllDocuments() {
         headers: response.headers
       });
 
-      // Verificar se a resposta é válida
       if (!response.data) {
         throw new Error('Nenhum dado recebido do servidor');
       }
 
-      // Verificar se é um erro em formato JSON
       if (response.data.type === 'application/json') {
         const text = await response.data.text();
         const errorData = JSON.parse(text);
         throw new Error(errorData.message || 'Erro no servidor');
       }
 
-      // Verificar tamanho mínimo do arquivo
       if (response.data.size < 100) {
         throw new Error('Arquivo muito pequeno, pode estar corrompido');
       }
 
-      // Criar blob com o tipo correto
       const mimeType = format === 'pdf' 
         ? 'application/pdf' 
         : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
       const blob = new Blob([response.data], { type: mimeType });
       
-      // Verificar se o blob foi criado corretamente
       if (blob.size === 0) {
         throw new Error('Erro ao criar arquivo para download');
       }
@@ -128,7 +120,6 @@ export default function AllDocuments() {
         type: blob.type
       });
 
-      // Criar URL e elemento de download
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -140,12 +131,10 @@ export default function AllDocuments() {
       link.download = fileName;
       link.style.display = 'none';
       
-      // Adicionar ao DOM, clicar e remover
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       
-      // Limpar URL após um tempo
       setTimeout(() => {
         window.URL.revokeObjectURL(url);
       }, 1000);
@@ -158,7 +147,6 @@ export default function AllDocuments() {
       
       if (err.response?.data) {
         try {
-          // Se a resposta é um blob, tentar ler como texto
           if (err.response.data instanceof Blob) {
             const reader = new FileReader();
             reader.onload = () => {
@@ -172,8 +160,8 @@ export default function AllDocuments() {
             reader.readAsText(err.response.data);
             return;
           }
-        } catch {
-          // Se falhar, usar mensagem padrão
+        } catch (error) {
+          console.log(error)
         }
       }
       
@@ -186,7 +174,6 @@ export default function AllDocuments() {
     setPreviewHtml('');
   };
 
-  // Upload de arquivo
   const handleFileSelect = (selectedFile) => {
     if (selectedFile && selectedFile.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
       setFile(selectedFile);
@@ -245,7 +232,6 @@ export default function AllDocuments() {
 
       setDocuments([response.data, ...documents]);
       
-      // Reset form
       setFile(null);
       setName('');
       setDescription('');
@@ -258,7 +244,6 @@ export default function AllDocuments() {
     }
   };
 
-  // Bloquear scroll do body quando modal estiver aberto
   useEffect(() => {
     if (previewDocument) {
       document.body.style.overflow = 'hidden';
@@ -271,7 +256,6 @@ export default function AllDocuments() {
     };
   }, [previewDocument]);
 
-  // Fechar modal com ESC
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === 'Escape' && previewDocument) {
@@ -301,7 +285,6 @@ export default function AllDocuments() {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  // Componente do Modal
   const PreviewModal = () => {
     if (!previewDocument) return null;
 
@@ -311,10 +294,10 @@ export default function AllDocuments() {
         <div className="modal-content" onClick={(e) => e.stopPropagation()}>
           <div className="modal-header">
             <h3 className="modal-title">
-              📄 Preview: {previewDocument.name}
+              📄 {language === "english" ? "Preview" : "Pré-visualização"}: {previewDocument.name}
             </h3>
             <button onClick={closePreview} className="close-btn">
-              ❌ Fechar
+              ❌ {language === "english" ? "Close" : "Fechar"}
             </button>
           </div>
           <div className="modal-body">
@@ -322,7 +305,7 @@ export default function AllDocuments() {
               {loadingPreview ? (
                 <div className="preview-loading-state">
                   <div className="loading-spinner-large"></div>
-                  <p>Carregando preview...</p>
+                  <p>{language === "english" ? "Loading Preview..." : "Carregando Pré-visualização..."}</p>
                 </div>
               ) : (
                 <div 
@@ -334,20 +317,20 @@ export default function AllDocuments() {
           </div>
           <div className="modal-footer">
             <button onClick={closePreview} className="btn btn-secondary">
-              Fechar
+              {language === "english" ? "Close" : "Fechar"}
             </button>
             <div className="download-buttons">
               <button
                 onClick={() => handleDownload(previewDocument, 'docx')}
                 className="btn btn-primary"
               >
-                📄 Download DOCX
+                📄 {language === "english" ? "Download" : "Baixar"} DOCX
               </button>
               <button
                 onClick={() => handleDownload(previewDocument, 'pdf')}
                 className="btn btn-primary"
               >
-                📋 Download PDF
+                📋 {language === "english" ? "Download" : "Baixar"} PDF
               </button>
             </div>
           </div>
@@ -361,7 +344,7 @@ export default function AllDocuments() {
     return (
       <div className="all-documents-loading">
         <div className="loading-spinner-large"></div>
-        <p>Carregando documentos...</p>
+        <p>{language === "english" ? "Loading Documents..." : "Carregando Documentos..."}</p>
       </div>
     );
   }
@@ -371,17 +354,23 @@ export default function AllDocuments() {
       <div className="all-documents-header">
         <div className="header-content">
           <h2 className="all-documents-title">
-            Todos os Documentos ({documents.length})
+            {language === "english" ? "All Documents " : "Todos os Documentos "} ({documents.length})
           </h2>
           <p className="all-documents-subtitle">
-            Documentos gerais sem campos de preenchimento
+            {language === "english" 
+              ? "General documents without filling fields" 
+              : "Documentos gerais sem campos de preenchimento"
+            }
           </p>
         </div>
         <button
           onClick={() => setShowUploadForm(!showUploadForm)}
           className="btn btn-primary"
         >
-          {showUploadForm ? '❌ Cancelar' : '📤 Adicionar Documento'}
+          {showUploadForm 
+            ? language === "english" ? '❌ Cancel' : '❌ Cancelar'
+            : language === "english" ? '📤 Add Document' : '📤 Adicionar Documento'
+          }
         </button>
       </div>
 
@@ -392,7 +381,6 @@ export default function AllDocuments() {
         </div>
       )}
 
-      {/* Formulário de Upload */}
       {showUploadForm && (
         <div className="upload-form-container">
           <form onSubmit={handleSubmit} className="upload-form">
@@ -415,7 +403,7 @@ export default function AllDocuments() {
                     onClick={() => setFile(null)}
                     className="remove-file-btn"
                   >
-                    🗑️ Remover
+                    🗑️ {language === "english" ? "Remove" : "Remover"}
                   </button>
                 </div>
               ) : (
@@ -423,8 +411,12 @@ export default function AllDocuments() {
                   <div className="upload-icon">📤</div>
                   <div className="upload-text">
                     <label htmlFor="file-upload" className="upload-label">
-                      <span className="upload-link">Clique para fazer upload</span>
-                      <span> ou arraste e solte</span>
+                      <span className="upload-link">
+                        {language === "english" ? "Click to upload" : "Clique Para Fazer Upload"}
+                      </span>
+                      <span>
+                        {language === "english" ? "or Drag and Drop" : "ou Arraste e Solte"}
+                      </span>
                     </label>
                     <input
                       id="file-upload"
@@ -435,15 +427,15 @@ export default function AllDocuments() {
                       onChange={(e) => handleFileSelect(e.target.files[0])}
                     />
                   </div>
-                  <p className="upload-hint">Apenas arquivos DOCX até 10MB</p>
-                </div>
+                  <p className="upload-hint">{language === "english" ? "Only DOCX files up to 10MB" : "Apenas arquivos DOCX até 10MB"}</p>
+                  </div>
               )}
             </div>
 
             <div className="form-fields">
               <div className="field-group">
                 <label htmlFor="name" className="field-label">
-                  Nome do Documento *
+                  {language === "english" ? "Document name *" : "Nome do Documento *"}
                 </label>
                 <input
                   type="text"
@@ -451,14 +443,14 @@ export default function AllDocuments() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="field-input"
-                  placeholder="Ex: Manual de Procedimentos"
+                  placeholder={language === "english" ? "Ex: Procedures Manual" : "Ex: Manual de Procedimentos"}
                   required
                 />
               </div>
 
               <div className="field-group">
                 <label htmlFor="description" className="field-label">
-                  Descrição (opcional)
+                  {language === "english" ? "Description" : "Descrição"} ({language === "english" ? "optional" : "opcional"})
                 </label>
                 <textarea
                   id="description"
@@ -466,7 +458,7 @@ export default function AllDocuments() {
                   onChange={(e) => setDescription(e.target.value)}
                   rows={3}
                   className="field-textarea"
-                  placeholder="Descreva o conteúdo deste documento..."
+                  placeholder={language === "english" ? "Describe the contents of this document..." : "Descreva o conteúdo deste documento..."}
                 />
               </div>
             </div>
@@ -477,7 +469,7 @@ export default function AllDocuments() {
                 onClick={() => setShowUploadForm(false)}
                 className="btn btn-secondary"
               >
-                ❌ Cancelar
+                ❌ {language === "english" ? "Cancel" : "Cancelar"}
               </button>
               <button
                 type="submit"
@@ -487,11 +479,11 @@ export default function AllDocuments() {
                 {uploading ? (
                   <>
                     <span className="loading-spinner"></span>
-                    Fazendo Upload...
+                    {language === "english" ? "Uploading..." : "Fazendo Upload..."}
                   </>
                 ) : (
                   <>
-                    📤 Salvar Documento
+                    📤 {language === "english" ? "Save Documents..." : "Salvar Documentos..."}
                   </>
                 )}
               </button>
@@ -504,15 +496,18 @@ export default function AllDocuments() {
       {documents.length === 0 ? (
         <div className="empty-state">
           <div className="empty-icon">📄</div>
-          <h3 className="empty-title">Nenhum documento encontrado</h3>
+          <h3 className="empty-title">{language === "english" ? "No Documents Found..." : "Nenhum Documento Encontrado..."}</h3>
           <p className="empty-subtitle">
-            Adicione documentos gerais que não precisam de preenchimento
+            {language === "english" 
+              ? "Add general documents that do not need to be filled out" 
+              : "Adicione documentos gerais que não precisam de preenchimento"
+            }
           </p>
           <button
             onClick={() => setShowUploadForm(true)}
             className="btn btn-primary"
           >
-            📤 Adicionar Primeiro Documento
+            📤 {language === "english" ? "Add First Document" : "Adicionar Primeiro Documento"}
           </button>
         </div>
       ) : (
@@ -528,7 +523,7 @@ export default function AllDocuments() {
                   onClick={() => handleDelete(document.id)}
                   disabled={deletingId === document.id}
                   className="delete-btn"
-                  title="Excluir documento"
+                  title={language === "english" ? "Delete Documents" : "Excluir Documentos"}
                 >
                   {deletingId === document.id ? (
                     <span className="loading-spinner-small"></span>
@@ -564,7 +559,7 @@ export default function AllDocuments() {
                   onClick={() => handlePreview(document)}
                   className="btn btn-secondary btn-small"
                 >
-                  👁️ Visualizar
+                  👁️ {language === "english" ? "View" : "Vizualizar"}
                 </button>
                 <div className="download-buttons">
                   <button

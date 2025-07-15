@@ -21,7 +21,6 @@ API.interceptors.request.use((config) => {
 API.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Adicione um log mais detalhado do erro
     console.error('Erro na requisição:', {
       config: error.config,
       response: error.response,

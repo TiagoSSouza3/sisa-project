@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import API from '../../api';
 import '../../styles/DocumentForm.css';
+import { useLanguage } from '../../components/LanguageContext';
 
 export default function DocumentForm({ layout, onCancel }) {
+  const { language } = useLanguage();
   const [formData, setFormData] = useState({});
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState('');
@@ -167,7 +169,6 @@ export default function DocumentForm({ layout, onCancel }) {
       const link = document.createElement('a');
       link.href = url;
       
-      // Nome do arquivo limpo
       const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
       const cleanName = layout.name.replace(/[^a-zA-Z0-9\s]/g, '').trim();
       const fileName = `${cleanName}_${timestamp}.${outputFormat}`;
@@ -175,17 +176,14 @@ export default function DocumentForm({ layout, onCancel }) {
       
       console.log('Iniciando download:', fileName);
       
-      // Fazer download
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       
-      // Aguardar um pouco antes de revogar a URL
       setTimeout(() => {
         window.URL.revokeObjectURL(url);
       }, 1000);
 
-      // Limpar formulário após sucesso
       const clearedData = {};
       placeholdersArray.forEach(placeholder => {
         clearedData[placeholder] = '';
@@ -198,11 +196,9 @@ export default function DocumentForm({ layout, onCancel }) {
     } catch (err) {
       console.error('Erro detalhado na geração:', err);
       
-      // Verificar se é erro de timeout
       if (err.code === 'ECONNABORTED') {
         setError('Timeout na geração do documento. Tente novamente.');
       } else if (err.response?.data) {
-        // Se a resposta contém dados, pode ser um erro JSON
         try {
           const reader = new FileReader();
           reader.onload = () => {
@@ -272,14 +268,14 @@ export default function DocumentForm({ layout, onCancel }) {
   return (
     <div className="document-form">
       <div className="form-header">
-        <h2 className="form-title">Preencher Formulário</h2>
+        <h2 className="form-title">{language === "english" ? "Fill out form" : "Preencher Formulario"}</h2>
         <div className="form-subtitle">
           <span className="layout-name">{layout.name}</span>
           {layout.description && (
             <span className="layout-description">{layout.description}</span>
           )}
           <span className="fields-count">
-            {placeholdersArray.length} campo(s) para preencher
+            {placeholdersArray.length} {language === "english" ? "field(s) to fill" : "campo(s) para preencher"}
           </span>
         </div>
       </div>
@@ -297,7 +293,7 @@ export default function DocumentForm({ layout, onCancel }) {
           <form onSubmit={handleGenerate} className="form-content">
             {/* Format Selection */}
             <div className="format-selection">
-              <h3 className="format-title">Formato de Saída</h3>
+              <h3 className="format-title">{language === "english" ? "field(s) to fill" : "Formato de Saida"}</h3>
               <div className="format-options">
                 <label className="format-option">
                   <input
@@ -372,7 +368,7 @@ export default function DocumentForm({ layout, onCancel }) {
                 onClick={onCancel}
                 className="btn btn-secondary"
               >
-                ❌ Cancelar
+                ❌ {language === "english" ? "Cancel" : "Cancelar"}
               </button>
               <button
                 type="submit"
@@ -382,11 +378,11 @@ export default function DocumentForm({ layout, onCancel }) {
                 {generating ? (
                   <>
                     <span className="loading-spinner"></span>
-                    Gerando {outputFormat.toUpperCase()}...
+                    {language === "english" ? "Generating" : "Gerando"} {outputFormat.toUpperCase()}...
                   </>
                 ) : (
                   <>
-                    📥 Gerar {outputFormat.toUpperCase()}
+                    📥 {language === "english" ? "Generate" : "Gerar"} {outputFormat.toUpperCase()}
                   </>
                 )}
               </button>
@@ -397,11 +393,11 @@ export default function DocumentForm({ layout, onCancel }) {
         {/* Preview */}
         <div className="preview-section">
           <div className="preview-header">
-            <h3 className="preview-title">📄 Preview do Documento</h3>
+            <h3 className="preview-title">📄 {language === "english" ? "Document Preview" : "Pré-visualização do Documento"}</h3>
             {loadingPreview && (
               <div className="preview-loading">
                 <span className="loading-spinner-small"></span>
-                <span>Atualizando...</span>
+                <span>{language === "english" ? "Updating..." : "Atualizando..."}</span>
               </div>
             )}
           </div>
@@ -414,7 +410,7 @@ export default function DocumentForm({ layout, onCancel }) {
             ) : (
               <div className="preview-placeholder">
                 <div className="placeholder-icon">📄</div>
-                <p>Carregando preview do documento...</p>
+                <p>{language === "english" ? "Loading document preview..." : "Carregando preview do documento..."}</p>
               </div>
             )}
           </div>

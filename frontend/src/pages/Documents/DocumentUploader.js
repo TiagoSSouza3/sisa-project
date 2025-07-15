@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import API from '../../api';
 import '../../styles/DocumentUploader.css';
+import { useLanguage } from '../../components/LanguageContext';
 
 export default function DocumentUploader({ onLayoutCreated, onCancel }) {
+  const { language } = useLanguage();
   const [file, setFile] = useState(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -83,9 +85,13 @@ export default function DocumentUploader({ onLayoutCreated, onCancel }) {
   return (
     <div className="document-uploader">
       <div className="uploader-header">
-        <h2 className="uploader-title">Upload de Documento DOCX</h2>
+        <h2 className="uploader-title">{language === "english" ? "Documents Upload DOCX" : "Upload de Documento DOCX"}</h2>
         <p className="uploader-subtitle">
-          Faça upload de um documento DOCX com placeholders no formato <code>{'{{campo}}'}</code>
+        {language === "english" 
+          ? "Upload a DOCX document with placeholders in the format " 
+          : "Faça upload de um documento DOCX com placeholders no formato "
+        }
+        <code>{'{{campo}}'}</code>
         </p>
       </div>
 
@@ -97,7 +103,6 @@ export default function DocumentUploader({ onLayoutCreated, onCancel }) {
       )}
 
       <form onSubmit={handleSubmit} className="uploader-form">
-        {/* Upload Area */}
         <div
           className={`upload-area ${dragActive ? 'drag-active' : ''} ${file ? 'has-file' : ''}`}
           onDragEnter={handleDrag}
@@ -117,7 +122,7 @@ export default function DocumentUploader({ onLayoutCreated, onCancel }) {
                 onClick={() => setFile(null)}
                 className="remove-file-btn"
               >
-                🗑️ Remover
+                🗑️ {language === "english" ? "Remove" : "Remover"}
               </button>
             </div>
           ) : (
@@ -125,8 +130,8 @@ export default function DocumentUploader({ onLayoutCreated, onCancel }) {
               <div className="upload-icon">📤</div>
               <div className="upload-text">
                 <label htmlFor="file-upload" className="upload-label">
-                  <span className="upload-link">Clique para fazer upload</span>
-                  <span> ou arraste e solte</span>
+                  <span className="upload-link">{language === "english" ? "Click to Upload" : "Clique Para Fazer Upload"}</span>
+                  <span>{language === "english" ? " or Drag and Drop" : " ou Arraste e Solte"}</span>
                 </label>
                 <input
                   id="file-upload"
@@ -137,7 +142,7 @@ export default function DocumentUploader({ onLayoutCreated, onCancel }) {
                   onChange={(e) => handleFileSelect(e.target.files[0])}
                 />
               </div>
-              <p className="upload-hint">Apenas arquivos DOCX até 10MB</p>
+              <p className="upload-hint">{language === "english" ? "Only DOCX files up to 10MB" : "Apenas arquivos DOCX até 10MB"}</p>
             </div>
           )}
         </div>
@@ -146,7 +151,7 @@ export default function DocumentUploader({ onLayoutCreated, onCancel }) {
         <div className="form-fields">
           <div className="field-group">
             <label htmlFor="name" className="field-label">
-              Nome do Layout *
+              {language === "english" ? "Document name *" : "Nome do Documento *"}
             </label>
             <input
               type="text"
@@ -154,14 +159,14 @@ export default function DocumentUploader({ onLayoutCreated, onCancel }) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="field-input"
-              placeholder="Ex: Certificado de Conclusão"
+              placeholder={language === "english" ? "Ex: Certificate of Completion" : "Ex: Certificado de Conclusão"}
               required
             />
           </div>
 
           <div className="field-group">
             <label htmlFor="description" className="field-label">
-              Descrição (opcional)
+              {language === "english" ? "Description" : "Descrição"} ({language === "english" ? "optional" : "opcional"})
             </label>
             <textarea
               id="description"
@@ -169,21 +174,23 @@ export default function DocumentUploader({ onLayoutCreated, onCancel }) {
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
               className="field-textarea"
-              placeholder="Descreva o propósito deste documento..."
+              placeholder={language === "english" ? "Describe the purpose of this document..." : "Descreva o propósito deste documento..."}
             />
           </div>
         </div>
 
-        {/* Info Box */}
         <div className="info-box">
           <div className="info-icon">💡</div>
           <div className="info-content">
-            <h4 className="info-title">Como usar placeholders</h4>
+            <h4 className="info-title">{language === "english" ? "How to use placeholders" : "Como usar placeholders"}</h4>
             <p className="info-text">
-              Use placeholders no formato <code>{'{{nome_do_campo}}'}</code> no seu documento DOCX.
+              {language === "english" 
+                ? "Use placeholders in format <code>{'{{nome_do_campo}}'}</code> in your document DOCX." 
+                : "Use placeholders no formato <code>{'{{nome_do_campo}}'}</code> no seu documento DOCX."
+              }
             </p>
             <p className="info-examples">
-              Exemplo: <code>{'{{nome}}'}</code>, <code>{'{{data}}'}</code>, <code>{'{{curso}}'}</code>
+              Ex: <code>{'{{nome}}'}</code>, <code>{'{{data}}'}</code>, <code>{'{{curso}}'}</code>
             </p>
           </div>
         </div>
@@ -195,7 +202,7 @@ export default function DocumentUploader({ onLayoutCreated, onCancel }) {
             onClick={onCancel}
             className="btn btn-secondary"
           >
-            ❌ Cancelar
+            ❌ {language === "english" ? "Cancel" : "Cancelar"}
           </button>
           <button
             type="submit"
@@ -205,11 +212,11 @@ export default function DocumentUploader({ onLayoutCreated, onCancel }) {
             {uploading ? (
               <>
                 <span className="loading-spinner"></span>
-                Fazendo Upload...
+                {language === "english" ? "Uploading..." : "Fazendo Upload..."}
               </>
             ) : (
               <>
-                📤 Salvar Layout
+                📤 {language === "english" ? "Save Layout..." : "Salvar Layout..."}
               </>
             )}
           </button>
