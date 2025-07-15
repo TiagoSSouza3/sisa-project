@@ -169,7 +169,7 @@
 
 .edit-button {
   background-color: var(--primary-light);
-  color: var(--primary-color);
+  color: #d4e1ff;
   border: none;
   padding: 0.5rem 1rem;
   border-radius: var(--border-radius);
@@ -185,7 +185,7 @@
 
 .delete-button {
   background-color: var(--error-light);
-  color: rgb(255, 255, 255, 0.5);
+  color: rgb(253, 203, 203);
   border: none;
   padding: 0.5rem 1rem;
   border-radius: var(--border-radius);
@@ -195,7 +195,7 @@
 
 .delete-button:hover {
   background-color: var(--error-color);
-  color: white;
+  color: rgb(255, 255, 255);
 }
 
 .summary-data-button {

@@ -57,6 +57,9 @@
 }
 
 .close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: #fee2e2;
   border: 1px solid #fecaca;
   cursor: pointer;

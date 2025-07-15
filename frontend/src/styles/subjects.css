@@ -49,6 +49,8 @@
 
 .edit-button {
   background-color: var(--primary-light);
+  display: block;
+  margin: 0 auto;
 }
 
 .delete-button {
