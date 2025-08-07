@@ -4,7 +4,7 @@ CREATE DATABASE IF NOT EXISTS sisa;
 USE sisa;
 
 -- Ocupações (Tipos de usuários)
-CREATE TABLE occupation (
+CREATE TABLE IF NOT EXISTS occupation (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name ENUM('Administrador', 'Colaborador', 'Professor') NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -12,7 +12,7 @@ CREATE TABLE occupation (
 );
 
 -- Usuários
-CREATE TABLE user (
+CREATE TABLE IF NOT EXISTS user (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE user (
 );
 
 -- Permissões configuráveis por ocupação
-CREATE TABLE permissions (
+CREATE TABLE IF NOT EXISTS permissions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     occupation_id INT,
     can_edit_subjects BOOLEAN DEFAULT FALSE,
@@ -38,7 +38,7 @@ CREATE TABLE permissions (
 );
 
 -- Estudantes
-CREATE TABLE students (
+CREATE TABLE IF NOT EXISTS students (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255),
@@ -51,7 +51,7 @@ CREATE TABLE students (
 );
 
 -- Disciplinas/Matérias
-CREATE TABLE subjects (
+CREATE TABLE IF NOT EXISTS subjects (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
@@ -59,7 +59,7 @@ CREATE TABLE subjects (
 );
 
 -- Professores das Disciplinas
-CREATE TABLE subject_professor (
+CREATE TABLE IF NOT EXISTS subject_professor (
     subject_id INT,
     professor_id INT,
     PRIMARY KEY (subject_id, professor_id),
@@ -68,7 +68,7 @@ CREATE TABLE subject_professor (
 );
 
 -- Students to Subjects
-CREATE TABLE subject_students (
+CREATE TABLE IF NOT EXISTS subject_students (
     subject_id INT,
     students_id INT,
     PRIMARY KEY (subject_id, students_id),
@@ -77,7 +77,7 @@ CREATE TABLE subject_students (
 );
 
 -- Templates de Documentos
-CREATE TABLE document_templates (
+CREATE TABLE IF NOT EXISTS document_templates (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
@@ -89,7 +89,7 @@ CREATE TABLE document_templates (
 );
 
 -- Campos Editáveis dos Templates
-CREATE TABLE template_fields (
+CREATE TABLE IF NOT EXISTS template_fields (
     id INT AUTO_INCREMENT PRIMARY KEY,
     template_id INT,
     field_name VARCHAR(255) NOT NULL,
@@ -101,7 +101,7 @@ CREATE TABLE template_fields (
 );
 
 -- Permissões de Edição de Campos
-CREATE TABLE field_permissions (
+CREATE TABLE IF NOT EXISTS field_permissions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     template_id INT,
     occupation_id INT,
@@ -113,8 +113,7 @@ CREATE TABLE field_permissions (
 );
 
 -- Modificar a tabela documents existente
-DROP TABLE IF EXISTS documents;
-CREATE TABLE documents (
+CREATE TABLE IF NOT EXISTS documents (
     id INT AUTO_INCREMENT PRIMARY KEY,
     subject_id INT,
     template_id INT,
@@ -136,7 +135,7 @@ CREATE TABLE documents (
 );
 
 -- Histórico de Versões dos Documentos
-CREATE TABLE document_versions (
+CREATE TABLE IF NOT EXISTS document_versions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     document_id INT,
     version INT,
@@ -148,7 +147,7 @@ CREATE TABLE document_versions (
 );
 
 -- Dados Resumidos
-CREATE TABLE summary_data (
+CREATE TABLE IF NOT EXISTS summary_data (
     id INT AUTO_INCREMENT PRIMARY KEY,
     students_active INT,
     students_total INT,
@@ -159,6 +158,7 @@ CREATE TABLE summary_data (
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
 CREATE TABLE IF NOT EXISTS document_layouts (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
@@ -169,6 +169,37 @@ CREATE TABLE IF NOT EXISTS document_layouts (
   created_by INT NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (created_by) REFERENCES user(id) ON DELETE CASCADE,
+  INDEX idx_created_by (created_by),
+  INDEX idx_created_at (created_at)
+);
+
+CREATE TABLE IF NOT EXISTS storage (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  last_price DECIMAL(10, 2),
+  last_price_date DATE,
+  amount INT,
+  created_by INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (created_by) REFERENCES user(id) ON DELETE CASCADE,
+  INDEX idx_created_by (created_by),
+  INDEX idx_created_at (created_at)
+);
+
+CREATE TABLE IF NOT EXISTS storage_log (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  last_price DECIMAL(10, 2),
+  last_price_date DATE,
+  last_change TEXT,
+  amount INT,
+  value_diference INT,
+  created_by INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (created_by) REFERENCES user(id) ON DELETE CASCADE,
   INDEX idx_created_by (created_by),
   INDEX idx_created_at (created_at)
