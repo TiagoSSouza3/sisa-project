@@ -191,6 +191,7 @@ CREATE TABLE IF NOT EXISTS storage (
 
 CREATE TABLE IF NOT EXISTS storage_log (
   id INT AUTO_INCREMENT PRIMARY KEY,
+  id_item INT NOT NULL,
   name VARCHAR(255) NOT NULL,
   description TEXT,
   last_price DECIMAL(10, 2),

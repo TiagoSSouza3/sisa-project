@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import API from "../../api";
 import { useNavigate } from "react-router-dom";
 import { occupationEnum } from "../../enums/occupationEnum";

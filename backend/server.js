@@ -12,8 +12,8 @@ const summaryDataRoutes = require("./routes/summaryDataRoutes");
 const documentRoutes = require("./routes/documentRoutes");
 const documentTemplateRoutes = require("./routes/documentTemplateRoutes");
 const documentLayoutRoutes = require("./routes/documentLayoutRoutes");
-const templateRoutes = require("./routes/templateRoutes");
 const allDocumentsRoutes = require("./routes/allDocumentsRoutes");
+const storageRoutes = require("./routes/storageRoutes");
 
 const fs = require('fs');
 const { Sequelize } = require("sequelize");
@@ -168,6 +168,7 @@ app.use("/api/documents", documentRoutes);
 app.use("/api/document-templates", documentTemplateRoutes);
 app.use("/api/document-layouts", documentLayoutRoutes);
 app.use("/api/all-documents", allDocumentsRoutes);
+app.use("/api/storage", storageRoutes);
 
 app.get("/", (req, res) => {
   res.send("SISA API is running.");
