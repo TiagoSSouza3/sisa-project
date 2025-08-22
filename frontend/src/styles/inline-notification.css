@@ -1,0 +1,127 @@
+/* Inline Notification Component Styles */
+.inline-notification {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  animation: slideDown 0.3s ease-out;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.inline-notification--exiting {
+  animation: slideUp 0.3s ease-in forwards;
+}
+
+/* Success Notification */
+.inline-notification--success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+/* Error Notification */
+.inline-notification--error {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Warning Notification */
+.inline-notification--warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+/* Info Notification */
+.inline-notification--info {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+/* Icon */
+.inline-notification__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+/* Content */
+.inline-notification__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.inline-notification__message {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+
+/* Animations */
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+    max-height: 0;
+    margin-top: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+    max-height: 100px;
+    margin-top: 16px;
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+    max-height: 100px;
+    margin-top: 16px;
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+  to {
+    transform: translateY(-20px);
+    opacity: 0;
+    max-height: 0;
+    margin-top: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .inline-notification {
+    padding: 14px;
+  }
+  
+  .inline-notification__message {
+    font-size: 13px;
+  }
+  
+  .inline-notification__icon {
+    width: 28px;
+    height: 28px;
+  }
+}

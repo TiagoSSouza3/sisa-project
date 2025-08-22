@@ -42,3 +42,5 @@ console.log('🎉 Todas as dependências foram instaladas com sucesso!');
 console.log('\n📋 Próximos passos:');
 console.log('   npm start    - Iniciar backend + frontend');
 console.log('   npm run dev  - Iniciar em modo desenvolvimento');
+
+//node install-all para instalar todas as dependências

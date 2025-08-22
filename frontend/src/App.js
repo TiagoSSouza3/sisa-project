@@ -13,6 +13,8 @@ import SubjectInscription from "./pages/SubjectsPages/SubjectInscription";
 import UsersForm from "./pages/UserPages/UsersForm";
 import Summary_data from "./pages/StudentPages/SummaryData";
 import Documents from "./pages/Documents/Documents";
+import ResetPassword from "./pages/ResetPassword";
+import FirstAccess from "./pages/FirstAccess";
 
 
 import Navbar from "./components/Navbar";
@@ -27,7 +29,9 @@ function App() {
       <Routes>
         <Route path='*' exact={true} element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/" element={<Login />} />
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/first-access" element={<FirstAccess />} />
+                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
         <Route path="/users_form" element={<ProtectedRoute><UsersForm /></ProtectedRoute>} />
         <Route path="/users_form/:id" element={<ProtectedRoute><UsersForm /></ProtectedRoute>} />

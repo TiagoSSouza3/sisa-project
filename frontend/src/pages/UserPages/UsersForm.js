@@ -16,7 +16,6 @@ export default function UsersForm() {
     const [user, setUser] = useState({
         name: "",
         email: "",
-        password: "",
         occupation_id: ""
     });
 
@@ -45,7 +44,6 @@ export default function UsersForm() {
             setUser({
                 name: "",
                 email: "",
-                password: "",
                 occupation_id: ""
             });
             navigate("/users");
@@ -98,16 +96,15 @@ export default function UsersForm() {
                     />
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="password">{language === "english" ? "Password" : "Senha"}</label>
-                    <input
-                        id="password"
-                        type="password"
-                        placeholder={language === "english" ? "Write the Password" : "Digite a Senha"}
-                        value={user.password}
-                        onChange={(e) => setUser({ ...user, password: e.target.value })}
-                    />
-                </div>
+                {/* Password field removed - users will receive email to set password */}
+                {!id && (
+                    <div className="info-message">
+                        <p>{language === "english" 
+                            ? "The user will receive an email to set their password." 
+                            : "O usuário receberá um email para definir sua senha."
+                        }</p>
+                    </div>
+                )}
 
                 <div className="form-group">
                     <label htmlFor="role">{language === "english" ? "Occupation" : "Função"}</label>
@@ -117,9 +114,9 @@ export default function UsersForm() {
                         onChange={(e) => setUser({ ...user, occupation_id: e.target.value})}
                     >
                         <option value="">{language === "english" ? "Select the occupation" : "Selecione a função"}</option>
-                        <option value="ADMINISTRADOR">Administrador</option>
-                        <option value="PROFESSOR">Professor</option>
-                        <option value="COLABORADOR">Colaborador</option>
+                        <option value="1">Administrador</option>
+                        <option value="3">Professor</option>
+                        <option value="2">Colaborador</option>
                     </select>
                 </div>
 

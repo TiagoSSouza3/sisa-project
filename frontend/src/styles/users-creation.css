@@ -52,6 +52,21 @@
   background-color: var(--success-color);
 }
 
+.info-message {
+  background-color: #e3f2fd;
+  border: 1px solid #2196f3;
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.info-message p {
+  margin: 0;
+  color: #1976d2;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
 @media (max-width: 768px) {
   .users-creation-container {
     padding: 1rem;

@@ -1,7 +1,7 @@
 -- Database: SISA
 
-CREATE DATABASE IF NOT EXISTS sisa;
-USE sisa;
+CREATE DATABASE IF NOT EXISTS sisinha;
+USE sisinha;
 
 -- Ocupações (Tipos de usuários)
 CREATE TABLE IF NOT EXISTS occupation (
@@ -17,7 +17,11 @@ CREATE TABLE IF NOT EXISTS user (
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
-    occupation_id ENUM('Administrador', 'Colaborador', 'Professor')
+    occupation_id INT,
+    first_login BOOLEAN DEFAULT TRUE,
+    reset_token VARCHAR(255) NULL,
+    reset_token_expires TIMESTAMP NULL,
+    FOREIGN KEY (occupation_id) REFERENCES occupation(id)
 );
 
 -- Permissões configuráveis por ocupação
@@ -55,6 +59,7 @@ CREATE TABLE IF NOT EXISTS subjects (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
+    professor_id INT,
     FOREIGN KEY (professor_id) REFERENCES user(id)
 );
 
@@ -211,9 +216,10 @@ INSERT INTO occupation (name) VALUES
     ('Colaborador'),
     ('Professor');
 
-INSERT INTO user VALUES (1 ,"Tiago Dos Santos Souza", "tirigopeixe@gmail.com", "$2b$10$Q2WnzVrpRLs.uEDSgZ2WxOn1mPF0eu4aVlZ.Ix2Sy6qxDKnJ/jO8K", 1);
-INSERT INTO user VALUES(2, 'Felipe souza', 'felipe20@gmail.com', '$2b$10$ENLkVCRPlF13TsPpFzRjCeUbUsc35uDAY2PTpKShRpn19b6/wN5fi', 3);
-INSERT INTO user VALUES(3, 'Rosana', 'rosanamssouza9@gmail.com', '$2b$10$S20LoNUde/3rcHsaIC3mb.1U70JTLzyPcJGpcD6P0hlMUvb5lNOcG', 2);
+INSERT INTO user (id, name, email, password, occupation_id, first_login, reset_token, reset_token_expires) VALUES 
+(1, "Tiago Dos Santos Souza", "tirigopeixe@gmail.com", "$2b$10$Q2WnzVrpRLs.uEDSgZ2WxOn1mPF0eu4aVlZ.Ix2Sy6qxDKnJ/jO8K", 1, FALSE, NULL, NULL),
+(2, 'Felipe souza', 'felipe20@gmail.com', '$2b$10$ENLkVCRPlF13TsPpFzRjCeUbUsc35uDAY2PTpKShRpn19b6/wN5fi', 3, FALSE, NULL, NULL),
+(3, 'Rosana', 'rosanamssouza9@gmail.com', '$2b$10$S20LoNUde/3rcHsaIC3mb.1U70JTLzyPcJGpcD6P0hlMUvb5lNOcG', 2, FALSE, NULL, NULL);
 
 -- Atualizar permissões do Administrador
 UPDATE permissions 

@@ -56,6 +56,55 @@
   font-size: 2rem;
 }
 
+.forgot-password-link {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  transition: var(--transition);
+}
+
+.forgot-password-link:hover {
+  color: var(--primary-dark);
+  text-decoration: none;
+}
+
+.welcome-message {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: var(--text-color);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.welcome-section {
+  margin-bottom: 2rem;
+}
+
+.welcome-description {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-top: 1rem;
+}
+
+.password-hint {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+  display: block;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
 @media (max-width: 768px) {
   .login-container {
     padding: 1rem;

@@ -8,8 +8,10 @@
     "dev": "nodemon server.js"
   },
   "dependencies": {
+    "axios": "^1.11.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "docx": "^8.5.0",
     "docx-pdf": "^0.0.1",
     "docxtemplater": "^3.42.4",
@@ -20,6 +22,7 @@
     "multer": "^1.4.5-lts.1",
     "mysql": "^2.18.1",
     "mysql2": "^3.9.7",
+    "nodemailer": "^7.0.5",
     "pdf-lib": "^1.17.1",
     "pdfkit": "^0.17.1",
     "pizzip": "^3.1.6",
