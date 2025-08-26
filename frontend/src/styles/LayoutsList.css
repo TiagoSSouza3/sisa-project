@@ -1,6 +1,12 @@
 /* Layouts List */
 .layouts-list {
   padding: 40px;
+  transition: color 0.3s ease;
+}
+
+/* Dark mode for Layouts List */
+.dark-mode .layouts-list {
+  color: var(--text-color);
 }
 
 /* Loading State */
@@ -11,6 +17,12 @@
   justify-content: center;
   padding: 60px 20px;
   color: #64748b;
+  transition: color 0.3s ease;
+}
+
+/* Dark mode for loading */
+.dark-mode .layouts-loading {
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .loading-spinner-large {
@@ -43,29 +55,47 @@
 }
 
 .empty-title {
-  font-size: 1.5rem;
+  font-size: 1.7rem !important;
   font-weight: 600;
   color: #1e293b;
   margin: 0 0 10px 0;
+  transition: color 0.3s ease;
 }
 
 .empty-subtitle {
+  font-size: 0.95rem;
   color: #64748b;
   margin: 0 0 25px 0;
   line-height: 1.5;
+  transition: color 0.3s ease;
+}
+
+
+.dark-mode .empty-title {
+  color: var(--text-light) !important;
+}
+
+.dark-mode .empty-subtitle {
+  color: var(--text-light) !important;
 }
 
 .empty-tip {
   margin-top: 20px;
   padding: 15px;
-  background: #f0f9ff;
-  border: 1px solid #bae6fd;
+  background: var(--surface-color);
+  border: 1px solid rgba(59, 130, 246, 0.25);
   border-radius: 10px;
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 0.9rem;
   color: #0369a1;
+}
+
+/* Dark mode border match */
+.dark-mode .empty-tip {
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--text-light);
 }
 
 .tip-icon {
@@ -90,12 +120,24 @@
   font-weight: 600;
   color: #1e293b;
   margin: 0 0 10px 0;
+  transition: color 0.3s ease;
 }
 
 .layouts-subtitle {
   color: #64748b;
   margin: 0;
   line-height: 1.5;
+  transition: color 0.3s ease;
+  font-size: 1.15rem;
+}
+
+/* Dark mode for layouts header */
+.dark-mode .layouts-title {
+  color: var(--text-color);
+}
+
+.dark-mode .layouts-subtitle {
+  color: rgba(255, 255, 255, 0.7);
 }
 
 /* Grid */
@@ -109,7 +151,7 @@
 
 /* Layout Card */
 .layout-card {
-  background: white;
+  background: var(--surface-color);
   border: 1px solid #e2e8f0;
   border-radius: 16px;
   padding: 24px;
@@ -325,7 +367,7 @@
 
 .modal-content {
   position: relative;
-  background: white;
+  background: var(--surface-color);
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -386,7 +428,7 @@
 }
 
 .preview-document {
-  background: white;
+  background: var(--surface-color);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   padding: 60px;

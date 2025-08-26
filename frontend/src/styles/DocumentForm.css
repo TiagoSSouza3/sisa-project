@@ -97,7 +97,7 @@
 
 /* Form Section */
 .form-section {
-  background: #f8fafc;
+  background: var(--surface-color);
   border: 1px solid #e2e8f0;
   border-radius: 16px;
   padding: 25px;
@@ -112,7 +112,7 @@
 
 /* Format Selection */
 .format-selection {
-  background: white;
+  background: var(--surface-color);
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   padding: 20px;
@@ -147,7 +147,7 @@
   padding: 10px 16px;
   border: 2px solid #e2e8f0;
   border-radius: 10px;
-  background: white;
+  background: var(--surface-color);
   transition: all 0.2s ease;
   font-weight: 500;
   color: #64748b;
@@ -183,7 +183,7 @@
 .field-label {
   font-weight: 500;
   color: #374151;
-  font-size: 0.95rem;
+  font-size: 1.075rem;
 }
 
 .field-container {
@@ -196,9 +196,9 @@
   padding: 12px 16px;
   border: 1px solid #d1d5db;
   border-radius: 10px;
-  font-size: 1rem;
+  font-size: 1.125rem;
   transition: all 0.2s ease;
-  background: white;
+  background: var(--surface-color);
   box-sizing: border-box;
 }
 
@@ -231,7 +231,7 @@
 
 /* Preview Section */
 .preview-section {
-  background: white;
+  background: var(--surface-color);
   border: 1px solid #e2e8f0;
   border-radius: 16px;
   overflow: hidden;

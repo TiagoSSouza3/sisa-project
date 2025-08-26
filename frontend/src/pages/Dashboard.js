@@ -6,9 +6,11 @@ export default function Dashboard() {
   const firstName = localStorage.getItem("name").split(" ")[0];
 
   return (
-    <h1>
-      {language === "english" ? "Welcome to system " : "Bem-vindo ao sistema "}
-      SISA, {firstName}
-    </h1>
+    <div className="container">
+      <h1>
+        {language === "english" ? "Welcome to system " : "Bem-vindo ao sistema "}
+        SISA, {firstName}
+      </h1>
+    </div>
   );
 }

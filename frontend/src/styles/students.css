@@ -115,7 +115,7 @@
 }
 
 .student-name {
-  font-size: 1.1rem;
+  font-size: 1.5rem;
   font-weight: 600;
   color: var(--primary-color);
   margin-bottom: 0.5rem;
@@ -123,7 +123,7 @@
 
 .student-details {
   color: var(--text-color);
-  font-size: 0.9rem;
+  font-size: 1.1rem;
 }
 
 .student-details p {

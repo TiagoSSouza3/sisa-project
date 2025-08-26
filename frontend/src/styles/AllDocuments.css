@@ -1,6 +1,12 @@
 /* All Documents */
 .all-documents {
   padding: 40px;
+  transition: color 0.3s ease;
+}
+
+/* Dark mode for All Documents */
+.dark-mode .all-documents {
+  color: var(--text-color);
 }
 
 /* Loading State */
@@ -11,6 +17,12 @@
   justify-content: center;
   padding: 60px 20px;
   color: #64748b;
+  transition: color 0.3s ease;
+}
+
+/* Dark mode for loading */
+.dark-mode .all-documents-loading {
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .loading-spinner-large {
@@ -41,12 +53,23 @@
   font-weight: 600;
   color: #1e293b;
   margin: 0 0 10px 0;
+  transition: color 0.3s ease;
 }
 
 .all-documents-subtitle {
   color: #64748b;
   margin: 0;
   line-height: 1.5;
+  transition: color 0.3s ease;
+}
+
+/* Dark mode for all documents header */
+.dark-mode .all-documents-title {
+  color: var(--text-color);
+}
+
+.dark-mode .all-documents-subtitle {
+  color: rgba(255, 255, 255, 0.7);
 }
 
 /* Error Message */
@@ -68,11 +91,18 @@
 
 /* Upload Form Container */
 .upload-form-container {
-  background: #f8fafc;
+  background: var(--surface-color);
   border: 1px solid #e2e8f0;
   border-radius: 16px;
   padding: 30px;
   margin-bottom: 30px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Dark mode for upload form container */
+.dark-mode .upload-form-container {
+  background: var(--surface-color);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .upload-form {
@@ -88,7 +118,7 @@
   padding: 40px 20px;
   text-align: center;
   transition: all 0.3s ease;
-  background: white;
+  background: var(--surface-color);
   cursor: pointer;
 }
 
@@ -147,6 +177,10 @@
   color: #64748b;
   font-size: 0.9rem;
   margin: 0;
+}
+
+.dark-mode .upload-hint {
+  color: var(--text-light) !important;
 }
 
 /* File Preview */
@@ -219,7 +253,11 @@
 .field-label {
   font-weight: 500;
   color: #374151;
-  font-size: 0.95rem;
+  font-size: 1.075rem;
+}
+
+.dark-mode .field-label {
+  color: var(--text-light);
 }
 
 .field-input,
@@ -227,9 +265,9 @@
   padding: 12px 16px;
   border: 1px solid #d1d5db;
   border-radius: 10px;
-  font-size: 1rem;
+  font-size: 1.125rem;
   transition: all 0.2s ease;
-  background: white;
+  background: var(--surface-color);
 }
 
 .field-input:focus,
@@ -296,7 +334,7 @@
 
 /* Document Card */
 .document-card {
-  background: white;
+  background: var(--surface-color);
   border: 1px solid #e2e8f0;
   border-radius: 16px;
   padding: 24px;
@@ -499,7 +537,7 @@
 
 .modal-content {
   position: relative;
-  background: white;
+  background: var(--surface-color);
   width: 90vw;
   height: 90vh;
   max-width: 1200px;
@@ -589,7 +627,7 @@
 }
 
 .preview-document {
-  background: white;
+  background: var(--surface-color);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   padding: 60px;
