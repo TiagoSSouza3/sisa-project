@@ -53,6 +53,11 @@ export default function Login() {
           <button className="login-button" type="submit">Entrar</button>
         </form>
       </div>
+      <div className="login-images">
+        <div className="image-slide">
+          <img src="/assets/onepiece.jpg" alt="Imagem 1"/>
+        </div>
+      </div>
     </div>
   );
 }
