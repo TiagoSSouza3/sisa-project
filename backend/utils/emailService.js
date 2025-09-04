@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer');
-const { getPasswordResetTemplate, getWelcomeTemplate } = require('./emailTemplates');
+const { getPasswordResetTemplate, getWelcomeTemplate, getRegistrationNotificationTemplate } = require('./emailTemplates');
 require('dotenv').config();
 
 // Configuração do transporter de email
@@ -90,8 +90,30 @@ const sendFirstAccessEmail = async (email, resetToken, userName) => {
   }
 };
 
+// Enviar email de notificação de cadastro
+const sendRegistrationNotificationEmail = async (email, userName) => {
+  const transporter = createTransporter();
+  
+  const mailOptions = {
+    from: `"Sistema SISA" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: '✅ Cadastro Realizado com Sucesso - SISA',
+    html: getRegistrationNotificationTemplate(userName, email),
+    encoding: 'utf8'
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    return { success: true };
+  } catch (error) {
+    console.error('Erro ao enviar email de notificação:', error);
+    return { success: false, error: error.message };
+  }
+};
+
 module.exports = {
   sendPasswordResetEmail,
   sendFirstAccessEmail,
+  sendRegistrationNotificationEmail,
   testConnection
 };

@@ -3,6 +3,7 @@ import API from "../../api";
 import { useNavigate, useParams } from "react-router-dom";
 import { cpf } from "cpf-cnpj-validator";
 import { useLanguage } from '../../components/LanguageContext';
+import { validateEmail } from '../../utils/validation';
 
 import '../../styles/global.css';
 import '../../styles/students-creation.css';
@@ -15,6 +16,7 @@ export default function StudentsForm() {
     const [secondPhoneError, setSecondPhoneError] = useState("");
     const [cpfError, setCpfError] = useState("");
     const [rgError, setRgError] = useState("");
+    const [emailError, setEmailError] = useState("");
 
     const [student, setStudent] = useState({
         name: "",
@@ -171,6 +173,22 @@ export default function StudentsForm() {
         }
     };
 
+    const handleEmailChange = (e) => {
+        const emailValue = e.target.value;
+        setStudent({ ...student, email: emailValue });
+        
+        if (emailValue) {
+            const emailValidation = validateEmail(emailValue);
+            if (!emailValidation.isValid) {
+                setEmailError(emailValidation.message);
+            } else {
+                setEmailError("");
+            }
+        } else {
+            setEmailError("");
+        }
+    };
+
     const handleCreate = async () => {
         if (!validateCPF(student.CPF)) {
             setCpfError("CPF inválido");
@@ -190,6 +208,14 @@ export default function StudentsForm() {
         if (student.second_phone && !validatePhoneNumber(student.second_phone)) {
             setSecondPhoneError("Telefone secundário inválido");
             return;
+        }
+
+        if (student.email) {
+            const emailValidation = validateEmail(student.email);
+            if (!emailValidation.isValid) {
+                setEmailError(emailValidation.message);
+                return;
+            }
         }
 
         try {
@@ -306,11 +332,12 @@ export default function StudentsForm() {
                 <label htmlFor="email">Email</label>
                 <input 
                     id="email"
-                    type="email"
+                    type="text"
                     placeholder={language === "english" ? "Write the Email Address" : "Digite o Email"}
                     value={student.email}
-                    onChange={(e) => setStudent({ ...student, email: e.target.value })}
+                    onChange={handleEmailChange}
                 />
+                {emailError && <span className="error-message">{emailError}</span>}
                 </div>
                 <div className="form-group">
                     <label htmlFor="phone">{language === "english" ? "Phone Number" : "Telefone"}</label>

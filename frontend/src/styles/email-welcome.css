@@ -1,11 +1,11 @@
-/* Email Template - Password Reset - SISA System */
+/* Email Template - Welcome - SISA System */
 /* Acessível para pessoas idosas - fontes grandes e alto contraste */
 
 .email-container {
   max-width: 700px;
   margin: 20px auto;
   background-color: #ffffff;
-  border: 3px solid #2563eb;
+  border: 3px solid #059669;
   border-radius: 15px;
   overflow: hidden;
   font-family: Arial, sans-serif;
@@ -13,7 +13,7 @@
 
 /* Header Section */
 .email-header {
-  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  background: linear-gradient(135deg, #047857 0%, #10b981 100%);
   padding: 60px 40px;
   text-align: center;
 }
@@ -103,23 +103,23 @@
   box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
 }
 
-/* Info Cards */
-.info-card {
-  background-color: #fef3c7;
-  border: 3px solid #f59e0b;
+/* Time Card */
+.time-card {
+  background-color: #e0f2fe;
+  border: 3px solid #0284c7;
   border-radius: 12px;
   padding: 30px;
   margin: 40px 0;
 }
 
-.info-card h3 {
+.time-card h3 {
   color: #000000;
   margin: 0 0 15px;
   font-size: 24px;
   font-weight: bold;
 }
 
-.info-card p {
+.time-card p {
   color: #000000;
   margin: 0;
   font-size: 20px;
@@ -127,20 +127,50 @@
   font-weight: 500;
 }
 
-/* Security Tip */
-.security-tip {
-  background-color: #e0f2fe;
-  border: 3px solid #0284c7;
+/* Steps Card */
+.steps-card {
+  background-color: #f0fdf4;
+  border: 3px solid #10b981;
+  border-radius: 12px;
+  padding: 30px;
+  margin: 40px 0;
+}
+
+.steps-card h3 {
+  color: #000000;
+  margin: 0 0 20px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.steps-card ol {
+  color: #000000;
+  margin: 0;
+  padding-left: 30px;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.steps-card li {
+  margin-bottom: 15px;
+  line-height: 1.8;
+}
+
+/* Help Tip */
+.help-tip {
+  background-color: #fef3c7;
+  border: 3px solid #f59e0b;
   padding: 30px;
   margin: 40px 0;
   border-radius: 12px;
 }
 
-.security-tip p {
+.help-tip p {
   color: #000000;
   margin: 0;
   font-size: 20px;
   font-weight: 500;
+  line-height: 1.8;
 }
 
 /* Footer */
@@ -198,15 +228,14 @@
     font-size: 22px;
   }
   
-  .info-card h3 {
+  .time-card h3,
+  .steps-card h3 {
     font-size: 22px;
   }
   
-  .info-card p {
-    font-size: 18px;
-  }
-  
-  .security-tip p {
+  .time-card p,
+  .steps-card ol,
+  .help-tip p {
     font-size: 18px;
   }
 }

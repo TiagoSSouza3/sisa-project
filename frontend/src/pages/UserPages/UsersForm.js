@@ -3,6 +3,7 @@ import API from "../../api";
 import { useNavigate, useParams } from "react-router-dom";
 import { occupationEnum } from "../../enums/occupationEnum";
 import { useLanguage } from '../../components/LanguageContext';
+import { validateEmail } from '../../utils/validation';
 
 import '../../styles/global.css';
 import '../../styles/users-creation.css';
@@ -13,6 +14,7 @@ export default function UsersForm() {
     const navigate = useNavigate();
     const { language } = useLanguage();
     const [error, setError] = useState("");
+    const [emailError, setEmailError] = useState("");
     const [user, setUser] = useState({
         name: "",
         email: "",
@@ -32,12 +34,52 @@ export default function UsersForm() {
             const response = await API.get(`/users/${id}`);
             setUser(response.data);
         } catch (err) {
-            console.error("Erro ao buscar aluno:", err);
+            console.error("Erro ao buscar usuário:", err);
             navigate("/users");
         }
     }
 
+    const handleEmailChange = (e) => {
+        const emailValue = e.target.value;
+        setUser({ ...user, email: emailValue });
+        
+        if (emailValue) {
+            const emailValidation = validateEmail(emailValue);
+            if (!emailValidation.isValid) {
+                setEmailError(emailValidation.message);
+            } else {
+                setEmailError("");
+            }
+        } else {
+            setEmailError("");
+        }
+    };
+
     const handleSave = async () => {
+        // Validar campos obrigatórios
+        if (!user.name.trim()) {
+            setError(language === "english" ? "Name is required" : "Nome é obrigatório");
+            return;
+        }
+
+        if (!user.email.trim()) {
+            setError(language === "english" ? "Email is required" : "Email é obrigatório");
+            return;
+        }
+
+        if (!user.occupation_id) {
+            setError(language === "english" ? "Occupation is required" : "Função é obrigatória");
+            return;
+        }
+
+        // Validar email
+        const emailValidation = validateEmail(user.email);
+        if (!emailValidation.isValid) {
+            setEmailError(emailValidation.message);
+            setError(language === "english" ? "Please fix the email error" : "Por favor, corrija o erro no email");
+            return;
+        }
+
         try {
             if (id) await API.put(`/users/${id}`, user);
             else await API.post("/users", user);
@@ -48,7 +90,8 @@ export default function UsersForm() {
             });
             navigate("/users");
         } catch (err) {
-            setError("Erro ao criar/editar usuário");
+            console.error("Erro ao salvar usuário:", err);
+            setError(err.response?.data?.error || (language === "english" ? "Error creating/editing user" : "Erro ao criar/editar usuário"));
         }
     };
 
@@ -75,25 +118,28 @@ export default function UsersForm() {
                 {error && <div className="error-message">{error}</div>}
 
                 <div className="form-group">
-                    <label htmlFor="name">{language === "english" ? "Name" : "Nome"}</label>
+                    <label htmlFor="name">{language === "english" ? "Name" : "Nome"} *</label>
                     <input
                         id="name"
                         type="text"
                         placeholder={language === "english" ? "Write the Name" : "Digite o Nome"}
                         value={user.name}
                         onChange={(e) => setUser({ ...user, name: e.target.value })}
+                        required
                     />
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="email">Email</label>
+                    <label htmlFor="email">Email *</label>
                     <input
                         id="email"
-                        type="email"
+                        type="text"
                         placeholder={language === "english" ? "Write the Email Address" : "Digite o Email"}
                         value={user.email}
-                        onChange={(e) => setUser({ ...user, email: e.target.value })}
+                        onChange={handleEmailChange}
+                        required
                     />
+                    {emailError && <span className="error-message">{emailError}</span>}
                 </div>
 
                 {/* Password field removed - users will receive email to set password */}
@@ -107,11 +153,12 @@ export default function UsersForm() {
                 )}
 
                 <div className="form-group">
-                    <label htmlFor="role">{language === "english" ? "Occupation" : "Função"}</label>
+                    <label htmlFor="role">{language === "english" ? "Occupation" : "Função"} *</label>
                     <select
                         id="role"
                         value={user.occupation_id}
                         onChange={(e) => setUser({ ...user, occupation_id: e.target.value})}
+                        required
                     >
                         <option value="">{language === "english" ? "Select the occupation" : "Selecione a função"}</option>
                         <option value="1">Administrador</option>

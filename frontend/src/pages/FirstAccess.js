@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import API from "../api";
 import { useLanguage } from '../components/LanguageContext';
 import InlineNotification from '../components/InlineNotification';
+import { validatePassword, validatePasswordConfirmation } from '../utils/validation';
 
 import '../styles/global.css';
 import '../styles/login.css';
@@ -15,6 +16,7 @@ export default function FirstAccess() {
   
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPasswords, setShowPasswords] = useState(false);
   const [loading, setLoading] = useState(false);
   const [tokenValid, setTokenValid] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
@@ -50,17 +52,21 @@ export default function FirstAccess() {
   const handleSetPassword = async (e) => {
     e.preventDefault();
     
-    if (newPassword !== confirmPassword) {
+    // Validar senha
+    const passwordValidation = validatePassword(newPassword);
+    if (!passwordValidation.isValid) {
       setNotification({
-        message: language === "english" ? "Passwords do not match" : "As senhas não coincidem",
+        message: passwordValidation.message,
         type: 'error'
       });
       return;
     }
 
-    if (newPassword.length < 6) {
+    // Validar confirmação de senha
+    const confirmValidation = validatePasswordConfirmation(newPassword, confirmPassword);
+    if (!confirmValidation.isValid) {
       setNotification({
-        message: language === "english" ? "Password must be at least 6 characters" : "A senha deve ter pelo menos 6 caracteres",
+        message: confirmValidation.message,
         type: 'error'
       });
       return;
@@ -134,28 +140,74 @@ export default function FirstAccess() {
             </div>
             
             <form className="login-form" onSubmit={handleSetPassword}>
-              <div className="form-group">
+              <div className="form-group password-group">
                 <input 
-                  type="password" 
+                  type={showPasswords ? "text" : "password"}
                   placeholder={language === "english" ? "Set your password" : "Defina sua senha"}
                   value={newPassword} 
                   onChange={(e) => setNewPassword(e.target.value)} 
                   required 
                   minLength="6"
                 />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPasswords(!showPasswords)}
+                  aria-label={showPasswords ? "Ocultar senhas" : "Mostrar senhas"}
+                  title={showPasswords ? "Ocultar senhas" : "Mostrar senhas"}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    {showPasswords ? (
+                      // Ícone de olho fechado (senha oculta)
+                      <>
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </>
+                    ) : (
+                      // Ícone de olho aberto (senha visível)
+                      <>
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </>
+                    )}
+                  </svg>
+                </button>
                 <small className="password-hint">
                   {language === "english" ? "Minimum 6 characters" : "Mínimo de 6 caracteres"}
                 </small>
               </div>
-              <div className="form-group">
+              <div className="form-group password-group">
                 <input 
-                  type="password" 
+                  type={showPasswords ? "text" : "password"}
                   placeholder={language === "english" ? "Confirm your password" : "Confirme sua senha"}
                   value={confirmPassword} 
                   onChange={(e) => setConfirmPassword(e.target.value)} 
                   required 
                   minLength="6"
                 />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPasswords(!showPasswords)}
+                  aria-label={showPasswords ? "Ocultar senhas" : "Mostrar senhas"}
+                  title={showPasswords ? "Ocultar senhas" : "Mostrar senhas"}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    {showPasswords ? (
+                      // Ícone de olho fechado (senha oculta)
+                      <>
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </>
+                    ) : (
+                      // Ícone de olho aberto (senha visível)
+                      <>
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </>
+                    )}
+                  </svg>
+                </button>
               </div>
               <button className="login-button" type="submit" disabled={loading}>
                 {loading 

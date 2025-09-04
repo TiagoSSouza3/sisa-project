@@ -544,3 +544,34 @@ h2 {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
+
+/* Desabilitar o botão nativo de mostrar/ocultar senha do browser em todos os campos de senha */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+input[type="password"]::-webkit-credentials-auto-fill-button {
+  display: none !important;
+  visibility: hidden;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+}
+
+/* Para campos de senha dentro de password-group */
+.password-group input[type="password"]::-ms-reveal,
+.password-group input[type="password"]::-ms-clear,
+.password-group input[type="text"]::-ms-reveal,
+.password-group input[type="text"]::-ms-clear {
+  display: none;
+}
+
+.password-group input[type="password"]::-webkit-credentials-auto-fill-button,
+.password-group input[type="text"]::-webkit-credentials-auto-fill-button {
+  display: none !important;
+  visibility: hidden;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+}
