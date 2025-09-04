@@ -10,22 +10,12 @@ export default function StorageLog() {
     const { id } = useParams();
     const { language } = useLanguage(); 
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [amount, setAmount] = useState(0);
     const navigate = useNavigate();
-    const [storage, setStorage] = useState([
-        {
-            id: 1,
-            name: "lapis",
-            description: "caixas de lapis",
-            last_price: "R$3.50",
-            last_price_date: "03/04/2019",
-            amount: 50
-        }
-    ]);
+    const [storage, setStorage] = useState([]);
 
     const loadStorage = async () => {
         try {
-            const storage =  await API.get(`/storage`)
+            const storage =  await API.get(`/storage/log/${id}`)
             setStorage(storage.data);
 
         } catch (err) {
@@ -35,38 +25,26 @@ export default function StorageLog() {
 
     useEffect(() => {
         const token = localStorage.getItem("token");
-        setIsLoggedIn(token !== null);
-        //loadStorage();
+        setIsLoggedIn(token !== null);0
+        loadStorage();
     }, []);
 
-    const addAmount = (index, type, amount) => {
-        storage[index].amount = 
-            type === "plus" 
-                ? storage[index].amount + amount 
-                : storage[index].amount - amount
-                
-        console.log(storage[index])
-        //saveStorage();
-    }
-
-    const saveStorage = async () => {
-        try {
-            res = await API.post(`/storage`, storage);
-            
-            console.log(res);
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    const handleInputChange = (e) => {
-        setAmount(Number(e.target.value));
-        console.log(amount)
-    };
+    if(!isLoggedIn) return <navigate to="/" />
 
     return (
         <div className="storage-container">
             <div className="storage-header">
+                <button onClick={() => navigate("/storage")} className="transparent-button">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="25"
+                        height="25"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                        >
+                        <path fillRule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
+                    </svg>
+                </button>
                 <h2>{language === "english" ? "Storage Log" : "Historico Estoque"}</h2>
             </div>
 
@@ -75,38 +53,14 @@ export default function StorageLog() {
                     <div className="empty-state">{language === "english" ? "Empty Storage" : "Estoque Vazio"}</div>
                 ) : (
                 storage.map((item, index) => (
-                    <div key={item.id} className="subject-card">
-                        <h3 className="storage-item-title">{item.name}</h3>
-                        <p className="storage-item-description">{item.description}</p>
-                        <p className="storage-item-last-price">{item.last_price}</p>
-                        <p className="storage-item-last-price-date">{item.last_price_date}</p>
-                        <p className="storage-item-amount">{item.amount}</p>
-                        <div className="storage-item-actions">
-                            <div className="storage-item-change-amount">
-                                <button 
-                                    className="minus-button"
-                                    onClick={() => addAmount(index, "minus", amount)}
-                                > - </button>
-
-                                <input 
-                                    className="amount-input"
-                                    type="number" 
-                                    min="1"
-                                    value={amount}
-                                    onChange={handleInputChange}
-                                />
-
-                                <button 
-                                    className="plus-button"
-                                    onClick={() => addAmount(index, "plus", amount)}
-                                > + </button>
-                            </div>
-                            <button 
-                                className="edit-button"
-                                onClick={() => navigate(`/storage_log/${item.id}`)}
-                            >
-                            {language === "english" ? "Product History" : "Historico do Produto"}
-                            </button>
+                    <div key={item.id} className="storage-item">
+                        <div className="storage-item-info">
+                            <h3 className="storage-item-date">{item.date}</h3>
+                            <h3 className="storage-item-title">{item.name}</h3>
+                            <p className="storage-item-description">{item.description}</p>
+                            <p className="storage-item-last-price">{item.last_price}</p>
+                            <p className="storage-item-last-price-date">{item.last_price_date}</p>
+                            <p className="storage-item-amount">{item.amount}</p>
                         </div>
                     </div>
                 ))

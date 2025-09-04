@@ -7,6 +7,10 @@ const StorageLog = sequelize.define("storage_log", {
     primaryKey: true,
     autoIncrement: true
   },
+  id_item: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
   name: {
     type: DataTypes.STRING,
     allowNull: false
@@ -40,16 +44,10 @@ const StorageLog = sequelize.define("storage_log", {
   created_at: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW
-  },
-  updated_at: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW
   }
 }, {
   tableName: 'storage_log',
-  timestamps: true,
-  createdAt: 'created_at',
-  updatedAt: 'updated_at'
+  timestamps: false
 });
 
 module.exports = StorageLog; 

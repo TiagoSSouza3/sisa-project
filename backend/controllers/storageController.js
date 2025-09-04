@@ -1,14 +1,19 @@
 const Storage = require('../models/Storage');
 const StorageLog = require('../models/StorageLog');
+const { Op } = require('sequelize');
 
 exports.getStorage = async (req, res) => {
-    const storage = await Storage.findAll();
-    res.json(storage);
+    const storage = await Storage.findAll({
+        where: { [Op.not]: [{ id: null }] }
+    });
+    res.json(storage.filter((item) => !!item));
 };
 
 exports.getStorageLog = async (req, res) => {
     if(req.params.type != "log") return
-    const storage_log = await StorageLog.findAll();
+    const storage_log = await StorageLog.findAll({
+        where: { [Op.not]: null }
+    });
     res.json(storage_log);
 };
 
@@ -31,70 +36,92 @@ exports.getStorageLogById = async (req, res) => {
 };
 
 exports.createStorageItem = async (req, res) => {
-    let item = req.body;
-
-    item = {
-        ...item,
-        created_by: req.user?.id || 1
-    }
-
-    let item_log = {
-        ...item, 
-        id_item: item.id
-    }
-    delete item_log[id]
-
     try {
+        const item = {
+            ...req.body,
+            created_by: req.user?.id || 1,
+            created_at: new Date()
+        };
+
         const storage = await Storage.create(item);
+
+        // Cria log de criação
+        const item_log = {
+            id_item: storage.id,
+            name: storage.name,
+            description: storage.description,
+            last_price: storage.last_price,
+            last_price_date: storage.last_price_date,
+            amount: storage.amount,
+            created_by: req.user?.id || 1,
+            created_at: new Date(),
+            last_change: "created",
+            value_diference: 0
+        };
 
         await StorageLog.create(item_log);
 
         res.status(201).json(storage);
     } catch (error) {
+        console.error("Erro ao criar item:", error);
         res.status(400).json({ error: error.message });
     }
 };
 
 exports.updateStorageItem = async (req, res) => {
-  const toUpdate = req.body;
-  const { id } = req.params;
-
-  toUpdate = {
-    ...toUpdate,
-    created_by: req.user?.id || 1
-  }
-
   try {
+    const { id } = req.params;
+    const toUpdate = {
+      ...req.body,
+      updated_by: req.user?.id || 1,
+      updated_at: new Date()
+    };
+
     const storage = await Storage.findByPk(id);
-    if (!storage) return res.status(404).json({ error: "Item não encontrado" });
-
-    const fields = new Set([...Object.keys(storage), ...Object.keys(toUpdate)])
-
-    let new_storage_log = {
-        ...storage, 
-        id_item: storage.id
+    if (!storage) {
+      return res.status(404).json({ error: "Item não encontrado" });
     }
-    delete new_storage_log[id]
 
-    fields.forEach((field) => {
-        if(storage[field] != toUpdate[field] && field != "id"){
-            if(field === "amount"){
-                const value_diference = toUpdate[field] - storage[field]
-                new_storage_log[value_diference] = value_diference
-            } else {
-                new_storage_log[value_diference] = 0
-            }
+    // Cria log antes da atualização
+    let new_storage_log = {
+      id_item: storage.id,
+      created_by: req.user?.id || 1,
+      created_at: new Date()
+    };
 
-            new_storage_log[last_change] = field
+    // Verifica mudanças e registra no log
+    Object.keys(toUpdate).forEach((field) => {
+      if (field !== "id" && field !== "updated_by" && field !== "updated_at") {
+        if (storage[field] !== toUpdate[field]) {
+          if (field === "amount") {
+            const valueDifference = toUpdate[field] - storage[field];
+            new_storage_log.value_diference = valueDifference; // Corrigido para o nome do campo no modelo
+          } else {
+            new_storage_log.value_diference = 0;
+          }
+          
+          new_storage_log.last_change = field;
+          // Copia os valores atuais para o log
+          new_storage_log.name = storage.name;
+          new_storage_log.description = storage.description;
+          new_storage_log.last_price = storage.last_price;
+          new_storage_log.last_price_date = storage.last_price_date;
+          new_storage_log.amount = storage.amount;
         }
+      }
     });
 
+    // Atualiza o item
     await storage.update(toUpdate);
-    await StorageLog.create(new_storage_log);
+
+    // Cria o log se houve mudanças
+    if (new_storage_log.last_change) {
+      await StorageLog.create(new_storage_log);
+    }
 
     const updated = await Storage.findByPk(id);
-
     res.json(updated);
+    
   } catch (error) {
     console.error("Erro ao atualizar item:", error);
     res.status(400).json({ error: error.message });
@@ -109,18 +136,26 @@ exports.deleteStorageItem = async (req, res) => {
       return res.status(404).json({ error: "Item não encontrado" });
     }
 
-    let item_log = {
-        ...storage, 
-        id_item: storage.id,
-        created_by: req.user?.id || 1
-    }
-    delete item_log[id]
+    // Cria log de exclusão
+    const item_log = {
+      id_item: storage.id,
+      name: storage.name,
+      description: storage.description,
+      last_price: storage.last_price,
+      last_price_date: storage.last_price_date,
+      amount: storage.amount,
+      created_by: req.user?.id || 1,
+      created_at: new Date(),
+      last_change: "deleted",
+      value_diference: 0
+    };
 
-    await storage.destroy();
     await StorageLog.create(item_log);
+    await storage.destroy();
 
     res.status(204).send();
   } catch (error) {
+    console.error("Erro ao deletar item:", error);
     res.status(400).json({ error: error.message });
   }
 }; 

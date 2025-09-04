@@ -41,9 +41,7 @@ const Storage = sequelize.define("storage", {
   }
 }, {
   tableName: 'storage',
-  timestamps: true,
-  createdAt: 'created_at',
-  updatedAt: 'updated_at'
+  timestamps: false
 });
 
 module.exports = Storage; 
