@@ -17,7 +17,6 @@ export default function SubjectInfos() {
         description: ""
     });
     const [students, setStudents] = useState([])
-    const [professor, setProfessor] = useState([])
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -37,19 +36,16 @@ export default function SubjectInfos() {
         
             if (subjectData.students) {
                 setStudents(subjectData.students);
-            } else if (subjectData.students) {
+            } else {
                 const studentData = await Promise.all(
-                subjectData.students.map(async (studentId) => {
-                    const res = await API.get(`/students/${studentId}`);
-                    return res.data;
-                })
+                    subjectData.students.map(async (studentId) => {
+                        const res = await API.get(`/students/${studentId}`);
+                        return res.data;
+                    })
                 );
                 setStudents(studentData);
             }
-        
-            const users = await API.get("/users");
-            setProfessor(users.data);
-      
+
         } catch (err) {
             console.error("Erro ao carregar disciplina ou alunos:", err);
             navigate("/subjects");
@@ -62,16 +58,28 @@ export default function SubjectInfos() {
         
             const updatedStudentIds = currentStudentIds.filter(i => i.id !== student_id);
         
-            await API.put(`/subjects/${id}`, {
+            const updated = await API.put(`/subjects/${id}`, {
                 name: subject.name,
                 description: subject.description,
                 students: updatedStudentIds
             });
         
             setSubject({
-                ...subject,
+                ...updated,
                 students: subject.students.filter(s => s.id !== student_id)
             });
+
+            if (updated.students) {
+                setStudents(updated.students);
+            } else {
+                const studentData = await Promise.all(
+                    subjectData.students.map(async (studentId) => {
+                        const res = await API.get(`/students/${studentId}`);
+                        return res.data;
+                    })
+                );
+                setStudents(studentData);
+            }
 
             console.log(subject.students)
         } catch (error) {

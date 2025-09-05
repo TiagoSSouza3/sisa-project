@@ -45,14 +45,45 @@ CREATE TABLE IF NOT EXISTS permissions (
 CREATE TABLE IF NOT EXISTS students (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+    registration INT,
+    CPF CHAR(15),
+    gender VARCHAR(50),
+    skin_color VARCHAR(50),
+    RG CHAR(12),
     email VARCHAR(255),
     phone VARCHAR(255),
+    second_phone VARCHAR(255),
+    responsable VARCHAR(255),
+    degree_of_kinship VARCHAR(255),
+    UBS VARCHAR(255),
+    is_on_school BOOLEAN,
+    school_year VARCHAR(50),
+    school_name VARCHAR(255),
+    school_period VARCHAR(50),
     birth_date DATE,
     address TEXT,
+    neighborhood TEXT,
+    cep CHAR(9),
     notes TEXT,
+    parent_id INT,
+    second_parent_id INT,
+    active BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (parent_id) REFERENCES parent(id),
+    FOREIGN KEY (second_parent_id) REFERENCES parent(id),
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+-- Parent
+CREATE TABLE IF NOT EXISTS parent (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    birth_date DATE,
+    RG CHAR(12),
+    CPF CHAR(15),
+    occupation VARCHAR(255)
+);
+
 
 -- Disciplinas/Matérias
 CREATE TABLE IF NOT EXISTS subjects (
@@ -232,3 +263,6 @@ WHERE occupation_id = (SELECT id FROM occupation WHERE name = 'Administrador');
 
 ALTER TABLE documents ADD COLUMN placeholders JSON;
 ALTER TABLE documents MODIFY COLUMN status ENUM('draft', 'published', 'archived', 'template') DEFAULT 'draft';
+
+
+SELECT * FROM students;

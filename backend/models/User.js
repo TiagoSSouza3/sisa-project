@@ -1,4 +1,4 @@
-const { DataTypes, ENUM } = require("sequelize");
+const { DataTypes } = require("sequelize");
 const sequelize = require("../config");
 
 const User = sequelize.define("user", {

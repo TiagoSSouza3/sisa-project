@@ -2,7 +2,7 @@ const Student = require("../models/Students");
 const Subject = require("../models/Subject");
 
 exports.getAllStudents = async (req, res) => {
-  try {
+
     const list = await Student.findAll(
       {
         include: [{
@@ -16,9 +16,6 @@ exports.getAllStudents = async (req, res) => {
     );
 
     res.json(list);
-  } catch (error) {
-    res.status(500).json({ error: "Erro ao buscar alunos" });
-  }
 };
 
 exports.createStudent = async (req, res) => {
