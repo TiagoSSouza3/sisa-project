@@ -15,7 +15,8 @@ import Summary_data from "./pages/StudentPages/SummaryData";
 import Documents from "./pages/Documents/Documents";
 import ResetPassword from "./pages/ResetPassword";
 import FirstAccess from "./pages/FirstAccess";
-
+import Storage from "./pages/Storage/Storage";
+import StorageLog from "./pages/Storage/StorageLog";
 
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -45,6 +46,8 @@ function App() {
         <Route path="/subject_inscription/:id" element={<ProtectedRoute><SubjectInscription /></ProtectedRoute>} />
         <Route path="/summary_data" element={<ProtectedRoute><Summary_data /></ProtectedRoute>} />
         <Route path="/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
+        <Route path="/storage" element={<ProtectedRoute><Storage /></ProtectedRoute>} />
+        <Route path="/storage_log/:id" element={<ProtectedRoute><StorageLog /></ProtectedRoute>} />
       </Routes>
     </Router>
   );

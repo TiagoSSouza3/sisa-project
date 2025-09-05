@@ -67,6 +67,11 @@ export default function Sidebar({ isOpen, onClose }) {
             {language === "english" ? "Documents" : "Documentos"}
           </Link>
 
+          <Link to="/storage" className={isActive("/storage")}>
+            <span role="img" aria-label="Estoque">📦</span>
+            {language === "english" ? "Storage" : "Estoque"}
+          </Link>
+
           <Link
             to="/"
             onClick={handleLogout}
