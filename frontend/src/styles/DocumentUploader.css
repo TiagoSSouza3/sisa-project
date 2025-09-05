@@ -3,6 +3,13 @@
   padding: 40px;
   max-width: 700px;
   margin: 0 auto;
+  transition: color 0.3s ease;
+  min-height: 781px;
+}
+
+/* Dark mode for Document Uploader */
+.dark-mode .document-uploader {
+  color: var(--text-color);
 }
 
 /* Header */
@@ -16,12 +23,23 @@
   font-weight: 600;
   color: #1e293b;
   margin: 0 0 10px 0;
+  transition: color 0.3s ease;
 }
 
 .uploader-subtitle {
   color: #64748b;
   margin: 0;
   line-height: 1.5;
+  transition: color 0.3s ease;
+}
+
+/* Dark mode for uploader text */
+.dark-mode .uploader-title {
+  color: var(--text-color);
+}
+
+.dark-mode .uploader-subtitle {
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .uploader-subtitle code {
@@ -31,6 +49,13 @@
   font-family: 'Courier New', monospace;
   font-size: 0.9em;
   color: #3b82f6;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark mode for code */
+.dark-mode .uploader-subtitle code {
+  background: var(--surface-color);
+  color: var(--primary-color);
 }
 
 /* Error Message */
@@ -84,6 +109,28 @@
   background: #f0fdf4;
 }
 
+/* Dark mode for Upload Area */
+.dark-mode .upload-area {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: var(--surface-color);
+  color: var(--text-color);
+}
+
+.dark-mode .upload-area:hover {
+  border-color: var(--primary-color);
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.dark-mode .upload-area.drag-active {
+  border-color: var(--primary-color);
+  background: rgba(59, 130, 246, 0.2);
+}
+
+.dark-mode .upload-area.has-file {
+  border-color: var(--success-color);
+  background: rgba(16, 185, 129, 0.1);
+}
+
 /* Upload Prompt */
 .upload-prompt {
   display: flex;
@@ -123,6 +170,10 @@
   color: #64748b;
   font-size: 0.9rem;
   margin: 0;
+}
+
+.dark-mode .upload-hint {
+  color: var(--text-light) !important;
 }
 
 /* File Preview */
@@ -195,7 +246,11 @@
 .field-label {
   font-weight: 500;
   color: #374151;
-  font-size: 0.95rem;
+  font-size: 1.075rem;
+}
+
+.dark-mode .field-label {
+  color: var(--text-light);
 }
 
 .field-input,
@@ -203,9 +258,9 @@
   padding: 12px 16px;
   border: 1px solid #d1d5db;
   border-radius: 10px;
-  font-size: 1rem;
+  font-size: 1.125rem;
   transition: all 0.2s ease;
-  background: white;
+  background: var(--surface-color);
 }
 
 .field-input:focus,
@@ -223,12 +278,19 @@
 
 /* Info Box */
 .info-box {
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
+  background: var(--surface-color);
+  border: 1px solid rgba(59, 130, 246, 0.25);
   border-radius: 12px;
   padding: 20px;
   display: flex;
   gap: 15px;
+}
+
+/* Dark mode for Info Box */
+.dark-mode .info-box {
+  background: var(--surface-color);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--text-light);
 }
 
 .info-icon {
@@ -261,10 +323,22 @@
   font-size: 0.9em;
 }
 
+.dark-mode .info-text code {
+  background: var(--surface-color);
+  color: var(--text-light);
+}
+
 .info-examples {
   color: #1e40af;
   margin: 0;
   font-size: 0.9rem;
+}
+
+/* Dark mode overrides for info box text */
+.dark-mode .info-title,
+.dark-mode .info-text,
+.dark-mode .info-examples {
+  color: var(--text-light);
 }
 
 .info-examples code {
@@ -273,6 +347,11 @@
   border-radius: 4px;
   font-family: 'Courier New', monospace;
   margin: 0 2px;
+}
+
+.dark-mode .info-examples code {
+  background: var(--surface-color);
+  color: var(--text-light);
 }
 
 /* Action Buttons */

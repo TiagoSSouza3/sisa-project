@@ -26,7 +26,7 @@
 
 .modal-content {
   position: relative;
-  background: white;
+  background: var(--surface-color);
   width: 90vw;
   height: 90vh;
   max-width: 1200px;
@@ -119,7 +119,7 @@
 }
 
 .preview-document {
-  background: white;
+  background: var(--surface-color);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   padding: 60px;

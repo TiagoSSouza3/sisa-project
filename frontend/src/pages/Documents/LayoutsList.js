@@ -179,15 +179,6 @@ export default function LayoutsList({ layouts, loading, onSelectLayout, onDelete
           >
             📤 {language === "english" ? "Upload Document" : "Upload Documento"}
           </button>
-          <div className="empty-tip">
-            <span className="tip-icon">💡</span>
-            <span>
-              {language === "english" 
-                ? "Use placeholders like <code>{'{{nome}}'}</code> in your DOCX" 
-                : "Use placeholders como <code>{'{{nome}}'}</code> no seu DOCX"
-              }
-            </span>
-          </div>
         </div>
       </div>
     );

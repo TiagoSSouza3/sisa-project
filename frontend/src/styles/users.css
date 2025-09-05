@@ -38,7 +38,7 @@
 }
 
 .user-name {
-  font-size: 1.1rem;
+  font-size: 1.5rem;
   font-weight: 600;
   color: var(--primary-color);
   margin-bottom: 0.5rem;
@@ -46,7 +46,10 @@
 
 .user-email {
   color: var(--text-color);
-  font-size: 0.9rem;
+  font-size: 1.2rem;
+  display: flex;
+  justify-content: left;
+  margin-bottom: 10px;
 }
 
 .user-role {
@@ -54,7 +57,7 @@
   color: var(--text-light);
   padding: 0.3rem 0.8rem;
   border-radius: 20px;
-  font-size: 0.8rem;
+  font-size: 1rem;
   font-weight: 500;
 }
 
@@ -112,13 +115,25 @@
   }
 
   .user-item {
+    display: flex;
+    justify-self: center;
     flex-direction: column;
     text-align: center;
     gap: 1rem;
   }
 
+  .user-email {
+    display: flex;
+    justify-self: center;
+  }
+
   .user-actions {
-    width: 100%;
+    width: 200px;
     justify-content: center;
+  }
+
+  .delete-button,
+  .edit-button {
+    display: flex;
   }
 } 

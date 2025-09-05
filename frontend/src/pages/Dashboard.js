@@ -42,18 +42,20 @@ export default function Dashboard() {
   });
 
   return (
-    <div>
-      {showFirstAccessModal && (
-        <FirstAccessModal 
-          userEmail={userEmail} 
-          onClose={handleCloseModal}
-        />
-      )}
-      
-      <h1>
-        {language === "english" ? "Welcome to system " : "Bem-vindo ao sistema "}
-        SISA, {firstName}!
-      </h1>
+    <div className="container">
+      <div>
+        {showFirstAccessModal && (
+          <FirstAccessModal 
+            userEmail={userEmail} 
+            onClose={handleCloseModal}
+          />
+        )}
+        
+        <h1>
+          {language === "english" ? "Welcome to system " : "Bem-vindo ao sistema "}
+          SISA, {firstName}!
+        </h1>
+      </div>
       <p>Dashboard carregado com sucesso!</p>
     </div>
   );

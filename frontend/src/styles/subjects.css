@@ -30,7 +30,7 @@
 }
 
 .subject-title {
-  font-size: 1.25rem;
+  font-size: 1.9rem;
   color: var(--primary-color);
   margin-bottom: 1rem;
   font-weight: 600;
@@ -39,6 +39,7 @@
 .subject-info {
   margin-bottom: 1rem;
   color: var(--text-color);
+  font-size: 1.2rem;
 }
 
 .subject-actions {
@@ -51,10 +52,14 @@
   background-color: var(--primary-light);
   display: block;
   margin: 0 auto;
+  width: 6rem;
+  height: 2.75rem;
 }
 
 .delete-button {
   background-color: var(--error-color);
+  width: 6rem;
+  height: 2.75rem;
 }
 
 .add-subject-button {

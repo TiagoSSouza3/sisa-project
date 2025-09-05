@@ -179,22 +179,6 @@ export default function DocumentUploader({ onLayoutCreated, onCancel }) {
           </div>
         </div>
 
-        <div className="info-box">
-          <div className="info-icon">💡</div>
-          <div className="info-content">
-            <h4 className="info-title">{language === "english" ? "How to use placeholders" : "Como usar placeholders"}</h4>
-            <p className="info-text">
-              {language === "english" 
-                ? "Use placeholders in format <code>{'{{nome_do_campo}}'}</code> in your document DOCX." 
-                : "Use placeholders no formato <code>{'{{nome_do_campo}}'}</code> no seu documento DOCX."
-              }
-            </p>
-            <p className="info-examples">
-              Ex: <code>{'{{nome}}'}</code>, <code>{'{{data}}'}</code>, <code>{'{{curso}}'}</code>
-            </p>
-          </div>
-        </div>
-
         {/* Action Buttons */}
         <div className="action-buttons">
           <button

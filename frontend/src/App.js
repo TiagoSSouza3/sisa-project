@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -26,7 +26,17 @@ import './styles/global.css';
 function App() {
   return (
     <Router future={{ v7_startTransition: true }}>
-      <Navbar />
+      <AppContent />
+    </Router>
+  );
+}
+
+function AppContent() {
+  const location = useLocation();
+  const hideNavbar = location.pathname === "/";
+  return (
+    <>
+      {!hideNavbar && <Navbar />}
       <Routes>
         <Route path='*' exact={true} element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/" element={<Login />} />
@@ -49,7 +59,7 @@ function App() {
         <Route path="/storage" element={<ProtectedRoute><Storage /></ProtectedRoute>} />
         <Route path="/storage_log/:id" element={<ProtectedRoute><StorageLog /></ProtectedRoute>} />
       </Routes>
-    </Router>
+    </>
   );
 }
 
