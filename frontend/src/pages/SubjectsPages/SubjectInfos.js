@@ -36,7 +36,7 @@ export default function SubjectInfos() {
         
             if (subjectData.students) {
                 setStudents(subjectData.students);
-            } else {
+            } else if (subjectData.students) {
                 const studentData = await Promise.all(
                     subjectData.students.map(async (studentId) => {
                         const res = await API.get(`/students/${studentId}`);
@@ -44,7 +44,7 @@ export default function SubjectInfos() {
                     })
                 );
                 setStudents(studentData);
-            }
+            } else setStudents([])
 
         } catch (err) {
             console.error("Erro ao carregar disciplina ou alunos:", err);
@@ -56,7 +56,7 @@ export default function SubjectInfos() {
         try {
             const currentStudentIds = subject.students?.map(s => s.id) || [];
         
-            const updatedStudentIds = currentStudentIds.filter(i => i.id !== student_id);
+            const updatedStudentIds = currentStudentIds.filter(i => i !== student_id);
         
             const updated = await API.put(`/subjects/${id}`, {
                 name: subject.name,
@@ -71,15 +71,15 @@ export default function SubjectInfos() {
 
             if (updated.students) {
                 setStudents(updated.students);
-            } else {
+            } else if(updated.students) {
                 const studentData = await Promise.all(
-                    subjectData.students.map(async (studentId) => {
+                    updated.students.map(async (studentId) => {
                         const res = await API.get(`/students/${studentId}`);
                         return res.data;
                     })
                 );
                 setStudents(studentData);
-            }
+            } else setStudents([])
 
             console.log(subject.students)
         } catch (error) {
