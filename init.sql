@@ -1,7 +1,7 @@
 -- Database: SISA
 
-CREATE DATABASE IF NOT EXISTS sisinha;
-USE sisinha;
+CREATE DATABASE IF NOT EXISTS sisa;
+USE sisa;
 
 -- Ocupações (Tipos de usuários)
 CREATE TABLE IF NOT EXISTS occupation (

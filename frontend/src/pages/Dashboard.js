@@ -56,7 +56,6 @@ export default function Dashboard() {
           SISA, {firstName}!
         </h1>
       </div>
-      <p>Dashboard carregado com sucesso!</p>
     </div>
   );
 }

@@ -29,7 +29,7 @@ export default function Navbar() {
   useEffect(() => {
     // Sincronizar o checkbox com o idioma armazenado
     const currentLanguage = localStorage.getItem("language");
-    setIsChecked(currentLanguage === "english");
+    setIsLanguageChecked(currentLanguage === "english");
   }, []);
 
   useEffect(() => {
@@ -44,7 +44,7 @@ export default function Navbar() {
   const handleLanguageChange = (e) => {
     const newLanguage = e.target.checked ? 'english' : 'portugues';
     changeLanguage(newLanguage);
-    setIsChecked(e.target.checked);
+    setIsLanguageChecked(e.target.checked);
   };
 
   return (
