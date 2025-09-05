@@ -2,6 +2,7 @@
 .all-documents {
   padding: 40px;
   transition: color 0.3s ease;
+  min-height: 781px;
 }
 
 /* Dark mode for All Documents */
@@ -466,6 +467,8 @@
 .btn-primary {
   background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: white;
+  padding: 13px 25px;
+  font-size: 1.2rem;
 }
 
 .btn-primary:hover:not(:disabled) {

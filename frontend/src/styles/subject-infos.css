@@ -14,3 +14,17 @@
     gap: 1rem;
     align-items: center;
 }
+
+/* Escopo exclusivo para a página de SubjectInfos */
+.subject-infos-container .students-list .student-item .user-actions {
+    display: flex;
+    justify-content: flex-start; /* botão à esquerda */
+    width: auto;
+}
+
+@media (max-width: 768px) {
+  .subject-infos-container .students-list .student-item .user-actions {
+      justify-content: flex-start; /* manter à esquerda no mobile */
+      width: auto;
+  }
+}

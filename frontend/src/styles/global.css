@@ -52,6 +52,12 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Usado para desabilitar rolagem apenas no Login */
+body.no-scroll {
+  overflow: hidden;
+  height: 100vh;
+}
+
 /* Navbar */
 .navbar {
   background-color: var(--primary-color);
@@ -145,6 +151,14 @@ body {
   animation: fadeIn 0.3s ease;
 }
 
+/* Quando o menu estiver aberto, esconder o seletor de idioma */
+.sidebar.open ~ .navbar .toggle-group,
+.sidebar.open + .navbar .toggle-group {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -158,7 +172,7 @@ body {
   height: 100vh;
   width: 320px;
   background: linear-gradient(145deg, #2563eb 0%, #3b82f6 50%, #60a5fa 100%);
-  box-shadow: 0 25px 50px rgba(37, 99, 235, 0.3);
+  box-shadow: none; /* sem sombra quando fechado para não vazar brilho */
   transform: translateX(-100%);
   transition: var(--transition);
   z-index: 999;
@@ -171,12 +185,17 @@ body {
 /* Dark mode sidebar adjustments */
 .dark-mode .sidebar {
   background: linear-gradient(145deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%);
-  box-shadow: 0 25px 50px rgba(37, 99, 235, 0.4);
+  box-shadow: none; /* sem sombra enquanto fechado */
 }
 
 .sidebar.open {
   transform: translateX(0);
   animation: slideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  box-shadow: 0 25px 50px rgba(37, 99, 235, 0.3); /* aplicar sombra somente quando aberto */
+}
+/* No dark mode, aplicar sombra do sidebar somente quando aberto */
+.dark-mode .sidebar.open {
+  box-shadow: 0 25px 50px rgba(37, 99, 235, 0.4);
 }
 
 @keyframes slideIn {
@@ -612,8 +631,16 @@ h2 {
     gap: 0.5rem;
     position: fixed;
     top: 1rem;
-    left: 1rem;
-    z-index: 1000;
+    left: 0.001rem;
+    z-index: 997;
+    pointer-events: none;
+    transform: scale(0.8);
+  }
+
+  .transparent-button {
+    width: 75px;
+    display: flex;
+    justify-content: left;
   }
 }
 
@@ -639,5 +666,9 @@ h2 {
   .navbar a {
     padding: 0.4rem 0.8rem;
     font-size: 0.9rem
+  }
+
+  .toggle-group {
+    transform: scale(0.7);
   }
 }

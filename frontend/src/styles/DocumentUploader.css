@@ -4,6 +4,7 @@
   max-width: 700px;
   margin: 0 auto;
   transition: color 0.3s ease;
+  min-height: 781px;
 }
 
 /* Dark mode for Document Uploader */
