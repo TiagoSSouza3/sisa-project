@@ -10,6 +10,7 @@ import '../../styles/storage.css';
 export default function Storage() {
     const { language } = useLanguage(); 
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const [newItem, setNewItem] = useState({
         name: "",
@@ -21,19 +22,50 @@ export default function Storage() {
     const [storage, setStorage] = useState([]);
 
     const loadStorage = async () => {
+        setLoading(true);
+
         try {
             const storage_res = await API.get(`/storage`);
-            const storageWithAmount = storage_res.data.map((item) => ({
-                ...item,
-                amountToAdd: "",
-                isEditingPrice: false,
-                isEditingDate: false,
-                editingPrice: null,
-                editingDate: null
-            }));
-            setStorage(storageWithAmount);
+            console.log("Storage response:", storage_res.data);
+
+            // Usar Promise.all para garantir que todas as promessas terminem antes de continuar
+            const storageWithAmount = await Promise.all(
+                storage_res.data.map(async (item) => {
+                    const storage_log_res = await API.get(`/storage/log/${item.id}`);
+                    const data = storage_log_res.data;
+
+                    // Calcular variação de preço baseada no preço atual vs preço anterior
+                    let priceChange = null;
+
+                    const currentPrice = parseFloat(item.last_price) || 0;
+                    const previousLog = data[1] || null;
+                    const previousPrice = previousLog ? previousLog.last_price : null;
+
+                    if (!!previousLog && previousPrice > 0) {
+                        const change = ((currentPrice - previousPrice) / previousPrice) * 100;
+                        priceChange = {
+                            percentage: change,
+                            isPositive: change > 0,
+                            isNegative: change < 0,
+                            isNeutral: change === 0
+                        };
+                    }
+
+                    return {
+                        ...item,
+                        priceChange: priceChange,
+                        amountToAdd: "",
+                        isEditingPrice: false,
+                        editingPrice: null
+                    };
+                })
+            );
+
+            setStorage(storageWithAmount); // Atualiza apenas quando todos os dados estiverem prontos
         } catch (err) {
-            console.log("Erro ao carregar estoque");
+            console.log("Erro ao carregar estoque:", err);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -68,16 +100,14 @@ export default function Storage() {
         };
 
         saveStorage(updatedItem, index);
-    }
+    };
 
     const saveStorage = async (item, index) => {
         try {
             const itemToSend = { ...item };
             delete itemToSend.amountToAdd;
             delete itemToSend.isEditingPrice;
-            delete itemToSend.isEditingDate;
             delete itemToSend.editingPrice;
-            delete itemToSend.editingDate;
             
             console.log("=== DEBUG saveStorage ===");
             console.log("Item original:", item);
@@ -92,26 +122,23 @@ export default function Storage() {
             
             if (res.status === 200) {
                 console.log("Sucesso! Atualizando estado local...");
-                // Mantém os dados locais atualizados, apenas adiciona os campos de controle
                 const updatedStorage = [...storage];
                 updatedStorage[index] = {
-                    ...updatedStorage[index], // Mantém os dados locais
+                    ...updatedStorage[index],
                     amountToAdd: "",
                     isEditingPrice: false,
-                    isEditingDate: false,
-                    editingPrice: null,
-                    editingDate: null
+                    editingPrice: null
                 };
-                console.log("Estado final:", updatedStorage[index]);
 
+                console.log("Estado final:", updatedStorage[index]);
                 setStorage(updatedStorage);
 
-                loadStorage()
+                loadStorage();
             }
         } catch (error) {
             console.log("Erro ao salvar:", error);
         }
-    }
+    };
     
     const handleInputChange = (e, index) => {
         let newValue = Number(e.target.value);
@@ -171,14 +198,15 @@ export default function Storage() {
         const newPrice = parseFloat(item.editingPrice) || 0;
         
         if (newPrice !== item.last_price) {
-            const today = new Date().toISOString().split('T')[0]; // Formato YYYY-MM-DD para o banco
+            // Atualiza last_price_date automaticamente para hoje
+            const today = new Date().toISOString().split('T')[0];
             const updatedItem = {
                 ...item,
                 last_price: newPrice,
                 last_price_date: today
             };
             
-            // Atualiza o estado local ANTES de chamar saveStorage
+            // Atualiza localmente
             const updatedStorage = [...storage];
             updatedStorage[index] = {
                 ...updatedStorage[index],
@@ -189,90 +217,15 @@ export default function Storage() {
             };
             setStorage(updatedStorage);
             
-            // Chama saveStorage para persistir no banco
+            // Salva no banco
             await saveStorage(updatedItem, index);
         } else {
-            // Se não houve mudança, apenas remove o modo de edição
+            // Apenas sai do modo de edição
             const updatedStorage = [...storage];
             updatedStorage[index] = {
                 ...updatedStorage[index],
                 isEditingPrice: false,
                 editingPrice: null
-            };
-            setStorage(updatedStorage);
-        }
-    };
-
-    // Funções para edição inline da data
-    const startDateEdit = (index) => {
-        const updatedStorage = [...storage];
-        updatedStorage[index] = {
-            ...updatedStorage[index],
-            isEditingDate: true,
-            editingDate: updatedStorage[index].last_price_date
-        };
-        setStorage(updatedStorage);
-    };
-
-    const handleDateEdit = (e, index) => {
-        const newDateValue = e.target.value;
-        console.log("=== DEBUG handleDateEdit ===");
-        console.log("Novo valor da data:", newDateValue);
-        console.log("Index:", index);
-        console.log("Item atual:", storage[index]);
-        
-        const updatedStorage = [...storage];
-        updatedStorage[index] = {
-            ...updatedStorage[index],
-            editingDate: newDateValue
-        };
-        
-        console.log("Item atualizado:", updatedStorage[index]);
-        setStorage(updatedStorage);
-    };
-
-    const saveDateEdit = async (index) => {
-        const item = storage[index];
-        const newDate = item.editingDate || item.last_price_date;
-        
-        console.log("=== DEBUG saveDateEdit ===");
-        console.log("Item atual:", item);
-        console.log("newDate:", newDate);
-        console.log("item.last_price_date:", item.last_price_date);
-        console.log("São diferentes?", newDate !== item.last_price_date);
-        
-        if (newDate !== item.last_price_date) {
-            console.log("Salvando nova data:", newDate);
-            
-            const updatedItem = {
-                ...item,
-                last_price_date: newDate
-            };
-            
-            console.log("Item para enviar:", updatedItem);
-            
-            // Atualiza o estado local ANTES de chamar saveStorage
-            const updatedStorage = [...storage];
-            updatedStorage[index] = {
-                ...updatedStorage[index],
-                last_price_date: newDate,
-                isEditingDate: false,
-                editingDate: null
-            };
-            
-            console.log("Estado local atualizado:", updatedStorage[index]);
-            setStorage(updatedStorage);
-            
-            // Chama saveStorage para persistir no banco
-            await saveStorage(updatedItem, index);
-        } else {
-            console.log("Nenhuma mudança detectada");
-            // Se não houve mudança, apenas remove o modo de edição
-            const updatedStorage = [...storage];
-            updatedStorage[index] = {
-                ...updatedStorage[index],
-                isEditingDate: false,
-                editingDate: null
             };
             setStorage(updatedStorage);
         }
@@ -302,6 +255,32 @@ export default function Storage() {
             return "N/A";
         }
     };
+
+    // Função auxiliar para formatar variação de preço
+    const formatPriceChange = (priceChange) => {
+        if (!priceChange) return "--//--";
+        if (priceChange.percentage === 0) return "0,00%";
+        
+        const sign = priceChange.isPositive ? "+" : "";
+        return `${sign}${priceChange.percentage.toFixed(2).replace(".", ",")}%`;
+    };
+
+    const getPriceChangeClass = (priceChange) => {
+        if (!priceChange) return "neutral";
+        if (priceChange.percentage === 0) return "neutral";
+        if (priceChange.isPositive) return "positive";
+        if (priceChange.isNegative) return "negative";
+        return "neutral";
+    };
+
+    if (loading) {
+        return (
+          <div className="all-documents-loading">
+            <div className="loading-spinner-large"></div>
+            <p>{language === "english" ? "Loading..." : "Carregando..."}</p>
+          </div>
+        );
+    }
 
     return (
         <div className="storage-container">
@@ -362,17 +341,6 @@ export default function Storage() {
                          </div>
 
                         <div className="form-field">
-                            <label htmlFor="last_price_date">{language === "english" ? "Last Price Date" : "Data do Último Preço"}</label>
-                            <input 
-                                id="last_price_date"
-                                type="date"
-                                placeholder={language === "english" ? "Enter date" : "Digite a data"}
-                                value={newItem.last_price_date}
-                                onChange={(e) => setNewItem({ ...newItem, last_price_date: e.target.value })}
-                            />
-                         </div>
-
-                        <div className="form-field">
                             <label htmlFor="amount">{language === "english" ? "Amount" : "Quantidade"}</label>
                             <input 
                                 id="amount"
@@ -396,7 +364,8 @@ export default function Storage() {
                     <h3>{language === "english" ? "Name" : "Nome"}</h3>
                     <h3>{language === "english" ? "Description" : "Descrição"}</h3>
                     <h3>{language === "english" ? "Last Price" : "Ultimo Preço"}</h3>
-                    <h3>{language === "english" ? "Date Of Last Purchase " : "Data Da Ultima Compra"}</h3>
+                    <h3>{language === "english" ? "Price Change" : "Variação de Preço"}</h3>
+                    <h3>{language === "english" ? "Date Of Last Purchase" : "Data Da Ultima Compra"}</h3>
                     <h3>{language === "english" ? "Amount" : "Quantidade"}</h3>
                     <h3>{language === "english" ? "Amount to Add/remove" : "Quantidade de entrada/saida"}</h3>
                 </div>
@@ -420,33 +389,19 @@ export default function Storage() {
                                         autoFocus
                                     />
                                 ) : (
-                                                                         <span 
-                                         className="editable-price"
-                                         onClick={() => startPriceEdit(index)}
-                                     >
-                                         {formatPrice(item.last_price)}
-                                     </span>
+                                <span 
+                                    className="editable-price"
+                                    onClick={() => startPriceEdit(index)}
+                                >
+                                    {formatPrice(item.last_price)}
+                                </span>
                                 )}
                             </div>
+                            <div className={`storage-item-price-change ${getPriceChangeClass(item.priceChange)}`}>
+                                {formatPriceChange(item.priceChange)}
+                            </div>
                             <div className="storage-item-last-price-date">
-                                {item.isEditingDate ? (
-                                    <input
-                                        type="date"
-                                        className="edit-date-input"
-                                        value={item.editingDate || item.last_price_date}
-                                        onChange={(e) => handleDateEdit(e, index)}
-                                        onBlur={() => saveDateEdit(index)}
-                                        onKeyPress={(e) => e.key === 'Enter' && saveDateEdit(index)}
-                                        autoFocus
-                                    />
-                                ) : (
-                                                                         <span 
-                                         className="editable-date"
-                                         onClick={() => startDateEdit(index)}
-                                     >
-                                         {formatDate(item.last_price_date)}
-                                     </span>
-                                )}
+                                {formatDate(item.last_price_date)}
                             </div>
                             <p className="storage-item-amount">{item.amount}</p>
                         </div>
@@ -483,4 +438,4 @@ export default function Storage() {
             </div>
         </div>
     );
-} 
+}

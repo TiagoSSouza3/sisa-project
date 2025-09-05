@@ -16,20 +16,117 @@ export default function StorageLog() {
     const loadStorage = async () => {
         try {
             const storage =  await API.get(`/storage/log/${id}`)
-            setStorage(storage.data);
+            const data = storage.data;
+            console.log("Storage Log Data:", data);
+            
+            // Calcular variação de preço para cada log
+            const storageWithPriceChange = data.map((item, index) => {
+                let priceChange = null;
+                
+                // Simular cálculo de variação baseado no índice
+                const currentPrice = parseFloat(item.last_price) || 0;
+                const previousLog = data[index + 1] || null;
+
+                const previousPrice = previousLog ? previousLog.last_price : null;
+
+                console.log(currentPrice, index)
+                console.log(previousPrice, index+1)
+                
+                if (!!previousPrice && previousPrice > 0) {
+                    const change = ((currentPrice - previousPrice) / previousPrice) * 100;
+                    priceChange = {
+                        percentage: change,
+                        isPositive: change > 0,
+                        isNegative: change < 0,
+                        isNeutral: change === 0
+                    };
+
+
+                }
+                
+                return {
+                    ...item,
+                    priceChange: priceChange
+                };
+            });
+            
+            setStorage(storageWithPriceChange);
 
         } catch (err) {
-            console.log("Erro ao carregar estoque");
+            console.log("Erro ao carregar estoque:", err);
         }
     };
 
     useEffect(() => {
         const token = localStorage.getItem("token");
-        setIsLoggedIn(token !== null);0
+        setIsLoggedIn(token !== null);
         loadStorage();
     }, []);
 
-    if(!isLoggedIn) return <navigate to="/" />
+    if(!isLoggedIn) {
+        navigate("/");
+        return null;
+    }
+
+    // Função auxiliar para formatar preço no formato brasileiro
+    const formatPrice = (price) => {
+        if (price === null || price === undefined) return "R$0,00";
+        const numPrice = parseFloat(price);
+        if (isNaN(numPrice)) return "R$0,00";
+        return `R$${numPrice.toFixed(2).replace(".", ",")}`;
+    };
+
+    // Função auxiliar para formatar data no formato brasileiro DD/MM/YYYY
+    const formatDate = (dateString) => {
+        if (!dateString) return "N/A";
+        try {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return "N/A";
+            
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            
+            return `${day}/${month}/${year}`;
+        } catch (error) {
+            return "N/A";
+        }
+    };
+
+    // Função auxiliar para formatar horário no formato HH:MM:SS
+    const formatTime = (dateString) => {
+        if (!dateString) return "N/A";
+        try {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return "N/A";
+            
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const seconds = date.getSeconds().toString().padStart(2, '0');
+            
+            return `${hours}:${minutes}:${seconds}`;
+        } catch (error) {
+            return "N/A";
+        }
+    };
+
+    // Função auxiliar para formatar variação de preço
+    const formatPriceChange = (priceChange) => {
+        if (!priceChange) return "--//--";
+        if (priceChange.percentage === 0) return "0,00%";
+        
+        const sign = priceChange.isPositive ? "+" : "";
+        return `${sign}${priceChange.percentage.toFixed(2).replace(".", ",")}%`;
+    };
+
+    // Função auxiliar para obter classe CSS da variação de preço
+    const getPriceChangeClass = (priceChange) => {
+        if (!priceChange) return "neutral";
+        if (priceChange.percentage === 0) return "neutral";
+        if (priceChange.isPositive) return "positive";
+        if (priceChange.isNegative) return "negative";
+        return "neutral";
+    };
 
     return (
         <div className="storage-container">
@@ -52,18 +149,32 @@ export default function StorageLog() {
                 {storage.length === 0 ? (
                     <div className="empty-state">{language === "english" ? "Empty Storage" : "Estoque Vazio"}</div>
                 ) : (
-                storage.map((item, index) => (
-                    <div key={item.id} className="storage-item">
-                        <div className="storage-item-info">
-                            <h3 className="storage-item-date">{item.date}</h3>
-                            <h3 className="storage-item-title">{item.name}</h3>
-                            <p className="storage-item-description">{item.description}</p>
-                            <p className="storage-item-last-price">{item.last_price}</p>
-                            <p className="storage-item-last-price-date">{item.last_price_date}</p>
-                            <p className="storage-item-amount">{item.amount}</p>
-                        </div>
+                <>
+                    <div className="storage-items-list-titles">
+                        <h3>{language === "english" ? "Date" : "Data"}</h3>
+                        <h3>{language === "english" ? "Name" : "Nome"}</h3>
+                        <h3>{language === "english" ? "Description" : "Descrição"}</h3>
+                        <h3>{language === "english" ? "Last Price" : "Ultimo Preço"}</h3>
+                        <h3>{language === "english" ? "Price Change" : "Variação de Preço"}</h3>
+                        <h3>{language === "english" ? "Date Of Last Purchase " : "Data Da Ultima Compra"}</h3>
+                        <h3>{language === "english" ? "Amount" : "Quantidade"}</h3>
                     </div>
-                ))
+                    {storage.map((item, index) => (
+                        <div key={item.id} className="storage-item">
+                            <div className="storage-item-info">
+                                <h3 className="storage-item-date">{formatDate(item.created_at)}<br />{formatTime(item.created_at)}</h3>
+                                <h3 className="storage-item-title">{item.name}</h3>
+                                <p className="storage-item-description">{item.description}</p>
+                                <p className="storage-item-last-price">{formatPrice(item.last_price)}</p>
+                                <div className={`storage-item-price-change ${getPriceChangeClass(item.priceChange)}`}>
+                                    {formatPriceChange(item.priceChange)}
+                                </div>
+                                <p className="storage-item-last-price-date">{formatDate(item.last_price_date)}</p>
+                                <p className="storage-item-amount">{item.amount}</p>
+                            </div>
+                        </div>
+                    ))}
+                </>
                 )}
             </div>
         </div>
