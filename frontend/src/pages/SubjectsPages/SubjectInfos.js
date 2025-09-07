@@ -63,25 +63,24 @@ export default function SubjectInfos() {
                 description: subject.description,
                 students: updatedStudentIds
             });
-        
+
             setSubject({
-                ...updated,
+                ...updated.data,
                 students: subject.students.filter(s => s.id !== student_id)
             });
 
-            if (updated.students) {
-                setStudents(updated.students);
-            } else if(updated.students) {
+            if (subject.students) {
+                setStudents(subject.students.filter(s => s.id !== student_id));
+            } else if(subject.students) {
                 const studentData = await Promise.all(
-                    updated.students.map(async (studentId) => {
+                    subject.students.map(async (studentId) => {
                         const res = await API.get(`/students/${studentId}`);
                         return res.data;
                     })
                 );
-                setStudents(studentData);
+                setStudents(studentData.data.filter(s => s.id !== student_id));
             } else setStudents([])
 
-            console.log(subject.students)
         } catch (error) {
             console.error("Não foi possível desinscrever o aluno", error);
         }
