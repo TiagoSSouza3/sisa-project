@@ -26,7 +26,7 @@ export default function Storage() {
 
         try {
             const storage_res = await API.get(`/storage`);
-            console.log("Storage response:", storage_res.data);
+            console.log("Storage response:", storage_res.data); 
 
             // Usar Promise.all para garantir que todas as promessas terminem antes de continuar
             const storageWithAmount = await Promise.all(
@@ -157,7 +157,8 @@ export default function Storage() {
     };
     
     const handleNewStorageItem = async () => {
-        await API.post("/storage", newItem);
+        const last_price_date = Date.now();
+        await API.post("/storage", { ...newItem, last_price_date: last_price_date });
         setNewItem({
             name: "",
             description: "",
@@ -191,6 +192,13 @@ export default function Storage() {
             };
             setStorage(updatedStorage);
         }
+    };
+
+    const handleDelete = async (e) => {
+        const id = e.target.value;
+        await API.delete(`/storage/${id}`);
+
+        loadStorage();
     };
 
     const savePriceEdit = async (index) => {
@@ -431,6 +439,13 @@ export default function Storage() {
                             >
                             {language === "english" ? "Product Log" : "Historico do Produto"}
                             </button>
+                        </div>
+                        <div className="storage-item-delete">
+                            <button 
+                                className="delete-button"
+                                value={item.id}
+                                onClick={handleDelete}
+                            >🗑️</button>
                         </div>
                     </div>
                 : <div className="empty-state">{language === "english" ? "Empty Storage" : "Estoque Vazio"}</div>
