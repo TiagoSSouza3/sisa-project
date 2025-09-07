@@ -119,8 +119,8 @@ exports.createStorageItem = async (req, res) => {
 
         res.status(201).json(storage);
     } catch (error) {
-        console.error("Erro ao criar item:", error);
-        res.status(400).json({ error: error.message });
+      console.error("Erro ao criar item:", error);
+      res.status(400).json({ error: error.message });
     }
 };
 

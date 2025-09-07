@@ -17,6 +17,8 @@ export default function StudentsForm() {
     const [cpfError, setCpfError] = useState("");
     const [rgError, setRgError] = useState("");
     const [emailError, setEmailError] = useState("");
+    const [childAge, setChildAge] = useState("");
+    const [ageError, setAgeError] = useState("");
 
     const [student, setStudent] = useState({
         name: "",
@@ -35,7 +37,7 @@ export default function StudentsForm() {
         school_year: "",
         school_name: "",
         school_period: "",
-        birth_date: Date,
+        birth_date: "",
         address: "",
         neighborhood: "",
         cep: "",
@@ -189,6 +191,18 @@ export default function StudentsForm() {
         }
     };
 
+    const handleBirthDate = (e) => {
+        const [year, month, day] = (e.target.value).split("-").map(Number);
+        const birth_date = new Date(year, month - 1, day);
+        const today = new Date(Date.now());
+        
+        if(birth_date >= today) setAgeError("Erro da Data de nascimento");
+        else setAgeError("");
+
+        setStudent({ ...student, birth_date: birth_date });
+        setChildAge(today.getFullYear() - birth_date.getFullYear());
+    }
+
     const handleCreate = async () => {
         if (!validateCPF(student.CPF)) {
             setCpfError("CPF inválido");
@@ -207,6 +221,11 @@ export default function StudentsForm() {
         
         if (student.second_phone && !validatePhoneNumber(student.second_phone)) {
             setSecondPhoneError("Telefone secundário inválido");
+            return;
+        }
+        
+        if (student.birth_date >= (new Date(Date.now()))) {
+            setAgeError("Erro da Data de nascimento");
             return;
         }
 
@@ -234,6 +253,18 @@ export default function StudentsForm() {
             });
         }
     };
+
+    function dateToString(date) {
+        if(date === ""){
+            return `yyyy-MM-dd`;
+        }
+
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0"); // +1 porque janeiro = 0
+        const year = date.getFullYear();
+        
+        return `${year}-${month}-${day}`;
+      }
 
     return (
         <div className="student-form-container">
@@ -298,48 +329,71 @@ export default function StudentsForm() {
                 {rgError && <span className="error-message">{rgError}</span>}
                 </div>
                 <div className="form-group">
-                <label htmlFor="gender">{language === "english" ? "Gender" : "Sexo"}</label>
-                <div className="radio-group">
-                  <input 
-                      id="gender-male"
-                      type="radio"
-                      name="gender"
-                      value="Masculino"
-                      checked={student.gender === "Masculino"}
-                      onChange={(e) => setStudent({ ...student, gender: e.target.value })}
-                  />
-                  <label htmlFor="gender-male">{language === "english" ? "Male" : "Masculino"}</label>
-                  <input 
-                      id="gender-female"
-                      type="radio"
-                      name="gender"
-                      value="Feminino"
-                      checked={student.gender === "Feminino"}
-                      onChange={(e) => setStudent({ ...student, gender: e.target.value })}
-                  />
-                  <label htmlFor="gender-female">{language === "english" ? "Female" : "Feminino"}</label>
-                </div>
-                </div>
-                <div className="form-group">
-                <label htmlFor="skin_color">{language === "english" ? "Skin Color" : "Cor Da Pele"}</label>
-                <input 
-                    id="skin_color"
-                    type="text"
-                    placeholder={language === "english" ? "Write the Student's Skin Color" : "Digite a cor da pele"}
-                    value={student.skin_color}
-                    onChange={(e) => setStudent({ ...student, skin_color: e.target.value })}
-                />
+                    <label htmlFor="gender">{language === "english" ? "Gender" : "Sexo"}</label>
+                    <div className="radio-group">
+                        <input 
+                            id="gender-male"
+                            type="radio"
+                            name="gender"
+                            value="Masculino"
+                            checked={student.gender === "Masculino"}
+                            onChange={(e) => setStudent({ ...student, gender: e.target.value })}
+                        />
+                        <label htmlFor="gender-male">{language === "english" ? "Male" : "Masculino"}</label>
+                        <input 
+                            id="gender-female"
+                            type="radio"
+                            name="gender"
+                            value="Feminino"
+                            checked={student.gender === "Feminino"}
+                            onChange={(e) => setStudent({ ...student, gender: e.target.value })}
+                        />
+                        <label htmlFor="gender-female">{language === "english" ? "Female" : "Feminino"}</label>
+                    </div>
                 </div>
                 <div className="form-group">
-                <label htmlFor="email">Email</label>
-                <input 
-                    id="email"
+                    <label htmlFor="birth_date">{language === "english" ? "Birth Date" : "Data de Nascimento"}</label>
+                    <input 
+                        id="birth_date"
+                        type="date"
+                        value={dateToString(student.birth_date)}
+                        onChange={handleBirthDate}
+                    />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="birth_date">{language === "english" ? "Child's age: " : "Idade Da Criança: "} {childAge}</label>
+                    {ageError && <span className="error-message">{ageError}</span>}
+                </div>
+                <div className="form-group">
+                    <label htmlFor="neighborhood">{language === "english" ? "neighborhood" : "Bairro"}</label>
+                    <input 
+                    id="neighborhood"
                     type="text"
-                    placeholder={language === "english" ? "Write the Email Address" : "Digite o Email"}
-                    value={student.email}
-                    onChange={handleEmailChange}
-                />
-                {emailError && <span className="error-message">{emailError}</span>}
+                    placeholder={language === "english" ? "Write the neighborhood " : "Digite a Bairro"}
+                    value={student.neighborhood}
+                    onChange={(e) => setStudent({ ...student, neighborhood: e.target.value })}
+                    />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="skin_color">{language === "english" ? "Skin Color" : "Cor Da Pele"}</label>
+                    <input 
+                        id="skin_color"
+                        type="text"
+                        placeholder={language === "english" ? "Write the Student's Skin Color" : "Digite a cor da pele"}
+                        value={student.skin_color}
+                        onChange={(e) => setStudent({ ...student, skin_color: e.target.value })}
+                    />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="email">Email para Contato</label>
+                    <input 
+                        id="email"
+                        type="text"
+                        placeholder={language === "english" ? "Write the Email Address to contact" : "Digite o Email para contato"}
+                        value={student.email}
+                        onChange={handleEmailChange}
+                    />
+                    {emailError && <span className="error-message">{emailError}</span>}
                 </div>
                 <div className="form-group">
                     <label htmlFor="phone">{language === "english" ? "Phone Number" : "Telefone"}</label>
@@ -362,6 +416,69 @@ export default function StudentsForm() {
                         onChange={(e) => handlePhoneChange(e, true)}
                     />
                     {secondPhoneError && <span className="error-message">{secondPhoneError}</span>}
+                </div>
+                <div className="form-group">
+                    <label htmlFor="is_on_school">{language === "english" ? "Is on School Actually?" : "Esta na Escola Atualmente?"}</label>
+                    <div className="radio-group">
+                        <input 
+                            id="is-school"
+                            type="radio"
+                            name="No"
+                            value="No"
+                            checked={student.is_on_school === "No"}
+                            onChange={(e) => setStudent({ ...student, is_on_school: e.target.value })}
+                        />
+                        <label htmlFor="isnt-school">{language === "english" ? "No" : "Não"}</label>
+                        <input 
+                            id="isnt-school"
+                            type="radio"
+                            name="Yes"
+                            value="Yes"
+                            checked={student.is_on_school === "Yes"}
+                            onChange={(e) => setStudent({ ...student, is_on_school: e.target.value })}
+                        />
+                        <label htmlFor="isnt-school">{language === "english" ? "Yes" : "Sim"}</label>
+                    </div>
+                </div>
+                <div className="form-group">
+                    <label htmlFor="school_year">{language === "english" ? "School's Year" : "Ano Escolar"}</label>
+                    <input 
+                        id="school_year"
+                        type="text"
+                        placeholder={language === "english" ? "Write the school year of student" : "Digite o ano da escola que o aluno esta"}
+                        value={student.school_year}
+                        onChange={(e) => setStudent({ ...student, school_year: e.target.value })}
+                    />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="school_name">{language === "english" ? "School's Name" : "Nome da Escola"}</label>
+                    <input 
+                        id="school_name"
+                        type="text"
+                        placeholder={language === "english" ? "Write the School's Name" : "Digite Nome da Escola"}
+                        value={student.school_name}
+                        onChange={(e) => setStudent({ ...student, school_name: e.target.value })}
+                    />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="school_period">{language === "english" ? "School's period" : "Periodo Escolar"}</label>
+                    <input 
+                        id="school_name"
+                        type="text"
+                        placeholder={language === "english" ? "Write the School's period" : "Digite Periodo que a criança estuda"}
+                        value={student.school_period}
+                        onChange={(e) => setStudent({ ...student, school_period: e.target.value })}
+                    />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="neighborhood">{language === "english" ? "Notes" : "Informações Adicionais"}</label>
+                    <input 
+                    id="notes"
+                    type="text"
+                    placeholder={language === "english" ? "Write addictional notes " : "Digite as Informações Adicionais"}
+                    value={student.neighborhood}
+                    onChange={(e) => setStudent({ ...student, neighborhood: e.target.value })}
+                    />
                 </div>
                 <button type="submit" className="add-student-button">
                     {id 
