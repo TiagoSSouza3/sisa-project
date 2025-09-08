@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLanguage } from '../components/LanguageContext';
 import FirstAccessModal from '../components/FirstAccessModal';
+import LinkShortCut from '../components/LinkShortCut';
 import API from '../api';
 
 export default function Dashboard() {
@@ -43,7 +44,7 @@ export default function Dashboard() {
 
   return (
     <div className="container">
-      <div>
+      <div className="title-div">
         {showFirstAccessModal && (
           <FirstAccessModal 
             userEmail={userEmail} 
@@ -55,6 +56,28 @@ export default function Dashboard() {
           {language === "english" ? "Welcome to system " : "Bem-vindo ao sistema "}
           SISA, {firstName}!
         </h1>
+      </div>
+      <div className="links-div">
+        <LinkShortCut 
+          name={language === "english" ? "Users" : "Usuários"}
+          linkToPage="/users"
+        />
+        <LinkShortCut 
+          name={language === "english" ? "Students" : "Alunos"}
+          linkToPage="/students"
+        />
+        <LinkShortCut 
+          name={language === "english" ? "Subjects" : "Atividades"}
+          linkToPage="/subjects"
+        />
+        <LinkShortCut 
+          name={language === "english" ? "Documents" : "Documentos"}
+          linkToPage="/documents"
+        />
+        <LinkShortCut 
+          name={language === "english" ? "Storage" : "Estoque"}
+          linkToPage="/storage"
+        />
       </div>
     </div>
   );
