@@ -10,6 +10,12 @@ export default function Sidebar({ isOpen, onClose }) {
 
   const isActive = (path) => (location.pathname === path ? "active" : "");
 
+  const handleNavClick = () => {
+    if (typeof onClose === 'function') {
+      onClose();
+    }
+  };
+
   const handleLogout = () => {
     localStorage.clear();
     window.location.href = "/";
@@ -39,42 +45,42 @@ export default function Sidebar({ isOpen, onClose }) {
         </div>
 
         <nav className="sidebar-nav">
-          <Link to="/dashboard" className={isActive("/dashboard")}>
+          <Link to="/dashboard" className={isActive("/dashboard")} onClick={handleNavClick}>
             <span role="img" aria-label="Início">🏠</span> 
             {language === "english" ? "Dashboard" : "Início"}
           </Link>
 
           {isLoggedIn &&
             localStorage.getItem("occupation_id") !== occupationEnum.professor && (
-              <Link to="/users" className={isActive("/users")}>
+              <Link to="/users" className={isActive("/users")} onClick={handleNavClick}>
                 <span role="img" aria-label="Usuários">👥</span> 
                 {language === "english" ? "Users" : "Usuários"}
               </Link>
           )}
 
-          <Link to="/students" className={isActive("/students")}>
+          <Link to="/students" className={isActive("/students")} onClick={handleNavClick}> 
             <span role="img" aria-label="Alunos">🎓</span> 
             {language === "english" ? "Students" : "Alunos"}
           </Link>
 
-          <Link to="/subjects" className={isActive("/subjects")}>
+          <Link to="/subjects" className={isActive("/subjects")} onClick={handleNavClick}>
             <span role="img" aria-label="Atividades">📚</span> 
             {language === "english" ? "Subjects" : "Atividades"}
           </Link>
 
-          <Link to="/documents" className={isActive("/documents")}>
+          <Link to="/documents" className={isActive("/documents")} onClick={handleNavClick}>
             <span role="img" aria-label="Documentos">📄</span>
             {language === "english" ? "Documents" : "Documentos"}
           </Link>
 
-          <Link to="/storage" className={isActive("/storage")}>
+          <Link to="/storage" className={isActive("/storage")} onClick={handleNavClick}>
             <span role="img" aria-label="Estoque">📦</span>
             {language === "english" ? "Storage" : "Estoque"}
           </Link>
 
           <Link
             to="/"
-            onClick={handleLogout}
+            onClick={() => { handleLogout(); handleNavClick(); }}
             className="logout-btn"
           >
             <span role="img" aria-label="Sair">🚪</span>

@@ -675,8 +675,8 @@ h2 {
 
 /* Menu Button */
 .menu-button {
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: var(--primary-color);
+  border: 1px solid var(--primary-color);
   color: var(--text-light);
   padding: 0.5rem 1rem;
   border-radius: var(--border-radius);
@@ -690,7 +690,7 @@ h2 {
 }
 
 .menu-button:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--primary-light);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }

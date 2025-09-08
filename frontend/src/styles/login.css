@@ -281,15 +281,33 @@
   color: var(--primary-color);
   text-decoration: underline;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 1rem;
   margin-top: 1rem;
-  padding: 0.5rem;
-  transition: var(--transition);
+  padding: 0;
+  transition: color 0.15s ease, filter 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
 }
 
 .forgot-password-link:hover {
-  color: var(--primary-dark);
-  text-decoration: none;
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  filter: brightness(1.15);
+  text-decoration: underline;
+  transform: none;
+  outline: none;
+  box-shadow: none;
+}
+
+.forgot-password-link:focus,
+.forgot-password-link:focus-visible,
+.forgot-password-link:active {
+  outline: none;
+  box-shadow: none;
+  border: none;
 }
 
 .welcome-message {

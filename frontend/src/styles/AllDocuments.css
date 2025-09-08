@@ -477,15 +477,16 @@
 }
 
 .btn-secondary {
-  background: #f8fafc;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  border: none;
   flex: 1;
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #f1f5f9;
-  color: #475569;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  transform: translateY(-1px);
 }
 
 /* Loading Spinner */
