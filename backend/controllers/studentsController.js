@@ -23,6 +23,7 @@ exports.createStudent = async (req, res) => {
     const student = await Student.create(req.body);
     res.status(201).json(student);
   } catch (error) {
+    console.error(error, error.mensage)
     res.status(400).json({ error: "Erro ao criar aluno. Verifique se todos os campos obrigatórios foram preenchidos." });
   }
 };

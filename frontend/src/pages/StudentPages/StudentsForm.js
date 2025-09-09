@@ -193,14 +193,24 @@ export default function StudentsForm() {
 
     const handleBirthDate = (e) => {
         const [year, month, day] = (e.target.value).split("-").map(Number);
-        const birth_date = new Date(year, month - 1, day);
-        const today = new Date(Date.now());
+        const birthDate = new Date(year, month - 1, day);
+        const today = new Date();
         
-        if(birth_date >= today) setAgeError("Erro da Data de nascimento");
+        if(birthDate.getTime() >= today.getTime()) setAgeError("Erro da Data de nascimento");
         else setAgeError("");
 
-        setStudent({ ...student, birth_date: birth_date });
-        setChildAge(today.getFullYear() - birth_date.getFullYear());
+        setStudent({ ...student, birth_date: birthDate});
+
+        let actualAge = today.getFullYear() - birthDate.getFullYear();
+        const hasBirthdayPassed = 
+            today.getMonth() > birthDate.getMonth() ||
+            (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
+
+        if (!hasBirthdayPassed) {
+            actualAge--;
+        }
+
+        setChildAge(actualAge);
     }
 
     const handleCreate = async () => {
