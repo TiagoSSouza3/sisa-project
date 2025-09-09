@@ -58,9 +58,9 @@ export default function StudentsForm() {
         try {
             const response = await API.get(`/students/${id}`);
             setStudent(response.data);
+            setChildAge(validadeAge(response.data.birth_date))
         } catch (err) {
             console.error("Erro ao buscar aluno:", err);
-            navigate("/students");
         }
     };
 
@@ -193,7 +193,7 @@ export default function StudentsForm() {
     };
 
     const handleBirthDate = (e) => {
-        
+
         const birthDate = StringToDate(e.target.value)
 
         const res = validadeAge(birthDate)
@@ -419,7 +419,7 @@ export default function StudentsForm() {
                             type="radio"
                             name="No"
                             value="false"
-                            checked={student.is_on_school === "false"}
+                            checked={student.is_on_school === false || student.is_on_school === "false"}
                             onChange={(e) => setStudent({ ...student, is_on_school: e.target.value })}
                         />
                         <label htmlFor="isnt-school">{language === "english" ? "No" : "Não"}</label>
@@ -428,7 +428,7 @@ export default function StudentsForm() {
                             type="radio"
                             name="Yes"
                             value="true"
-                            checked={student.is_on_school === "true"}
+                            checked={student.is_on_school === true || student.is_on_school === "true"}
                             onChange={(e) => setStudent({ ...student, is_on_school: e.target.value })}
                         />
                         <label htmlFor="isnt-school">{language === "english" ? "Yes" : "Sim"}</label>

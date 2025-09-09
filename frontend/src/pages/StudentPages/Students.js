@@ -173,10 +173,6 @@ export default function Students() {
     let newStudentsList = filteredStudents
     newStudentsList[index] = newStudent;
 
-    console.log(student)
-    console.log(newStudent)
-    console.log(newStudentsList)
-
     setFilteredStudents(newStudentsList)
     await API.put(`/students/${student.id}`, newStudent);
 
