@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useLanguage } from './LanguageContext';
-import '../styles/LinkShortCut.css';
+import '../styles/link-short-cut.css';
 
 export default function LinkShortCut({ name, linkToPage}) {
     const location = useLocation();

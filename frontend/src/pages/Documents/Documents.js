@@ -4,7 +4,7 @@ import DocumentUploader from './DocumentUploader';
 import LayoutsList from './LayoutsList';
 import DocumentForm from './DocumentForm';
 import AllDocuments from './AllDocuments';
-import '../../styles/Documents.css';
+import '../../styles/documents.css';
 import { useLanguage } from '../../components/LanguageContext';
 
 export default function Documents() {

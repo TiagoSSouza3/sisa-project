@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import API from '../../api';
-import '../../styles/DocumentForm.css';
+import '../../styles/document-form.css';
 import { useLanguage } from '../../components/LanguageContext';
 
 export default function DocumentForm({ layout, onCancel }) {

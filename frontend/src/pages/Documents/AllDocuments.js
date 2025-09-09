@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import API from '../../api';
-import '../../styles/AllDocuments.css';
+import '../../styles/all-documents.css';
 import { useLanguage } from '../../components/LanguageContext';
 
 export default function AllDocuments() {
