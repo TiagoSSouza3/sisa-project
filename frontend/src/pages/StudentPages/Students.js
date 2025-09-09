@@ -9,6 +9,8 @@ import { useLanguage } from '../../components/LanguageContext';
 
 import '../../styles/global.css';
 import '../../styles/students.css';
+import { validadeAge } from "../../utils/validation";
+import { StringToDate } from "../../utils/utils";
 
 export default function Students() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -158,8 +160,23 @@ export default function Students() {
     setIsFilterModalOpen(false);
   };
 
-  const changeStudentStatus = (student_id) => {
+  const getAge = (birth_date) => {
+    const date = StringToDate(birth_date);
+    const res = validadeAge(date);
+    return res;
+  }
 
+  const changeStudentStatus = async (index) => {
+    const student = filteredStudents[index];
+    const newStudent = {...student, active: !student.active};
+
+    let newStudentsList = filteredStudents
+    newStudentsList[index] = newStudent;
+
+    setFilteredStudents(newStudentsList)
+    await API.put(`/students/${student.id}`, newStudent);
+
+    loadStudents()
   }
 
   return (
@@ -210,13 +227,13 @@ export default function Students() {
       {success && <div className="success">{success}</div>}
 
       <div className="students-list">
-        {filteredStudents.map(student => (
+        {filteredStudents.map((student, index) => (
           <div key={student.id} className="student-item">
             <div className="student-info">
               <div className="student-name">{student.name}</div>
               <div className="student-details">
                 <p>{language === "english" ? "Registration" : "Matrícula"}: {student.id}</p>
-                {student.email && <p>Email: {student.email}</p>}
+                {student.email && <p>Idade: {getAge(student.birth_date)}</p>}
               </div>
               <div className="student-status">
                 <input
@@ -226,7 +243,7 @@ export default function Students() {
                           : language === "english" ? "Inactive" : "Inativo"
                         }
                   className={`status-badge ${student.active ? 'active' : 'inactive'}`}
-                  onClick={changeStudentStatus(student.id)}
+                  onClick={() => changeStudentStatus(index)}
                 />
               </div>
             </div>

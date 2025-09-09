@@ -1,6 +1,6 @@
 const Storage = require('../models/Storage');
 const StorageLog = require('../models/StorageLog');
-const { Op } = require('sequelize');
+const { Op, fn, col, where } = require('sequelize');
 
 exports.getStorage = async (req, res) => {
   try {
@@ -41,10 +41,27 @@ exports.getStorage = async (req, res) => {
 exports.getStorageLog = async (req, res) => {
   if(req.params.type != "log") return
   const storage_log = await StorageLog.findAll({
-    where: { [Op.not]: null },
     order: [[ 'created_at', 'DESC' ]]
   });
   res.json(storage_log);
+};
+
+exports.getStorageLogByMonth = async (req, res) => {
+  if (req.params.type !== "log") return;
+
+  const month = parseInt(req.params.month, 10);
+
+  try {
+    const storage_log = await StorageLog.findAll({
+      where: where(fn('MONTH', col('created_at')), month),
+      order: [['created_at', 'DESC']]
+    });
+
+    res.json(storage_log);
+  } catch (error) {
+    console.error("Erro ao buscar storage log:", error);
+    res.status(500).json({ error: "Erro ao buscar storage log" });
+  }
 };
 
 exports.getStorageLogById = async (req, res) => {

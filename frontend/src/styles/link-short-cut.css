@@ -1,0 +1,23 @@
+.shortcut {
+    display: block;
+    justify-content: center;
+    align-items: center;
+    min-height: 0.5rem;
+    min-width: 0.5rem;
+    text-align: center;
+    padding: 10px;
+}
+
+.link-button{
+    width: 100%;
+}
+
+.title{
+    font-weight: bold;
+}
+
+#link{
+    text-decoration: none;
+    color: var(--background-color);
+    font-size: 23px;
+}

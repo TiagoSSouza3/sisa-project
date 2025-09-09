@@ -17,6 +17,7 @@ import ResetPassword from "./pages/ResetPassword";
 import FirstAccess from "./pages/FirstAccess";
 import Storage from "./pages/Storage/Storage";
 import StorageLog from "./pages/Storage/StorageLog";
+import CashFlow from "./pages/Storage/CashFlow";
 
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -58,6 +59,7 @@ function AppContent() {
         <Route path="/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
         <Route path="/storage" element={<ProtectedRoute><Storage /></ProtectedRoute>} />
         <Route path="/storage_log/:id" element={<ProtectedRoute><StorageLog /></ProtectedRoute>} />
+        <Route path="/cash-flow" element={<ProtectedRoute><CashFlow /></ProtectedRoute>} />
       </Routes>
     </>
   );

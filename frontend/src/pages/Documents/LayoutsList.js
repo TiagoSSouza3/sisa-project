@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import API from '../../api';
-import '../../styles/LayoutsList.css';
-import '../../styles/LayoutsList-modal.css';
+import '../../styles/layouts-list.css';
+import '../../styles/layouts-list-modal.css';
 import { useLanguage } from '../../components/LanguageContext';
 
 export default function LayoutsList({ layouts, loading, onSelectLayout, onDeleteLayout, onUseLayout, hasLoaded }) {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import API from '../../api';
-import '../../styles/DocumentUploader.css';
+import '../../styles/document-uploader.css';
 import { useLanguage } from '../../components/LanguageContext';
 
 export default function DocumentUploader({ onLayoutCreated, onCancel }) {

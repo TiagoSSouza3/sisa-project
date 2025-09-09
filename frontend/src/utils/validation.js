@@ -1,3 +1,5 @@
+import { StringToDate } from "./utils";
+
 // Função para validar email
 export const validateEmail = (email) => {
   if (!email) return { isValid: false, message: "Email é obrigatório" };
@@ -74,3 +76,22 @@ export const validatePasswordConfirmation = (password, confirmPassword) => {
   
   return { isValid: true, message: "" };
 };
+
+export const validadeAge = (birthDate) => {
+  if(typeof birthDate === "string") birthDate = StringToDate(birthDate)
+    
+  const today = new Date();
+
+  if(birthDate.getTime() >= today.getTime()) return Error("Erro da Data de nascimento");
+
+  let actualAge = today.getFullYear() - birthDate.getFullYear();
+  const hasBirthdayPassed = 
+    today.getMonth() > birthDate.getMonth() ||
+    (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
+
+  if (!hasBirthdayPassed) {
+    actualAge--;
+  }
+
+  return actualAge;
+}

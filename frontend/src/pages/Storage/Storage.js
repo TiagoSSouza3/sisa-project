@@ -28,13 +28,11 @@ export default function Storage() {
             const storage_res = await API.get(`/storage`);
             console.log("Storage response:", storage_res.data); 
 
-            // Usar Promise.all para garantir que todas as promessas terminem antes de continuar
             const storageWithAmount = await Promise.all(
                 storage_res.data.map(async (item) => {
                     const storage_log_res = await API.get(`/storage/log/${item.id}`);
                     const data = storage_log_res.data;
 
-                    // Calcular variação de preço baseada no preço atual vs preço anterior
                     let priceChange = null;
 
                     const currentPrice = parseFloat(item.last_price) || 0;
@@ -61,7 +59,7 @@ export default function Storage() {
                 })
             );
 
-            setStorage(storageWithAmount); // Atualiza apenas quando todos os dados estiverem prontos
+            setStorage(storageWithAmount);
         } catch (err) {
             console.log("Erro ao carregar estoque:", err);
         } finally {
@@ -295,12 +293,20 @@ export default function Storage() {
             <div className="storage-header">
                 <h2>{language === "english" ? "Storage" : "Estoque"}</h2>
                 { isLoggedIn && localStorage.getItem("occupation_id") !== occupationEnum.professor && 
+                <div>
                     <button 
                         className="storage-log-button"
                         onClick={() => navigate("/storage_log")}
                     >
                         {language === "english" ? "Logs" : "Historico"}
                     </button>
+                    <button 
+                        className="cash-flow-button"
+                        onClick={() => navigate("/cash-flow")}
+                    >
+                        {language === "english" ? "Cash Flow" : "Fluxo de Caixa"}
+                    </button>
+                </div>
                 }
             </div>
 
