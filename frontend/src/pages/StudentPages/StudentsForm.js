@@ -3,7 +3,8 @@ import API from "../../api";
 import { useNavigate, useParams } from "react-router-dom";
 import { cpf } from "cpf-cnpj-validator";
 import { useLanguage } from '../../components/LanguageContext';
-import { validateEmail } from '../../utils/validation';
+import { validadeAge, validateEmail } from '../../utils/validation';
+import { dateToString, StringToDate } from '../../utils/utils';
 
 import '../../styles/global.css';
 import '../../styles/students-creation.css';
@@ -192,25 +193,20 @@ export default function StudentsForm() {
     };
 
     const handleBirthDate = (e) => {
-        const [year, month, day] = (e.target.value).split("-").map(Number);
-        const birthDate = new Date(year, month - 1, day);
-        const today = new Date();
         
-        if(birthDate.getTime() >= today.getTime()) setAgeError("Erro da Data de nascimento");
-        else setAgeError("");
+        const birthDate = StringToDate(e.target.value)
 
-        setStudent({ ...student, birth_date: birthDate});
+        const res = validadeAge(birthDate)
 
-        let actualAge = today.getFullYear() - birthDate.getFullYear();
-        const hasBirthdayPassed = 
-            today.getMonth() > birthDate.getMonth() ||
-            (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
-
-        if (!hasBirthdayPassed) {
-            actualAge--;
+        if(typeof res != "number"){
+            setAgeError(res.message)
+            setChildAge("");
+            
+        } else {
+            setAgeError("")
+            setStudent({ ...student, birth_date: birthDate});
+            setChildAge(res);
         }
-
-        setChildAge(actualAge);
     }
 
     const handleCreate = async () => {
@@ -263,18 +259,6 @@ export default function StudentsForm() {
             });
         }
     };
-
-    function dateToString(date) {
-        if(date === ""){
-            return `yyyy-MM-dd`;
-        }
-
-        const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1).padStart(2, "0"); // +1 porque janeiro = 0
-        const year = date.getFullYear();
-        
-        return `${year}-${month}-${day}`;
-      }
 
     return (
         <div className="student-form-container">
@@ -434,8 +418,8 @@ export default function StudentsForm() {
                             id="is-school"
                             type="radio"
                             name="No"
-                            value="No"
-                            checked={student.is_on_school === "No"}
+                            value="false"
+                            checked={student.is_on_school === "false"}
                             onChange={(e) => setStudent({ ...student, is_on_school: e.target.value })}
                         />
                         <label htmlFor="isnt-school">{language === "english" ? "No" : "Não"}</label>
@@ -443,8 +427,8 @@ export default function StudentsForm() {
                             id="isnt-school"
                             type="radio"
                             name="Yes"
-                            value="Yes"
-                            checked={student.is_on_school === "Yes"}
+                            value="true"
+                            checked={student.is_on_school === "true"}
                             onChange={(e) => setStudent({ ...student, is_on_school: e.target.value })}
                         />
                         <label htmlFor="isnt-school">{language === "english" ? "Yes" : "Sim"}</label>

@@ -74,3 +74,20 @@ export const validatePasswordConfirmation = (password, confirmPassword) => {
   
   return { isValid: true, message: "" };
 };
+
+export const validadeAge = (birthDate) => {
+  const today = new Date();
+
+  if(birthDate.getTime() >= today.getTime()) return Error("Erro da Data de nascimento");
+
+  let actualAge = today.getFullYear() - birthDate.getFullYear();
+  const hasBirthdayPassed = 
+    today.getMonth() > birthDate.getMonth() ||
+    (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
+
+  if (!hasBirthdayPassed) {
+    actualAge--;
+  }
+
+  return actualAge;
+}
