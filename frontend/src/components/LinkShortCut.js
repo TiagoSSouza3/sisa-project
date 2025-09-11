@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useLanguage } from './LanguageContext';
 import '../styles/link-short-cut.css';
 
@@ -7,6 +7,7 @@ export default function LinkShortCut({ name, linkToPage}) {
     const location = useLocation();
     const isActive = (path) => (location.pathname === path ? "active" : "");
     const { language } = useLanguage();
+    const navigate = useNavigate();
 
     useEffect(() => {}, [location]);
 
@@ -29,7 +30,7 @@ export default function LinkShortCut({ name, linkToPage}) {
 
     return (
         <div className="shortcut">
-            <button className="link-button">
+            <button className="link-button" type="button" onClick={() => navigate(linkToPage)}>
                 <Link to={linkToPage} className={isActive(linkToPage)} id="link">
                     <div className="title">
                         <span role="img" aria-label={name}>{getIcon()}</span> 

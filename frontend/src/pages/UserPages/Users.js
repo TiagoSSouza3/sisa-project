@@ -78,11 +78,11 @@ export default function Users() {
             </div>
             { isLoggedIn && localStorage.getItem("occupation_id") === occupationEnum.administrador
               ? <div className="user-actions">
-                <button className="delete-button" onClick={() => handleDelete(user.id)}>
-                  {language === "english" ? "Delete" : "Excluir"}
-                </button>
                 <button className="edit-button" onClick={() => handleEdit(user.id)}>
                   {language === "english" ? "Edit" : "Editar"}
+                </button>
+                <button className="delete-button" onClick={() => handleDelete(user.id)}>
+                  {language === "english" ? "Delete" : "Excluir"}
                 </button>
               </div>
               : ""

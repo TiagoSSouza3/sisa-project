@@ -381,27 +381,24 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
+  background: var(--primary-color) !important;
+  color: var(--text-light) !important;
   flex: 1;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  transform: translateY(-1px);
+  background: var(--primary-light) !important;
 }
 
 .btn-secondary {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
+  background: var(--primary-color) !important;
+  color: var(--text-light) !important;
   border: none;
   flex: 1;
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: white;
-  transform: translateY(-1px);
+  background: var(--primary-light) !important;
 }
 
 /* Dark mode secondary button */

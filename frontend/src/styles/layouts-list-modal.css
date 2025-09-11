@@ -231,26 +231,22 @@
 }
 
 .modal-footer .btn-primary {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  background: var(--primary-color) !important;
+  color: var(--text-light) !important;
 }
 
 .modal-footer .btn-primary:hover {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+  background: var(--primary-light) !important;
 }
 
 .modal-footer .btn-secondary {
-  background: #f8fafc;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
+  background: var(--primary-color) !important;
+  color: var(--text-light) !important;
+  border: none;
 }
 
 .modal-footer .btn-secondary:hover {
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--primary-light) !important;
 }
 
 /* Responsive */
