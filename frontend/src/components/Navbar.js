@@ -89,7 +89,7 @@ export default function Navbar() {
               <input 
                 type="checkbox" 
                 onChange={handleLanguageChange}
-                checked={isChecked} 
+                checked={isLanguageChecked} 
               />
               <span className="slider round"></span>
             </label>

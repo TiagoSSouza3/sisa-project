@@ -1,9 +1,11 @@
 const User = require('./User');
 const Permission = require('./Permission');
+const GranularPermission = require('./GranularPermission');
 const Subject = require('./Subject');
 const Student = require('./Students');
 const Document = require('./Document');
 const DocumentTemplate = require('./DocumentTemplate');
+const DocumentLayout = require('./DocumentLayout');
 const DocumentVersion = require('./DocumentVersion');
 const Parent = require('./Parent');
 const Students = require('./Students');
@@ -60,10 +62,12 @@ Parent.hasMany(Student, { foreignKey: 'second_parent_id', as: 'second_parent_chi
 module.exports = {
   User,
   Permission,
+  GranularPermission,
   Subject,
   Student,
   Document,
   DocumentTemplate,
+  DocumentLayout,
   DocumentVersion,
   Parent
 }; 

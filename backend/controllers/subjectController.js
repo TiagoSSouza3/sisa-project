@@ -126,4 +126,32 @@ exports.deleteSubject = async (req, res) => {
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
+};
+
+// Novo método para buscar matérias por professor
+exports.getSubjectsByProfessor = async (req, res) => {
+  try {
+    const { professorId } = req.params;
+    
+    console.log("🔍 Buscando matérias para professor ID:", professorId);
+    
+    const subjects = await Subject.findAll({
+      include: [{
+        model: User,
+        as: 'professores',
+        where: { id: professorId },
+        attributes: ['id', 'name'],
+        through: { attributes: [] },
+        required: true // INNER JOIN - só matérias que têm esse professor
+      }]
+    });
+    
+    console.log("📦 Matérias encontradas:", subjects.length);
+    console.log("📋 Lista de matérias:", subjects.map(s => ({ id: s.id, name: s.name })));
+    
+    res.json(subjects);
+  } catch (error) {
+    console.error("❌ Erro ao buscar matérias do professor:", error);
+    res.status(400).json({ error: error.message });
+  }
 }; 

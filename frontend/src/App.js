@@ -20,6 +20,7 @@ import StorageLog from "./pages/Storage/StorageLog";
 
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
+import PermissionProtectedRoute from "./components/PermissionProtectedRoute";
 
 import './styles/global.css';
 
@@ -42,22 +43,22 @@ function AppContent() {
         <Route path="/" element={<Login />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/first-access" element={<FirstAccess />} />
-                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-        <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
-        <Route path="/users_form" element={<ProtectedRoute><UsersForm /></ProtectedRoute>} />
-        <Route path="/users_form/:id" element={<ProtectedRoute><UsersForm /></ProtectedRoute>} />
-        <Route path="/students" element={<ProtectedRoute><Students /></ProtectedRoute>} />
-        <Route path="/student_form" element={<ProtectedRoute><StudentsForm /></ProtectedRoute>} />
-        <Route path="/student_form/:id" element={<ProtectedRoute><StudentsForm /></ProtectedRoute>} />
-        <Route path="/subjects" element={<ProtectedRoute><Subjects /></ProtectedRoute>} />
-        <Route path="/subject_form" element={<ProtectedRoute><SubjectForm /></ProtectedRoute>} />
-        <Route path="/subject_form/:id" element={<ProtectedRoute><SubjectForm /></ProtectedRoute>} />
-        <Route path="/subject_infos/:id" element={<ProtectedRoute><SubjectInfos /></ProtectedRoute>} />
-        <Route path="/subject_inscription/:id" element={<ProtectedRoute><SubjectInscription /></ProtectedRoute>} />
-        <Route path="/summary_data" element={<ProtectedRoute><Summary_data /></ProtectedRoute>} />
-        <Route path="/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
-        <Route path="/storage" element={<ProtectedRoute><Storage /></ProtectedRoute>} />
-        <Route path="/storage_log/:id" element={<ProtectedRoute><StorageLog /></ProtectedRoute>} />
+                <Route path="/dashboard" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_dashboard"><Dashboard /></PermissionProtectedRoute></ProtectedRoute>} />
+        <Route path="/users" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_users"><Users /></PermissionProtectedRoute></ProtectedRoute>} />
+        <Route path="/users_form" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_users"><UsersForm /></PermissionProtectedRoute></ProtectedRoute>} />
+        <Route path="/users_form/:id" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_users"><UsersForm /></PermissionProtectedRoute></ProtectedRoute>} />
+        <Route path="/students" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_students"><Students /></PermissionProtectedRoute></ProtectedRoute>} />
+        <Route path="/student_form" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_students"><StudentsForm /></PermissionProtectedRoute></ProtectedRoute>} />
+        <Route path="/student_form/:id" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_students"><StudentsForm /></PermissionProtectedRoute></ProtectedRoute>} />
+        <Route path="/subjects" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_subjects"><Subjects /></PermissionProtectedRoute></ProtectedRoute>} />
+        <Route path="/subject_form" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_subjects"><SubjectForm /></PermissionProtectedRoute></ProtectedRoute>} />
+        <Route path="/subject_form/:id" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_subjects"><SubjectForm /></PermissionProtectedRoute></ProtectedRoute>} />
+        <Route path="/subject_infos/:id" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_subjects"><SubjectInfos /></PermissionProtectedRoute></ProtectedRoute>} />
+        <Route path="/subject_inscription/:id" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_subjects"><SubjectInscription /></PermissionProtectedRoute></ProtectedRoute>} />
+        <Route path="/summary_data" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_summary_data"><Summary_data /></PermissionProtectedRoute></ProtectedRoute>} />
+        <Route path="/documents" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_documents"><Documents /></PermissionProtectedRoute></ProtectedRoute>} />
+        <Route path="/storage" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_storage"><Storage /></PermissionProtectedRoute></ProtectedRoute>} />
+        <Route path="/storage_log/:id" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_storage"><StorageLog /></PermissionProtectedRoute></ProtectedRoute>} />
       </Routes>
     </>
   );

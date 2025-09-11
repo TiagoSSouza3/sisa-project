@@ -14,6 +14,11 @@ const documentTemplateRoutes = require("./routes/documentTemplateRoutes");
 const documentLayoutRoutes = require("./routes/documentLayoutRoutes");
 const allDocumentsRoutes = require("./routes/allDocumentsRoutes");
 const storageRoutes = require("./routes/storageRoutes");
+const permissionRoutes = require("./routes/permissionRoutes");
+const granularPermissionRoutes = require("./routes/granularPermissionRoutes");
+const globalPermissionRoutes = require("./routes/globalPermissionRoutes");
+const globalDocumentPermissionsRoutes = require("./routes/globalDocumentPermissions");
+const individualDocumentPermissionRoutes = require("./routes/individualDocumentPermissionRoutes");
 
 const fs = require('fs');
 const { Sequelize } = require("sequelize");
@@ -169,6 +174,11 @@ app.use("/api/document-templates", documentTemplateRoutes);
 app.use("/api/document-layouts", documentLayoutRoutes);
 app.use("/api/all-documents", allDocumentsRoutes);
 app.use("/api/storage", storageRoutes);
+app.use("/api/permissions", permissionRoutes);
+app.use("/api/granular-permissions", granularPermissionRoutes);
+app.use("/api/global-permissions", globalPermissionRoutes);
+app.use("/api/global-document-permissions", globalDocumentPermissionsRoutes);
+app.use("/api/individual-document-permissions", individualDocumentPermissionRoutes);
 
 app.get("/", (req, res) => {
   res.send("SISA API is running.");

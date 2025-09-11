@@ -43,6 +43,26 @@ const mockAuth = (req, res, next) => {
   next();
 };
 
+// Middleware de debug para todas as rotas
+router.use((req, res, next) => {
+  console.log(`🔍 DocumentLayout Route: ${req.method} ${req.path}`);
+  console.log(`🔍 Full URL: ${req.originalUrl}`);
+  console.log(`🔍 Params:`, req.params);
+  next();
+});
+
+// Rotas para templates parciais (DEVEM VIR ANTES das rotas com :id)
+router.get('/partial-templates', mockAuth, documentLayoutController.getPartialTemplates);
+router.get('/partial-templates/:id', mockAuth, documentLayoutController.getPartialTemplate);
+router.post('/partial-templates/:id/preview', mockAuth, documentLayoutController.previewPartialTemplate);
+router.post('/partial-templates/:id/complete', mockAuth, documentLayoutController.completePartialTemplate);
+router.delete('/partial-templates/:id', mockAuth, documentLayoutController.deletePartialTemplate);
+
+// Rota de teste para debug
+router.get('/test-partial-templates', mockAuth, (req, res) => {
+  res.json({ message: 'Rota de teste funcionando!', timestamp: new Date().toISOString() });
+});
+
 // Rotas CRUD (usando mockAuth temporariamente)
 router.get('/', mockAuth, documentLayoutController.getAllLayouts);
 router.get('/:id', mockAuth, documentLayoutController.getLayout);
@@ -55,5 +75,8 @@ router.post('/:id/preview', mockAuth, documentLayoutController.previewDocument);
 
 // Rota para gerar documento
 router.post('/:id/generate', mockAuth, documentLayoutController.generateDocument);
+
+// Rota para salvar template parcial
+router.post('/:id/save-partial', mockAuth, documentLayoutController.savePartialTemplate);
 
 module.exports = router;

@@ -5,7 +5,7 @@ import '../../styles/LayoutsList.css';
 import '../../styles/LayoutsList-modal.css';
 import { useLanguage } from '../../components/LanguageContext';
 
-export default function LayoutsList({ layouts, loading, onSelectLayout, onDeleteLayout, onUseLayout, hasLoaded }) {
+export default function LayoutsList({ layouts, loading, onSelectLayout, onDeleteLayout, onUseLayout, hasLoaded, canEdit = false, canDelete = false }) {
   const { language } = useLanguage();
   const [deletingId, setDeletingId] = useState(null);
   const [previewLayout, setPreviewLayout] = useState(null);
@@ -135,16 +135,18 @@ export default function LayoutsList({ layouts, loading, onSelectLayout, onDelete
             <button onClick={closePreview} className="btn btn-secondary">
               {language === "english" ? "Close" : "Fechar"}
             </button>
-            <button
-              onClick={() => {
-                onSelectLayout(previewLayout);
-                onUseLayout(previewLayout);
-                closePreview();
-              }}
-              className="btn btn-primary"
-            >
-              ✏️ {language === "english" ? "Use This Layout..." : "Usar Este Layout..."}
-            </button>
+            {canEdit && (
+              <button
+                onClick={() => {
+                  onSelectLayout(previewLayout);
+                  onUseLayout(previewLayout);
+                  closePreview();
+                }}
+                className="btn btn-primary"
+              >
+                ✏️ {language === "english" ? "Use This Layout..." : "Usar Este Layout..."}
+              </button>
+            )}
           </div>
         </div>
       </div>,
@@ -209,18 +211,20 @@ export default function LayoutsList({ layouts, loading, onSelectLayout, onDelete
                   <div className="card-icon">📄</div>
                   <h3 className="card-title">{layout.name}</h3>
                 </div>
-                <button
-                  onClick={() => handleDelete(layout.id)}
-                  disabled={deletingId === layout.id}
-                  className="delete-btn"
-                  title={language === "english" ? "Delete layout" : "Excluir layout"}
-                >
-                  {deletingId === layout.id ? (
-                    <span className="loading-spinner-small"></span>
-                  ) : (
-                    '🗑️'
-                  )}
-                </button>
+                {canDelete && (
+                  <button
+                    onClick={() => handleDelete(layout.id)}
+                    disabled={deletingId === layout.id}
+                    className="delete-btn"
+                    title={language === "english" ? "Delete layout" : "Excluir layout"}
+                  >
+                    {deletingId === layout.id ? (
+                      <span className="loading-spinner-small"></span>
+                    ) : (
+                      '🗑️'
+                    )}
+                  </button>
+                )}
               </div>
 
               {layout.description && (
@@ -261,15 +265,17 @@ export default function LayoutsList({ layouts, loading, onSelectLayout, onDelete
               )}
 
               <div className="card-actions">
-                <button
-                  onClick={() => {
-                    onSelectLayout(layout);
-                    onUseLayout(layout);
-                  }}
-                  className="btn btn-primary btn-small"
-                >
-                  ✏️ {language === "english" ? "Use Layout" : "Usar Layout"}
-                </button>
+                {canEdit && (
+                  <button
+                    onClick={() => {
+                      onSelectLayout(layout);
+                      onUseLayout(layout);
+                    }}
+                    className="btn btn-primary btn-small"
+                  >
+                    ✏️ {language === "english" ? "Use Layout" : "Usar Layout"}
+                  </button>
+                )}
                 <button
                   onClick={() => handlePreview(layout)}
                   className="btn btn-secondary btn-small"

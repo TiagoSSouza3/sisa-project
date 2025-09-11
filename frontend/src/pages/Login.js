@@ -50,36 +50,20 @@ export default function Login() {
     
     setLoading(true);
     
-    console.log('🔐 Frontend: Tentativa de login', { email, passwordLength: password.length });
-    
     try {
       const res = await API.post("/auth/login", { email, password });
       
-      console.log('✅ Frontend: Resposta recebida', res.data);
-      
       // Verificar se temos token
       if (!res.data.token) {
-        console.error('❌ Frontend: Token não recebido', res.data);
         setNotification({ message: "Erro: Token de autenticação não recebido", type: 'error' });
         setLoading(false);
         return;
       }
       
-      console.log('💾 Frontend: Salvando dados no localStorage');
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("occupation_id", res.data.user.occupation_id);
       localStorage.setItem("name", res.data.user.name);
       localStorage.setItem("id", res.data.user.id);
-      
-      // Verificar se os dados foram salvos
-      console.log('🔍 Frontend: Verificando localStorage:', {
-        token: localStorage.getItem("token") ? 'Salvo' : 'Não salvo',
-        occupation_id: localStorage.getItem("occupation_id"),
-        name: localStorage.getItem("name"),
-        id: localStorage.getItem("id")
-      });
-      
-      console.log('🚀 Frontend: Navegando para dashboard');
       
       // Usar setTimeout para garantir que o localStorage foi salvo
       setTimeout(() => {
@@ -87,7 +71,6 @@ export default function Login() {
       }, 100);
       
     } catch (error) {
-      console.error("❌ Frontend: Erro no login:", error.response?.data || error.message);
       setNotification({ message: error.response?.data?.error || "Erro ao fazer login", type: 'error' });
     } finally {
       setLoading(false);

@@ -1,0 +1,933 @@
+/* ========================================
+   CSS UNIFICADO PARA TODAS AS PERMISSÕES
+   ======================================== */
+
+/* ========== RESET GLOBAL PARA EVITAR CONFLITOS ========== */
+.toggle-switch-container,
+.toggle-switch,
+.toggle-slider,
+.toggle-knob,
+.toggle-text,
+.granular-toggle,
+.permission-toggle-btn {
+  box-sizing: border-box;
+}
+
+/* ========== TOGGLE SWITCHES MODERNOS (USERS.JS) ========== */
+.toggle-switch-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+}
+
+.toggle-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  font-family: inherit;
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+/* Esconde o input nativo, mantendo acessibilidade via label */
+.toggle-switch input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.toggle-switch:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+  border-radius: 20px;
+}
+
+.toggle-slider {
+  position: relative;
+  width: 54px;
+  height: 28px;
+  border-radius: 14px;
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 2px solid transparent;
+}
+
+.toggle-switch.enabled .toggle-slider {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.toggle-switch.disabled .toggle-slider {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.toggle-knob {
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  transform: translateY(-50%);
+}
+
+.toggle-switch.enabled .toggle-knob {
+  transform: translateX(26px) translateY(-50%);
+}
+
+.toggle-switch.disabled .toggle-knob {
+  transform: translateX(0) translateY(-50%);
+}
+
+.toggle-text {
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1;
+  min-width: 80px;
+  text-align: left;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+}
+
+.toggle-switch.enabled .toggle-text {
+  color: #28a745;
+}
+
+.toggle-switch.disabled .toggle-text {
+  color: #dc3545;
+}
+
+/* ========== TOGGLE SWITCHES GRANULARES (GRANULARPERMISSIONS.JS) ========== */
+.granular-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.granular-toggle input[type="checkbox"] {
+  display: none;
+}
+
+.granular-toggle .toggle-slider {
+  position: relative;
+  width: 54px;
+  height: 28px;
+  background: #dc3545;
+  border-radius: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.granular-toggle .toggle-slider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  background: white;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.granular-toggle input[type="checkbox"]:checked + .toggle-slider {
+  background: #28a745;
+}
+
+.granular-toggle input[type="checkbox"]:checked + .toggle-slider::before {
+  transform: translateX(26px) translateY(-50%);
+}
+
+.granular-toggle .toggle-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-color);
+  min-width: 140px;
+}
+
+/* ========== BOTÕES DE PERMISSÃO (USERSFORM.JS) ========== */
+.permission-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 28px;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.permission-toggle-btn.allowed {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+}
+
+.permission-toggle-btn.denied {
+  background: linear-gradient(135deg, #dc3545, #e74c3c);
+  color: white;
+  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+}
+
+.permission-toggle-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.permission-toggle-btn:active {
+  transform: scale(0.95);
+}
+
+/* ========== SEÇÕES PRINCIPAIS ========== */
+.document-permissions-section {
+  padding: 20px;
+  background: var(--surface-color);
+  border-radius: 12px;
+  box-shadow: var(--box-shadow);
+  margin-bottom: 20px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.document-permissions-section h4 {
+  color: var(--text-color);
+  margin-bottom: 8px;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.document-permissions-section > p {
+  color: var(--text-color);
+  opacity: 0.8;
+  margin-bottom: 30px;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* ========== CONTROLES GLOBAIS ========== */
+.global-controls-section {
+  background: linear-gradient(135deg, #e3f2fd 0%, #f8f9fa 100%);
+  border: 2px solid #2196f3;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.section-header {
+  margin-bottom: 20px;
+}
+
+.section-header h5 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #1976d2;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.section-icon {
+  font-size: 1.5rem;
+}
+
+.section-description {
+  color: #455a64;
+  font-size: 0.95rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.global-controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.global-role-card {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.global-role-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.role-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.role-icon {
+  font-size: 1.8rem;
+}
+
+.role-title {
+  color: #2c3e50;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.global-permission-control {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.permission-label {
+  color: #495057;
+  font-weight: 500;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* ========== DOCUMENTOS INDIVIDUAIS ========== */
+.individual-documents-section {
+  background: linear-gradient(135deg, #fff3e0 0%, #f8f9fa 100%);
+  border: 2px solid #ff9800;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.individual-documents-section .section-header h5 {
+  color: #f57c00;
+}
+
+.documents-list {
+  margin-top: 20px;
+}
+
+.document-category {
+  margin-bottom: 30px;
+}
+
+.category-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #424242;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.category-icon {
+  font-size: 1.3rem;
+}
+
+.category-count {
+  background: #e0e0e0;
+  color: #616161;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.documents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 15px;
+}
+
+.document-card {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 18px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.document-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.document-info {
+  margin-bottom: 15px;
+}
+
+.document-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #2c3e50;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 5px;
+}
+
+.document-icon {
+  font-size: 1.1rem;
+}
+
+.document-type-badge {
+  background: #f5f5f5;
+  color: #757575;
+  padding: 3px 8px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.document-permissions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.role-permission {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.role-label {
+  color: #495057;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+/* ========== GRANULAR PERMISSIONS ========== */
+.granular-permissions {
+  background: var(--surface-color);
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: var(--box-shadow);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.granular-permissions-header {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid rgba(128, 128, 128, 0.2);
+}
+
+.granular-permissions-header h3 {
+  margin: 0 0 8px 0;
+  color: var(--text-color);
+  font-size: 18px;
+}
+
+.granular-permissions-header p {
+  margin: 0;
+  color: var(--text-color);
+  opacity: 0.8;
+  font-size: 14px;
+}
+
+.granular-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+}
+
+.granular-tab {
+  background: none;
+  border: none;
+  padding: 12px 20px;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-color);
+  opacity: 0.7;
+  transition: all 0.2s ease;
+}
+
+.granular-tab:hover {
+  color: var(--text-color);
+  opacity: 1;
+  background: rgba(128, 128, 128, 0.1);
+}
+
+.granular-tab.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+  background: rgba(128, 128, 128, 0.1);
+  opacity: 1;
+}
+
+.granular-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.granular-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 15px;
+  border: 1px solid rgba(128, 128, 128, 0.2);
+  border-radius: 6px;
+  background: var(--surface-color);
+  transition: all 0.2s ease;
+}
+
+.granular-item:hover {
+  border-color: var(--primary-color);
+  background: var(--surface-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.granular-item.has-access {
+  border-color: #28a745;
+  background: var(--surface-color);
+}
+
+.granular-item.restricted {
+  border-color: #dc3545;
+  background: var(--surface-color);
+}
+
+.granular-item-info {
+  flex: 1;
+  margin-right: 20px;
+}
+
+.granular-item-info h4 {
+  margin: 0 0 5px 0;
+  color: var(--text-color);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.granular-item-info p {
+  margin: 0 0 8px 0;
+  color: var(--text-color);
+  opacity: 0.8;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.granular-item-info small {
+  color: var(--text-color);
+  opacity: 0.6;
+  font-size: 12px;
+}
+
+.granular-item-permissions {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+
+/* ========== EFEITOS DE HOVER E FOCO ========== */
+.toggle-switch:hover .toggle-slider {
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+}
+
+.toggle-switch.disabled:hover .toggle-slider {
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+.toggle-switch:hover .toggle-knob {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+}
+
+.toggle-switch:focus-visible {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+  border-radius: 20px;
+}
+
+.granular-toggle:hover .toggle-slider {
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+/* ========== ESTADOS ATIVOS ========== */
+.toggle-switch:active .toggle-knob {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.toggle-switch.enabled:active .toggle-knob {
+  transform: translateX(26px) translateY(-50%) scale(0.95);
+}
+
+.toggle-switch.disabled:active .toggle-knob {
+  transform: translateX(0) translateY(-50%) scale(0.95);
+}
+
+/* ========== CAIXAS DE INFORMAÇÃO ========== */
+.global-controls-info,
+.individual-documents-info {
+  margin-top: 20px;
+}
+
+.info-box {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-left: 4px solid #2196f3;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.info-box strong {
+  color: #1976d2;
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.info-box ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #495057;
+}
+
+.info-box li {
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+/* ========== ESTADO SEM DOCUMENTOS ========== */
+.no-documents {
+  text-align: center;
+  padding: 40px 20px;
+  background: #f8f9fa;
+  border: 2px dashed #dee2e6;
+  border-radius: 12px;
+  color: #6c757d;
+}
+
+.no-documents-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  opacity: 0.5;
+}
+
+.no-documents h6 {
+  color: #495057;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+}
+
+.no-documents p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* ========== BOTÕES DE AÇÃO ========== */
+.document-permissions-actions {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 2px solid #e9ecef;
+}
+
+.save-button,
+.reset-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.save-button.primary {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+}
+
+.save-button.primary:hover {
+  background: linear-gradient(135deg, #0056b3, #004085);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.reset-button.secondary {
+  background: linear-gradient(135deg, #28a745, #1e7e34);
+  color: white;
+}
+
+.reset-button.secondary:hover {
+  background: linear-gradient(135deg, #1e7e34, #155724);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+.button-icon {
+  font-size: 1rem;
+}
+
+/* ========== LOADING STATE ========== */
+.granular-permissions-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: var(--surface-color);
+  border-radius: 8px;
+  color: var(--text-color);
+}
+
+.granular-permissions-loading p {
+  margin: 0;
+  color: var(--text-color);
+  opacity: 0.8;
+  font-size: 14px;
+}
+
+/* ========== EMPTY STATE ========== */
+.granular-empty {
+  text-align: center;
+  padding: 40px 20px;
+  background: var(--surface-color);
+  border: 2px dashed rgba(128, 128, 128, 0.3);
+  border-radius: 12px;
+  color: var(--text-color);
+  opacity: 0.8;
+}
+
+.granular-empty p {
+  margin: 0;
+  color: var(--text-color);
+  opacity: 0.8;
+  font-size: 14px;
+}
+
+/* ========== SUMMARY INFO ========== */
+.granular-summary {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(128, 128, 128, 0.2);
+  text-align: center;
+}
+
+.auto-save-info {
+  color: var(--text-color);
+  opacity: 0.7;
+  font-size: 12px;
+}
+
+/* ========== RESPONSIVIDADE ========== */
+@media (max-width: 768px) {
+  .global-controls-grid,
+  .documents-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .document-permissions-actions {
+    flex-direction: column;
+  }
+  
+  .save-button,
+  .reset-button {
+    justify-content: center;
+  }
+  
+  .role-permission {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .toggle-switch-container {
+    align-self: flex-end;
+  }
+  
+  .granular-item {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .granular-item-info {
+    margin-right: 0;
+  }
+  
+  .granular-item-permissions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .document-permissions-section {
+    padding: 15px;
+  }
+  
+  .global-controls-section,
+  .individual-documents-section {
+    padding: 20px;
+  }
+  
+  .section-header h5 {
+    font-size: 1.1rem;
+  }
+  
+  .document-card {
+    padding: 15px;
+  }
+  
+  .toggle-slider {
+    width: 48px;
+    height: 26px;
+  }
+  
+  .toggle-knob {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .toggle-switch.enabled .toggle-knob {
+    transform: translateX(22px) translateY(-50%);
+  }
+  
+  .toggle-switch.disabled .toggle-knob {
+    transform: translateX(0) translateY(-50%);
+  }
+  
+  .granular-toggle .toggle-slider {
+    width: 48px;
+    height: 26px;
+  }
+  
+  .granular-toggle .toggle-slider::before {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .granular-toggle input[type="checkbox"]:checked + .toggle-slider::before {
+    transform: translateX(22px) translateY(-50%);
+  }
+}
+
+/* ========== PREVENÇÃO DE CONFLITOS ========== */
+.toggle-switch *,
+.toggle-switch *::before,
+.toggle-switch *::after,
+.granular-toggle *,
+.granular-toggle *::before,
+.granular-toggle *::after {
+  box-sizing: border-box;
+}
+
+/* Remover pseudo-elementos conflitantes */
+.toggle-switch::before,
+.toggle-switch::after {
+  display: none !important;
+}
+
+.toggle-slider::before:not(.granular-toggle .toggle-slider::before),
+.toggle-slider::after:not(.granular-toggle .toggle-slider::after) {
+  display: none !important;
+}
+
+.toggle-knob::before,
+.toggle-knob::after {
+  display: none !important;
+}
+
+/* Garantir que os toggles tenham prioridade de clique */
+.toggle-switch-container,
+.toggle-switch {
+  pointer-events: auto !important;
+}
+
+.granular-item {
+  pointer-events: auto;
+}
+
+.granular-item-info {
+  pointer-events: none;
+}
+
+.granular-item-permissions {
+  pointer-events: auto;
+}
+
+/* ========== ANIMAÇÕES ========== */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.document-card,
+.global-role-card,
+.granular-item {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(128, 128, 128, 0.2);
+  border-top: 3px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
