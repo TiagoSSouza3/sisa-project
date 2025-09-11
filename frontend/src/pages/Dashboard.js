@@ -78,6 +78,10 @@ export default function Dashboard() {
           name={language === "english" ? "Storage" : "Estoque"}
           linkToPage="/storage"
         />
+        <LinkShortCut 
+          name={language === "english" ? "Summary Data" : "Dados Resumidos"}
+          linkToPage="/summary_data"
+        />
       </div>
     </div>
   );

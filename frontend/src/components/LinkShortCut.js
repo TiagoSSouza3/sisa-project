@@ -23,6 +23,8 @@ export default function LinkShortCut({ name, linkToPage}) {
                 return "📄";
             case "/storage":
                 return "📦";
+            case "/summary_data":
+                return "";
             default:
                 return "";
         }
