@@ -71,7 +71,7 @@ const sendPasswordResetEmail = async (email, resetToken, userName) => {
 const sendFirstAccessEmail = async (email, resetToken, userName) => {
   const transporter = createTransporter();
   
-  const resetUrl = `${process.env.FRONTEND_URL}/first-access?token=${resetToken}`;
+  const resetUrl = `${process.env.FRONTEND_URL}/first-access/${resetToken}`;
   
   const mailOptions = {
     from: `"Sistema SISA" <${process.env.EMAIL_USER}>`,

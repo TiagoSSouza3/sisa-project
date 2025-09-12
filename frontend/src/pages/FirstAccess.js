@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import API from "../api";
 import { useLanguage } from '../components/LanguageContext';
 import InlineNotification from '../components/InlineNotification';
@@ -9,9 +9,8 @@ import '../styles/global.css';
 import '../styles/login.css';
 
 export default function FirstAccess() {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const token = searchParams.get('token');
+  const { token } = useParams();
   const { language } = useLanguage();
   
   const [newPassword, setNewPassword] = useState("");

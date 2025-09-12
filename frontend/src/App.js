@@ -42,8 +42,8 @@ function AppContent() {
         <Route path='*' exact={true} element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/" element={<Login />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/first-access" element={<FirstAccess />} />
-                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/first-access/:token" element={<FirstAccess />} />
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
         <Route path="/users_form" element={<ProtectedRoute><UsersForm /></ProtectedRoute>} />
         <Route path="/users_form/:id" element={<ProtectedRoute><UsersForm /></ProtectedRoute>} />
