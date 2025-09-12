@@ -10,6 +10,12 @@
   background-color: var(--background-color);
 }
 
+/* Centralizar a tela de "Esqueci minha senha" sem afetar o layout do login */
+.forgot-container {
+  align-items: center;
+  justify-content: center;
+}
+
 .login-left {
   flex: 1;
   display: flex;

@@ -383,26 +383,24 @@
 }
 
 .btn-secondary {
-  background: #f8fafc;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
+  background: var(--primary-color) !important;
+  color: var(--text-light) !important;
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--primary-light) !important;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
+  background: var(--primary-color) !important;
+  color: var(--text-light) !important;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
   display: flex;
   justify-content: center;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  background: var(--primary-light) !important;
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
   display: flex;

@@ -107,6 +107,23 @@
   box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.1);
 }
 
+.edit-button{
+  min-width: 1px;
+  background-color: transparent;
+  color: var(--text-light);
+}
+
+.edit-button:hover{
+  background-color: var(--primary-light-tranparent);
+  color: var(--text-color);
+}
+
+.delete-button{
+  min-width: 100px;
+  background-color: var(--error-color);
+  color: var(--text-light);
+}
+
 @media (max-width: 768px) {
   .users-header {
     flex-direction: column;

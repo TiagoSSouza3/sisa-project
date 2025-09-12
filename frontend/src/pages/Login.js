@@ -129,7 +129,7 @@ export default function Login() {
 
   if (showForgotPassword) {
     return (
-      <div className="login-container">
+      <div className="login-container forgot-container">
         <div className="login-card">
           <h2 className="login-title">Esqueci minha senha</h2>
           <form className="login-form" onSubmit={handleForgotPassword}>
