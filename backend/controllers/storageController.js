@@ -49,11 +49,12 @@ exports.getStorageLog = async (req, res) => {
 exports.getStorageLogByMonth = async (req, res) => {
   if (req.params.type !== "log") return;
 
-  const month = parseInt(req.params.month, 10);
+  const { month, year } = req.body;
 
   try {
     const storage_log = await StorageLog.findAll({
       where: where(fn('MONTH', col('created_at')), month),
+      where: where(fn('YEAR', col('created_at')), year),
       order: [['created_at', 'DESC']]
     });
 

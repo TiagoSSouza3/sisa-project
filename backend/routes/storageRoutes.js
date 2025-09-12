@@ -6,7 +6,7 @@ const authenticateToken = require('../middleware/authMiddleware');
 router.get("/", authenticateToken, storageController.getStorage);
 router.get("/:type/:id", authenticateToken, storageController.getStorageLogById);
 router.get("/:type", authenticateToken, storageController.getStorageLog);
-router.get("/:type/:month", authenticateToken, storageController.getStorageLogByMonth);
+router.post("/:type", authenticateToken, storageController.getStorageLogByMonth);
 router.post("/", authenticateToken, storageController.createStorageItem);
 router.put("/:id", authenticateToken, storageController.updateStorageItem);
 router.delete("/:id", authenticateToken, storageController.deleteStorageItem);
