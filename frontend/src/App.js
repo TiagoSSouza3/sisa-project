@@ -58,6 +58,7 @@ function AppContent() {
         <Route path="/summary_data" element={<ProtectedRoute><Summary_data /></ProtectedRoute>} />
         <Route path="/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
         <Route path="/storage" element={<ProtectedRoute><Storage /></ProtectedRoute>} />
+        <Route path="/storage_log" element={<ProtectedRoute><StorageLog /></ProtectedRoute>} />
         <Route path="/storage_log/:id" element={<ProtectedRoute><StorageLog /></ProtectedRoute>} />
         <Route path="/cash-flow" element={<ProtectedRoute><CashFlow /></ProtectedRoute>} />
       </Routes>

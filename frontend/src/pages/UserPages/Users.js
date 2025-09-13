@@ -5,6 +5,8 @@ import '../../styles/global.css';
 import '../../styles/users.css';
 import { occupationEnum } from "../../enums/occupationEnum";
 import { useLanguage } from '../../components/LanguageContext';
+import ConfirmationModal from '../../components/ConfirmationModal';
+import useConfirmation from '../../hooks/useConfirmation';
 
 
 export default function Users() {
@@ -14,6 +16,7 @@ export default function Users() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
+  const { confirmationState, showConfirmation, hideConfirmation, handleConfirm } = useConfirmation();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -31,17 +34,38 @@ export default function Users() {
   };
 
   const handleDelete = async (id) => {
-    try {
-      await API.delete(`/users/${id}`);
-      setUsers(users.filter(u => u.id !== id));
-      setSuccess("Usuário removido com sucesso!");
-    } catch (err) {
-      setError("Erro ao remover usuário");
-    }
+    const user = users.find(u => u.id === id);
+    
+    showConfirmation({
+      type: 'delete',
+      title: language === "english" ? "Delete User" : "Excluir Usuário",
+      message: language === "english" 
+        ? `Are you sure you want to delete user "${user?.name}"? This action cannot be undone.`
+        : `Tem certeza que deseja excluir o usuário "${user?.name}"? Esta ação não pode ser desfeita.`,
+      onConfirm: async () => {
+        try {
+          await API.delete(`/users/${id}`);
+          setUsers(users.filter(u => u.id !== id));
+          setSuccess(language === "english" ? "User removed successfully!" : "Usuário removido com sucesso!");
+        } catch (err) {
+          setError(language === "english" ? "Error removing user" : "Erro ao remover usuário");
+        }
+      }
+    });
   };
 
   const handleEdit = async (id) => {
-    navigate(`/users_form/${id}`)
+    const user = users.find(u => u.id === id);
+    
+    showConfirmation({
+      type: 'edit',
+      title: language === "english" ? "Edit User" : "Editar Usuário",
+      message: language === "english" 
+        ? `Do you want to edit user "${user?.name}"?`
+        : `Deseja editar o usuário "${user?.name}"?`,
+      confirmText: language === "english" ? "Edit" : "Editar",
+      onConfirm: () => navigate(`/users_form/${id}`)
+    });
   };
 
   if(isLoggedIn && localStorage.getItem("occupation_id") === occupationEnum.professor){
@@ -90,6 +114,18 @@ export default function Users() {
           </div>
         ))}
       </div>
+      
+      <ConfirmationModal
+        isOpen={confirmationState.isOpen}
+        onClose={hideConfirmation}
+        onConfirm={handleConfirm}
+        title={confirmationState.title}
+        message={confirmationState.message}
+        confirmText={confirmationState.confirmText}
+        cancelText={confirmationState.cancelText}
+        type={confirmationState.type}
+        isLoading={confirmationState.isLoading}
+      />
     </div>
   );
 }

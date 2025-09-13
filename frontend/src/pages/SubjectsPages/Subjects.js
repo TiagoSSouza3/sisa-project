@@ -3,6 +3,8 @@ import API from "../../api";
 import { useNavigate } from "react-router-dom";
 import { occupationEnum } from "../../enums/occupationEnum";
 import { useLanguage } from '../../components/LanguageContext';
+import ConfirmationModal from '../../components/ConfirmationModal';
+import useConfirmation from '../../hooks/useConfirmation';
 
 import '../../styles/global.css';
 import '../../styles/subjects.css';
@@ -12,6 +14,7 @@ export default function Subjects() {
   const { language } = useLanguage();
   const [subjects, setSubjects] = useState([]);
   const navigate = useNavigate();
+  const { confirmationState, showConfirmation, hideConfirmation, handleConfirm } = useConfirmation();
 
   const loadSubjects = async () => {
     try {
@@ -58,7 +61,17 @@ export default function Subjects() {
               <div className="subject-actions">
                 <button 
                   className="edit-button"
-                  onClick={() => navigate(`/subject_infos/${subject.id}`)}
+                  onClick={() => {
+                    showConfirmation({
+                      type: 'edit',
+                      title: language === "english" ? "Edit Subject" : "Editar Disciplina",
+                      message: language === "english" 
+                        ? `Do you want to edit subject "${subject.name}"?`
+                        : `Deseja editar a disciplina "${subject.name}"?`,
+                      confirmText: language === "english" ? "Edit" : "Editar",
+                      onConfirm: () => navigate(`/subject_infos/${subject.id}`)
+                    });
+                  }}
                 >
                   {language === "english" ? "Edit" : "Editar"}
                 </button>
@@ -67,6 +80,18 @@ export default function Subjects() {
           ))
         )}
       </div>
+      
+      <ConfirmationModal
+        isOpen={confirmationState.isOpen}
+        onClose={hideConfirmation}
+        onConfirm={handleConfirm}
+        title={confirmationState.title}
+        message={confirmationState.message}
+        confirmText={confirmationState.confirmText}
+        cancelText={confirmationState.cancelText}
+        type={confirmationState.type}
+        isLoading={confirmationState.isLoading}
+      />
     </div>
   );
 } 

@@ -3,6 +3,8 @@ import API from "../../api";
 import { useNavigate } from "react-router-dom";
 import { occupationEnum } from "../../enums/occupationEnum";
 import { useLanguage } from '../../components/LanguageContext';
+import ConfirmationModal from '../../components/ConfirmationModal';
+import useConfirmation from '../../hooks/useConfirmation';
 
 import '../../styles/global.css';
 import '../../styles/storage.css';
@@ -12,6 +14,7 @@ export default function Storage() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const { confirmationState, showConfirmation, hideConfirmation, handleConfirm } = useConfirmation();
     const [newItem, setNewItem] = useState({
         name: "",
         description: "",
@@ -194,9 +197,19 @@ export default function Storage() {
 
     const handleDelete = async (e) => {
         const id = e.target.value;
-        await API.delete(`/storage/${id}`);
-
-        loadStorage();
+        const item = storage.find(item => item.id === parseInt(id));
+        
+        showConfirmation({
+            type: 'delete',
+            title: language === "english" ? "Delete Item" : "Excluir Item",
+            message: language === "english" 
+                ? `Are you sure you want to delete "${item?.name}"? This action cannot be undone.`
+                : `Tem certeza que deseja excluir "${item?.name}"? Esta ação não pode ser desfeita.`,
+            onConfirm: async () => {
+                await API.delete(`/storage/${id}`);
+                loadStorage();
+            }
+        });
     };
 
     const savePriceEdit = async (index) => {
@@ -441,7 +454,17 @@ export default function Storage() {
                             </div>
                             <button 
                                 className="edit-button"
-                                onClick={() => navigate(`/storage_log/${item.id}`)}
+                                onClick={() => {
+                                    showConfirmation({
+                                        type: 'edit',
+                                        title: language === "english" ? "View Product Log" : "Ver Histórico do Produto",
+                                        message: language === "english" 
+                                            ? `Do you want to view the log for "${item.name}"?`
+                                            : `Deseja visualizar o histórico de "${item.name}"?`,
+                                        confirmText: language === "english" ? "View Log" : "Ver Histórico",
+                                        onConfirm: () => navigate(`/storage_log/${item.id}`)
+                                    });
+                                }}
                             >
                             {language === "english" ? "Product Log" : "Historico do Produto"}
                             </button>
@@ -457,6 +480,18 @@ export default function Storage() {
                 : <div className="empty-state">{language === "english" ? "Empty Storage" : "Estoque Vazio"}</div>
                 ))}
             </div>
+            
+            <ConfirmationModal
+                isOpen={confirmationState.isOpen}
+                onClose={hideConfirmation}
+                onConfirm={handleConfirm}
+                title={confirmationState.title}
+                message={confirmationState.message}
+                confirmText={confirmationState.confirmText}
+                cancelText={confirmationState.cancelText}
+                type={confirmationState.type}
+                isLoading={confirmationState.isLoading}
+            />
         </div>
     );
 }

@@ -162,34 +162,72 @@ exports.updateStorageItem = async (req, res) => {
       created_at: new Date()
     };
 
-    // Verifica mudanças e registra no log
-    Object.keys(toUpdate).forEach((field) => {
-      if (field !== "id" && field !== "updated_by" && field !== "updated_at") {
-        if (storage[field] !== toUpdate[field]) {
-          if (field === "amount") {
-            const valueDifference = toUpdate[field] - storage[field];
-            new_storage_log.value_diference = valueDifference; // Corrigido para o nome do campo no modelo
-          } else {
-            new_storage_log.value_diference = 0;
-          }
-          
-          new_storage_log.last_change = field;
-          // Copia os valores atuais para o log
-          new_storage_log.name = storage.name;
-          new_storage_log.description = storage.description;
-          new_storage_log.last_price = storage.last_price;
-          new_storage_log.last_price_date = storage.last_price_date;
-          new_storage_log.amount = storage.amount;
-        }
+    // Verifica mudanças e cria logs separados para cada tipo de mudança
+    const logsToCreate = [];
+    
+    // Verifica mudança de preço
+    if (toUpdate.last_price !== undefined && storage.last_price !== toUpdate.last_price) {
+      const priceLog = {
+        id_item: storage.id,
+        name: storage.name,
+        description: storage.description,
+        last_price: toUpdate.last_price, // Novo preço
+        last_price_date: toUpdate.last_price_date || storage.last_price_date,
+        amount: storage.amount, // Quantidade atual
+        created_by: req.user?.id || 1,
+        created_at: new Date(),
+        last_change: "price_update",
+        value_diference: 0
+      };
+      logsToCreate.push(priceLog);
+    }
+
+    // Verifica mudança de quantidade (entrada de estoque)
+    if (toUpdate.amount !== undefined && storage.amount !== toUpdate.amount) {
+      const amountDifference = toUpdate.amount - storage.amount;
+      if (amountDifference > 0) { // Só registra entradas (compras)
+        const amountLog = {
+          id_item: storage.id,
+          name: storage.name,
+          description: storage.description,
+          last_price: toUpdate.last_price !== undefined ? toUpdate.last_price : storage.last_price,
+          last_price_date: toUpdate.last_price_date !== undefined ? toUpdate.last_price_date : storage.last_price_date,
+          amount: storage.amount, // Quantidade anterior
+          created_by: req.user?.id || 1,
+          created_at: new Date(),
+          last_change: "amount_increase",
+          value_diference: amountDifference
+        };
+        logsToCreate.push(amountLog);
+      }
+    }
+
+    // Verifica outras mudanças (nome, descrição, etc.)
+    const otherFields = ['name', 'description'];
+    otherFields.forEach(field => {
+      if (toUpdate[field] !== undefined && storage[field] !== toUpdate[field]) {
+        const otherLog = {
+          id_item: storage.id,
+          name: storage.name,
+          description: storage.description,
+          last_price: storage.last_price,
+          last_price_date: storage.last_price_date,
+          amount: storage.amount,
+          created_by: req.user?.id || 1,
+          created_at: new Date(),
+          last_change: field + "_update",
+          value_diference: 0
+        };
+        logsToCreate.push(otherLog);
       }
     });
 
     // Atualiza o item
     await storage.update(toUpdate);
 
-    // Cria o log se houve mudanças
-    if (new_storage_log.last_change) {
-      await StorageLog.create(new_storage_log);
+    // Cria todos os logs necessários
+    for (const log of logsToCreate) {
+      await StorageLog.create(log);
     }
 
     const updated = await Storage.findByPk(id);

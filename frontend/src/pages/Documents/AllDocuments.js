@@ -3,6 +3,8 @@ import { createPortal } from 'react-dom';
 import API from '../../api';
 import '../../styles/all-documents.css';
 import { useLanguage } from '../../components/LanguageContext';
+import ConfirmationModal from '../../components/ConfirmationModal';
+import useConfirmation from '../../hooks/useConfirmation';
 
 export default function AllDocuments() {
   const { language } = useLanguage();
@@ -15,6 +17,7 @@ export default function AllDocuments() {
   const [loadingPreview, setLoadingPreview] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [showUploadForm, setShowUploadForm] = useState(false);
+  const { confirmationState, showConfirmation, hideConfirmation, handleConfirm } = useConfirmation();
 
   const [file, setFile] = useState(null);
   const [name, setName] = useState('');
@@ -44,20 +47,27 @@ export default function AllDocuments() {
   }, []);
 
   const handleDelete = async (documentId) => {
-    if (!window.confirm('Tem certeza que deseja excluir este documento?')) {
-      return;
-    }
-
-    setDeletingId(documentId);
-    try {
-      await API.delete(`/all-documents/${documentId}`);
-      setDocuments(documents.filter(doc => doc.id !== documentId));
-    } catch (err) {
-      console.error('Erro ao deletar documento:', err);
-      alert('Erro ao deletar documento');
-    } finally {
-      setDeletingId(null);
-    }
+    const document = documents.find(doc => doc.id === documentId);
+    
+    showConfirmation({
+      type: 'delete',
+      title: language === "english" ? "Delete Document" : "Excluir Documento",
+      message: language === "english" 
+        ? `Are you sure you want to delete "${document?.name}"? This action cannot be undone.`
+        : `Tem certeza que deseja excluir "${document?.name}"? Esta ação não pode ser desfeita.`,
+      onConfirm: async () => {
+        setDeletingId(documentId);
+        try {
+          await API.delete(`/all-documents/${documentId}`);
+          setDocuments(documents.filter(doc => doc.id !== documentId));
+        } catch (err) {
+          console.error('Erro ao deletar documento:', err);
+          setError(language === "english" ? "Error deleting document" : "Erro ao deletar documento");
+        } finally {
+          setDeletingId(null);
+        }
+      }
+    });
   };
 
   const handlePreview = async (document) => {
@@ -582,6 +592,18 @@ export default function AllDocuments() {
 
       {/* Modal renderizado via Portal */}
       <PreviewModal />
+      
+      <ConfirmationModal
+        isOpen={confirmationState.isOpen}
+        onClose={hideConfirmation}
+        onConfirm={handleConfirm}
+        title={confirmationState.title}
+        message={confirmationState.message}
+        confirmText={confirmationState.confirmText}
+        cancelText={confirmationState.cancelText}
+        type={confirmationState.type}
+        isLoading={confirmationState.isLoading}
+      />
     </div>
   );
 }
