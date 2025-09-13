@@ -15,7 +15,12 @@ export default function StorageLog() {
 
     const loadStorage = async () => {
         try {
-            const storage =  await API.get(`/storage/log/${id}`)
+            let storage;
+            if(id){
+                storage =  await API.get(`/storage/log/${id}`);
+            } else {
+                storage =  await API.get(`/storage/log`);
+            }
             const data = storage.data;
             console.log("Storage Log Data:", data);
             
@@ -62,11 +67,6 @@ export default function StorageLog() {
         setIsLoggedIn(token !== null);
         loadStorage();
     }, []);
-
-    if(!isLoggedIn) {
-        navigate("/");
-        return null;
-    }
 
     // Função auxiliar para formatar preço no formato brasileiro
     const formatPrice = (price) => {
