@@ -6,6 +6,8 @@ import Modal from "../../components/Modal";
 import { useNavigate } from "react-router-dom";
 import { occupationEnum } from "../../enums/occupationEnum"
 import { useLanguage } from '../../components/LanguageContext';
+import ConfirmationModal from '../../components/ConfirmationModal';
+import useConfirmation from '../../hooks/useConfirmation';
 
 import '../../styles/global.css';
 import '../../styles/students.css';
@@ -22,6 +24,7 @@ export default function Students() {
   const [success, setSuccess] = useState("");
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const navigate = useNavigate();
+  const { confirmationState, showConfirmation, hideConfirmation, handleConfirm } = useConfirmation();
   const [filters, setFilters] = useState({
     name: '',
     registration: '',
@@ -148,8 +151,20 @@ export default function Students() {
   };
 
   const handleEdit = (studentId) => {
-    const url = '/student_form/' + studentId
-    navigate(url);
+    const student = students.find(s => s.id === studentId);
+    
+    showConfirmation({
+      type: 'edit',
+      title: language === "english" ? "Edit Student" : "Editar Aluno",
+      message: language === "english" 
+        ? `Do you want to edit student "${student?.name}"?`
+        : `Deseja editar o aluno "${student?.name}"?`,
+      confirmText: language === "english" ? "Edit" : "Editar",
+      onConfirm: () => {
+        const url = '/student_form/' + studentId;
+        navigate(url);
+      }
+    });
   }
 
   const handleOpenFilterModal = () => {
@@ -257,6 +272,18 @@ export default function Students() {
           </div>
         ))}
       </div>
+      
+      <ConfirmationModal
+        isOpen={confirmationState.isOpen}
+        onClose={hideConfirmation}
+        onConfirm={handleConfirm}
+        title={confirmationState.title}
+        message={confirmationState.message}
+        confirmText={confirmationState.confirmText}
+        cancelText={confirmationState.cancelText}
+        type={confirmationState.type}
+        isLoading={confirmationState.isLoading}
+      />
     </div>
   );
 }

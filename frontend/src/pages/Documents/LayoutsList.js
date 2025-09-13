@@ -3,6 +3,8 @@ import { createPortal } from 'react-dom';
 import API from '../../api';
 import '../../styles/layouts-list.css';
 import '../../styles/layouts-list-modal.css';
+import ConfirmationModal from '../../components/ConfirmationModal';
+import useConfirmation from '../../hooks/useConfirmation';
 import { useLanguage } from '../../components/LanguageContext';
 
 export default function LayoutsList({ layouts, loading, onSelectLayout, onDeleteLayout, onUseLayout, hasLoaded }) {
@@ -11,22 +13,30 @@ export default function LayoutsList({ layouts, loading, onSelectLayout, onDelete
   const [previewLayout, setPreviewLayout] = useState(null);
   const [previewHtml, setPreviewHtml] = useState('');
   const [loadingPreview, setLoadingPreview] = useState(false);
+  const { confirmationState, showConfirmation, hideConfirmation, handleConfirm } = useConfirmation();
 
   const handleDelete = async (layoutId) => {
-    if (!window.confirm('Tem certeza que deseja excluir este layout?')) {
-      return;
-    }
-
-    setDeletingId(layoutId);
-    try {
-      await API.delete(`/document-layouts/${layoutId}`);
-      onDeleteLayout(layoutId);
-    } catch (err) {
-      console.error('Erro ao deletar layout:', err);
-      alert('Erro ao deletar layout');
-    } finally {
-      setDeletingId(null);
-    }
+    const layout = layouts.find(layout => layout.id === layoutId);
+    
+    showConfirmation({
+      type: 'delete',
+      title: language === "english" ? "Delete Layout" : "Excluir Layout",
+      message: language === "english" 
+        ? `Are you sure you want to delete layout "${layout?.name}"? This action cannot be undone.`
+        : `Tem certeza que deseja excluir o layout "${layout?.name}"? Esta ação não pode ser desfeita.`,
+      onConfirm: async () => {
+        setDeletingId(layoutId);
+        try {
+          await API.delete(`/document-layouts/${layoutId}`);
+          onDeleteLayout(layoutId);
+        } catch (err) {
+          console.error('Erro ao deletar layout:', err);
+          alert(language === "english" ? "Error deleting layout" : "Erro ao deletar layout");
+        } finally {
+          setDeletingId(null);
+        }
+      }
+    });
   };
 
   const handlePreview = async (layout) => {
@@ -284,6 +294,18 @@ export default function LayoutsList({ layouts, loading, onSelectLayout, onDelete
 
       {/* Modal renderizado via Portal */}
       <PreviewModal />
+      
+      <ConfirmationModal
+        isOpen={confirmationState.isOpen}
+        onClose={hideConfirmation}
+        onConfirm={handleConfirm}
+        title={confirmationState.title}
+        message={confirmationState.message}
+        confirmText={confirmationState.confirmText}
+        cancelText={confirmationState.cancelText}
+        type={confirmationState.type}
+        isLoading={confirmationState.isLoading}
+      />
     </div>
   );
 }
