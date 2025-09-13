@@ -88,7 +88,7 @@
   color: var(--text-light);
   font-weight: 600;
   border-bottom: 2px solid var(--primary-light);
-  min-width: 1000px;
+  min-width: 1020px;
 }
 
 .storage-items-list-titles h3 {
@@ -127,7 +127,7 @@
 
 .storage-items-list-titles h3:last-child {
   text-align: right;
-  width: 200px;
+  width: 220px;
 }
 
 
@@ -238,7 +238,8 @@
   border-bottom: 1px solid rgba(0,0,0,0.1);
   transition: var(--transition);
   background: var(--surface-color);
-  min-width: 1000px;
+  min-width: 1020px;
+  min-height: 80px;
 }
 
 .storage-item:last-child {
@@ -256,6 +257,8 @@
   display: flex;
   align-items: center;
   gap: 0;
+  height: 100%;
+  min-height: 80px;
 }
 
 .storage-item-title {
@@ -269,6 +272,9 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  height: 100%;
 }
 
 .storage-item-description {
@@ -281,6 +287,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }
 
 .storage-item-last-price {
@@ -292,6 +302,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 100%;
 }
 
 .editable-price {
@@ -331,6 +342,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 100%;
 }
 
 .editable-date {
@@ -370,6 +382,10 @@
   width: 80px;
   flex-shrink: 0;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }
 
 .storage-item-date {
@@ -392,6 +408,10 @@
   text-align: center;
   padding: 0.3rem 0.5rem;
   border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }
 
 .storage-item-price-change.positive {
@@ -427,9 +447,11 @@
   display: flex;
   gap: 1rem;
   align-items: center;
-  width: 200px;
+  width: 220px;
   flex-shrink: 0;
   justify-content: flex-end;
+  height: 100%;
+  min-height: 80px;
 }
 
 .storage-item-change-amount {
@@ -486,14 +508,21 @@
 .edit-button {
   background-color: var(--primary-light);
   color: var(--text-light);
-  padding: 0.8rem 1.5rem;
+  padding: 1rem 1.8rem;
   font-weight: 600;
   border: none;
   border-radius: var(--border-radius);
   cursor: pointer;
   transition: var(--transition);
   width: 100%;
-  max-width: 200px;
+  max-width: 220px;
+  font-size: 1rem;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  line-height: 1.2;
 }
 
 .edit-button:hover {
@@ -572,7 +601,7 @@
   
   .storage-items-list-titles h3:last-child,
   .storage-item-actions {
-    width: 180px;
+    width: 200px;
   }
 }
 
@@ -660,7 +689,7 @@
   
   .storage-items-list-titles h3:last-child,
   .storage-item-actions {
-    width: 150px;
+    width: 170px;
   }
   
   .edit-price-input,
@@ -774,6 +803,6 @@
   
   .storage-items-list-titles h3:last-child,
   .storage-item-actions {
-    width: 120px;
+    width: 140px;
   }
 }

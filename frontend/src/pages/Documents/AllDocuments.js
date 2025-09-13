@@ -390,6 +390,7 @@ export default function AllDocuments() {
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
               onDrop={handleDrop}
+              onClick={() => !file && document.getElementById('file-upload').click()}
             >
               {file ? (
                 <div className="file-preview">
@@ -410,26 +411,24 @@ export default function AllDocuments() {
                 <div className="upload-prompt">
                   <div className="upload-icon">📤</div>
                   <div className="upload-text">
-                    <label htmlFor="file-upload" className="upload-label">
-                      <span className="upload-link">
-                        {language === "english" ? "Click to upload" : "Clique Para Fazer Upload"}
-                      </span>
-                      <span>
-                        {language === "english" ? "or Drag and Drop" : "ou Arraste e Solte"}
-                      </span>
-                    </label>
-                    <input
-                      id="file-upload"
-                      name="file-upload"
-                      type="file"
-                      className="file-input"
-                      accept=".docx"
-                      onChange={(e) => handleFileSelect(e.target.files[0])}
-                    />
+                    <span className="upload-link">
+                      {language === "english" ? "Click to upload" : "Clique Para Fazer Upload"}
+                    </span>
+                    <span>
+                      {language === "english" ? "or Drag and Drop" : "ou Arraste e Solte"}
+                    </span>
                   </div>
                   <p className="upload-hint">{language === "english" ? "Only DOCX files up to 10MB" : "Apenas arquivos DOCX até 10MB"}</p>
-                  </div>
+                </div>
               )}
+              <input
+                id="file-upload"
+                name="file-upload"
+                type="file"
+                className="file-input"
+                accept=".docx"
+                onChange={(e) => handleFileSelect(e.target.files[0])}
+              />
             </div>
 
             <div className="form-fields">

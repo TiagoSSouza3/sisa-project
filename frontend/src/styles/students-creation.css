@@ -43,7 +43,7 @@
 }
 
 .form-group label {
-  display: block;
+  display: flex;
   margin-bottom: 0.5rem;
   color: var(--text-color);
   font-weight: 600;
@@ -65,11 +65,11 @@
 }
 
 .radio-group label {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  margin-bottom: 0;
+  gap: 0.5rem;
+  font-weight: 600;
   cursor: pointer;
-  font-weight: normal;
 }
 
 .form-group input,

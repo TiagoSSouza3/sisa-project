@@ -16,13 +16,22 @@
 }
 
 .form-group label {
-  display: block;
+  display: flex;
   margin-bottom: 0.5rem;
   color: var(--text-color);
   font-weight: 600;
+
 }
 
-.form-group input,
+.form-group input{
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+  font-size: large;
+}
+
 .form-group select {
   width: 100%;
   padding: 1rem;

@@ -97,7 +97,6 @@ export default function Login() {
   const handleForgotPassword = async (e) => {
     e.preventDefault();
     
-    // Validar email antes de enviar
     const emailValidation = validateEmail(forgotEmail);
     if (!emailValidation.isValid) {
       setNotification({ 
@@ -108,7 +107,7 @@ export default function Login() {
     }
     
     setLoading(true);
-    setNotification(null); // Limpar notificação anterior
+    setNotification(null);
     try {
       await API.post("/users/request-password-reset", { email: forgotEmail });
       setNotification({ 
@@ -129,40 +128,68 @@ export default function Login() {
 
   if (showForgotPassword) {
     return (
-      <div className="login-container forgot-container">
-        <div className="login-card">
-          <h2 className="login-title">Esqueci minha senha</h2>
-          <form className="login-form" onSubmit={handleForgotPassword}>
-            <div className="form-group">
-              <input 
-                type="text" 
-                placeholder="Digite seu email" 
-                value={forgotEmail} 
-                onChange={(e) => setForgotEmail(e.target.value)} 
-                required 
-              />
+      <div className="login-container">
+        <div className="login-left">
+          <div className="login-card">
+            <div className="login-logo">
+              <div className="responsive-logo">
+                <img src={logoInstituto} alt="Logo Instituto" />
+              </div>
             </div>
-            <button className="login-button" type="submit" disabled={loading}>
-              {loading ? "Processando..." : "Enviar email de redefinição"}
-            </button>
-            <button 
-              type="button" 
-              className="forgot-password-link" 
-              onClick={() => {
-                setShowForgotPassword(false);
-                setNotification(null);
-              }}
-            >
-              Voltar ao login
-            </button>
-            {notification && (
-              <InlineNotification
-                message={notification.message}
-                type={notification.type}
-                onClose={() => setNotification(null)}
-              />
-            )}
-          </form>
+            <h2 className="login-title">Esqueci minha senha</h2>
+            <form className="login-form" onSubmit={handleForgotPassword}>
+              <div className="form-group">
+                <input 
+                  type="text" 
+                  placeholder="Digite seu email" 
+                  value={forgotEmail} 
+                  onChange={(e) => setForgotEmail(e.target.value)} 
+                  required 
+                />
+              </div>
+              <button className="login-button" type="submit" disabled={loading}>
+                {loading ? "Processando..." : "Enviar email de redefinição"}
+              </button>
+              <button 
+                type="button" 
+                className="forgot-password-link" 
+                onClick={() => {
+                  setShowForgotPassword(false);
+                  setNotification(null);
+                }}
+              >
+                Voltar ao login
+              </button>
+              {notification && (
+                <InlineNotification
+                  message={notification.message}
+                  type={notification.type}
+                  onClose={() => setNotification(null)}
+                />
+              )}
+            </form>
+          </div>
+        </div>
+
+        {/* Lado Direito - Galeria Vertical */}
+        <div className="login-right">
+          <div 
+            className="image-slider"
+            style={{"--scroll-duration": `${animationConfig.scrollDurationMs}ms`}}
+          >
+            {[...loginImages, ...loginImages].map((src, index) => (
+              <div className="slider-image" key={index}>
+                <img src={src} alt={`slide-${index}`} />
+              </div>
+            ))}
+          </div>
+
+          <div className="promotional-content">
+            <div className="promo-icon">
+              <img src={logoInstituto} alt="Logo Instituto" />
+            </div>
+            <h1 className="promo-title">O que fazemos é resultado do que somos!</h1>
+          </div>
         </div>
       </div>
     );

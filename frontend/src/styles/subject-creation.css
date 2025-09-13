@@ -34,15 +34,23 @@
   color: var(--text-color);
   font-weight: 500;
 }
-
-.form-group input,
-.form-group select,
 .form-group textarea {
   width: 100%;
   padding: 0.8rem;
   border: 2px solid #e0e0e0;
   border-radius: var(--border-radius);
   transition: var(--transition);
+  font-size: larger;
+}
+
+.form-group input,
+.form-group select{
+  width: 100%;
+  padding: 0.8rem;
+  border: 2px solid #e0e0e0;
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+  font-size: large;
 }
 
 .form-group input:focus,
