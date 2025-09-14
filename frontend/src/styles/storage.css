@@ -10,6 +10,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  position: relative;
 }
 
 /* Coloca os botões do cabeçalho lado a lado com espaçamento */
@@ -26,18 +27,22 @@
   font-weight: 700;
   text-align: left;
   flex: 1;
+  margin-left: 80px;
+  margin-right: 200px;
 }
 
 .storage-log-button {
   background-color: var(--primary-color);
   color: var(--text-light);
-  padding: 0.8rem 1.5rem;
+  padding: 0.8rem 2rem;
   font-weight: 600;
   border-radius: var(--border-radius);
   transition: var(--transition);
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  min-width: 140px;
+  justify-content: center;
 }
 
 /* Botão de Fluxo de Caixa com o mesmo estilo do botão de Histórico */
@@ -75,20 +80,45 @@
   min-width: 0;
   margin-left: auto;
   margin-right: auto;
-  max-width: 1200px;
+  max-width: 1400px;
   width: 100%;
+}
+
+/* Storage Form Container */
+.storage-form-container {
+  background: var(--surface-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  margin-bottom: 2rem;
+  padding: 0;
+  overflow: hidden;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Storage Items List Titles */
 .storage-items-list-titles {
-  display: flex;
+  display: grid;
+  grid-template-columns: 120px 150px 200px 120px 120px 120px 200px 120px 60px;
   align-items: center;
+  justify-items: center;
+  gap: 1rem;
   padding: 1.5rem;
   background: var(--primary-color);
   color: var(--text-light);
   font-weight: 600;
   border-bottom: 2px solid var(--primary-light);
-  min-width: 1020px;
+  min-width: 1200px;
+}
+
+/* Storage Log specific titles */
+.storage-log-titles {
+  display: grid;
+  grid-template-columns: 120px 150px 200px 120px 120px 120px 1fr;
+  align-items: center;
+  justify-items: center;
+  gap: 1rem;
 }
 
 .storage-items-list-titles h3 {
@@ -97,37 +127,46 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   text-align: center;
-  flex-shrink: 0;
 }
 
 .storage-items-list-titles h3:first-child {
   text-align: left;
-  width: 120px;
+  grid-column: 1;
 }
 
 .storage-items-list-titles h3:nth-child(2) {
-  width: 150px;
+  grid-column: 2;
 }
 
 .storage-items-list-titles h3:nth-child(3) {
-  width: 100px;
+  grid-column: 3;
 }
 
 .storage-items-list-titles h3:nth-child(4) {
-  width: 120px;
+  grid-column: 4;
 }
 
 .storage-items-list-titles h3:nth-child(5) {
-  width: 120px;
+  grid-column: 5;
 }
 
 .storage-items-list-titles h3:nth-child(6) {
-  width: 80px;
+  grid-column: 6;
 }
 
-.storage-items-list-titles h3:last-child {
-  text-align: right;
-  width: 220px;
+.storage-items-list-titles h3:nth-child(7) {
+  grid-column: 7;
+  text-align: left;
+}
+
+.storage-items-list-titles h3:nth-child(8) {
+  grid-column: 8;
+  text-align: center;
+}
+
+.storage-items-list-titles h3:nth-child(9) {
+  grid-column: 9;
+  text-align: center;
 }
 
 
@@ -139,11 +178,25 @@
   gap: 1.5rem;
   padding: 2rem;
   background: var(--surface-color);
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
-  margin-bottom: 2rem;
   align-items: flex-end;
   flex-wrap: wrap;
+  justify-content: center;
+  max-width: 1000px;
+  overflow-x: auto;
+}
+
+/* Storage Form Header */
+.storage-form-header {
+  background: var(--primary-color);
+  color: var(--text-light);
+  padding: 1rem 2rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .form-field {
@@ -151,6 +204,7 @@
   flex-direction: column;
   flex: 1;
   min-width: 140px;
+  max-width: 200px;
 }
 
 .form-field label {
@@ -160,6 +214,7 @@
   margin-bottom: 0.5rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  margin-left: 5px;
 }
 
 .storage-form input {
@@ -231,15 +286,26 @@
 
 /* Storage Item Cards */
 .storage-item {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 120px 150px 200px 120px 120px 120px 200px 120px 60px;
   align-items: center;
+  justify-items: center;
+  gap: 1rem;
   padding: 1.5rem;
   border-bottom: 1px solid rgba(0,0,0,0.1);
   transition: var(--transition);
   background: var(--surface-color);
-  min-width: 1020px;
+  min-width: 1200px;
   min-height: 80px;
+}
+
+/* Storage Log specific items */
+.storage-log-item {
+  display: grid;
+  grid-template-columns: 120px 150px 200px 120px 120px 120px 1fr;
+  align-items: center;
+  justify-items: center;
+  gap: 1rem;
 }
 
 .storage-item:last-child {
@@ -253,12 +319,11 @@
 
 
 .storage-item-info {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 0;
-  height: 100%;
-  min-height: 80px;
+  display: contents;
+}
+
+.storage-log-item .storage-item-info {
+  display: contents;
 }
 
 .storage-item-title {
@@ -266,8 +331,6 @@
   font-size: 1.3rem;
   color: var(--primary-color);
   font-weight: 600;
-  width: 120px;
-  flex-shrink: 0;
   text-align: left;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -275,14 +338,14 @@
   display: flex;
   align-items: center;
   height: 100%;
+  grid-column: 1;
+  justify-self: start;
 }
 
 .storage-item-description {
   font-weight: bold;
   color: var(--text-color);
   font-size: 1rem;
-  width: 150px;
-  flex-shrink: 0;
   text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -291,18 +354,20 @@
   align-items: center;
   justify-content: center;
   height: 100%;
+  grid-column: 2;
+  justify-self: center;
 }
 
 .storage-item-last-price {
   color: var(--success-color);
   font-weight: 600;
   font-size: 1.1rem;
-  width: 100px;
-  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
+  grid-column: 3;
+  justify-self: center;
 }
 
 .editable-price {
@@ -337,12 +402,12 @@
   color: var(--text-color);
   font-size: 1rem;
   opacity: 0.8;
-  width: 120px;
-  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
+  grid-column: 5;
+  justify-self: center;
 }
 
 .editable-date {
@@ -379,13 +444,13 @@
   border-radius: 20px;
   font-size: 0.95rem;
   font-weight: 500;
-  width: 80px;
-  flex-shrink: 0;
   text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
+  grid-column: 6;
+  justify-self: center;
 }
 
 .storage-item-date {
@@ -403,8 +468,6 @@
 .storage-item-price-change {
   font-weight: 600;
   font-size: 1rem;
-  width: 120px;
-  flex-shrink: 0;
   text-align: center;
   padding: 0.3rem 0.5rem;
   border-radius: 4px;
@@ -412,6 +475,8 @@
   align-items: center;
   justify-content: center;
   height: 100%;
+  grid-column: 4;
+  justify-self: center;
 }
 
 .storage-item-price-change.positive {
@@ -444,24 +509,20 @@
 
 /* Storage Item Actions */
 .storage-item-actions {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  width: 220px;
-  flex-shrink: 0;
-  justify-content: flex-end;
-  height: 100%;
-  min-height: 80px;
+  display: contents;
 }
 
 .storage-item-change-amount {
   display: flex;
+  justify-content: flex-start;
   align-items: center;
   gap: 0.5rem;
   background: var(--background-color);
   padding: 0.5rem;
   border-radius: var(--border-radius);
   border: 1px solid rgba(0, 0, 0, 0.1);
+  grid-column: 7;
+  justify-self: start;
 }
 
 .minus-button,
@@ -514,21 +575,45 @@
   border-radius: var(--border-radius);
   cursor: pointer;
   transition: var(--transition);
-  width: 100%;
-  max-width: 220px;
   font-size: 1rem;
-  min-height: 50px;
+  min-height: 2.7rem;
   display: flex;
   align-items: center;
   justify-content: center;
   white-space: nowrap;
   line-height: 1.2;
+  grid-column: 8;
+  justify-self: start;
 }
 
 .edit-button:hover {
   background-color: var(--primary-color);
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+}
+
+.storage-item-delete {
+  display: contents;
+}
+
+.delete-button {
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  grid-column: 9;
+  justify-self: center;
+}
+
+.delete-button:hover {
+  background-color: #b91c1c;
+  transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
 }
 
 /* Empty State */
@@ -545,21 +630,23 @@
 .storage-header .transparent-button {
   background-color: transparent;
   color: var(--primary-color);
-  border: 2px solid var(--primary-color);
+  border: none;
   padding: 0.8rem 1.2rem;
   border-radius: var(--border-radius);
-  font-weight: 600;
-  transition: var(--transition);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: absolute;
+  left: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
 }
 
 .storage-header .transparent-button:hover {
-  background-color: var(--primary-color);
-  color: var(--text-light);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+  background-color: rgba(37, 99, 235, 0.1);
+  transform: translateY(-50%) translateX(-2px);
 }
 
 /* Responsive Design */
@@ -567,6 +654,12 @@
   .storage-items-list-titles,
   .storage-item {
     min-width: 900px;
+  }
+  
+  .storage-log-titles,
+  .storage-log-item {
+    grid-template-columns: 100px 130px 180px 90px 110px 110px 1fr;
+    justify-items: center;
   }
   
   .storage-items-list-titles h3:first-child,
@@ -611,9 +704,31 @@
     min-width: 800px;
   }
   
+  .storage-log-titles,
+  .storage-log-item {
+    grid-template-columns: 90px 120px 160px 80px 100px 100px 1fr;
+    justify-items: center;
+  }
+  
   .storage-items-list-titles h3,
   .storage-item-info > * {
     font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 919px){
+  .create-item-button{
+    width: 100%;
+  }
+
+  .storage-log-button{
+    width: 150px;
+    height: 50px;
+  }
+
+  .cash-flow-button{
+    width: 150px;
+    height: 50px;
   }
 }
 
@@ -628,18 +743,26 @@
     text-align: center;
   }
   
+  .storage-header .transparent-button {
+    left: 1.5rem;
+    padding: 0.6rem 1rem;
+  }
+  
   .storage-header h2 {
     font-size: 1.7rem;
+    margin-left: 70px;
   }
   
   .storage-form {
     flex-direction: column;
     align-items: stretch;
     gap: 1rem;
+    padding: 1.5rem;
   }
   
   .form-field {
     min-width: auto;
+    max-width: none;
   }
   
   .storage-form input {
@@ -647,49 +770,35 @@
     width: 100%;
   }
   
+  .create-item-button {
+    margin-top: 0;
+    width: 100%;
+  }
+
+  .storage-log-button{
+    width: 150px;
+    height: 50px;
+  }
+
+  .cash-flow-button{
+    width: 150px;
+    height: 50px;
+  }
+  
   .storage-items-list-titles,
   .storage-item {
     min-width: 700px;
   }
   
+  .storage-log-titles,
+  .storage-log-item {
+    grid-template-columns: 80px 100px 140px 70px 90px 90px 1fr;
+    justify-items: center;
+  }
+  
   .storage-items-list-titles h3,
   .storage-item-info > * {
     font-size: 0.85rem;
-  }
-  
-  .storage-items-list-titles h3:first-child,
-  .storage-item-title {
-    width: 80px;
-  }
-  
-  .storage-items-list-titles h3:nth-child(2),
-  .storage-item-description {
-    width: 100px;
-  }
-  
-  .storage-items-list-titles h3:nth-child(3),
-  .storage-item-last-price {
-    width: 70px;
-  }
-  
-  .storage-items-list-titles h3:nth-child(4),
-  .storage-item-price-change {
-    width: 90px;
-  }
-  
-  .storage-items-list-titles h3:nth-child(5),
-  .storage-item-last-price-date {
-    width: 90px;
-  }
-  
-  .storage-items-list-titles h3:nth-child(6),
-  .storage-item-amount {
-    width: 60px;
-  }
-  
-  .storage-items-list-titles h3:last-child,
-  .storage-item-actions {
-    width: 170px;
   }
   
   .edit-price-input,
@@ -731,8 +840,14 @@
     padding: 1rem;
   }
   
+  .storage-header .transparent-button {
+    left: 1rem;
+    padding: 0.5rem 0.8rem;
+  }
+  
   .storage-header h2 {
     font-size: 1.5rem;
+    margin-left: 60px;
   }
   
   .storage-form {
@@ -766,14 +881,15 @@
     min-width: 600px;
   }
   
+  .storage-log-titles,
+  .storage-log-item {
+    grid-template-columns: 70px 90px 120px 60px 80px 80px 1fr;
+    justify-items: center;
+  }
+  
   .storage-items-list-titles h3,
   .storage-item-info > * {
     font-size: 0.8rem;
-  }
-  
-  .storage-items-list-titles h3:first-child,
-  .storage-item-title {
-    width: 70px;
   }
   
   .storage-items-list-titles h3:nth-child(2),

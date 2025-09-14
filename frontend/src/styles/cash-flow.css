@@ -37,6 +37,10 @@
   color: var(--text-light);
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
 }
 
 .cash-flow-header::before {
@@ -57,6 +61,7 @@
 }
 
 .cash-flow-title {
+  color: white;
   font-size: 2.2rem;
   font-weight: 700;
   margin: 0 0 0.5rem 0;
@@ -71,6 +76,29 @@
   margin: 0;
   position: relative;
   z-index: 1;
+}
+
+/* Back Button */
+.cash-flow-header .transparent-button {
+  background-color: transparent;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.2rem;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: absolute;
+  left: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cash-flow-header .transparent-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-50%) translateX(-2px);
 }
 
 /* Inputs Section */
@@ -105,6 +133,7 @@
   color: var(--primary-color);
   font-weight: 600;
   font-size: 1rem;
+  margin-left: 5px;
   margin-bottom: 0.5rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -328,6 +357,11 @@
     padding: 1.5rem;
   }
   
+  .cash-flow-header .transparent-button {
+    left: 1.5rem;
+    padding: 0.6rem 1rem;
+  }
+  
   .cash-flow-title {
     font-size: 1.8rem;
   }
@@ -384,6 +418,11 @@
   
   .cash-flow-header {
     padding: 1rem;
+  }
+  
+  .cash-flow-header .transparent-button {
+    left: 1rem;
+    padding: 0.5rem 0.8rem;
   }
   
   .cash-flow-title {

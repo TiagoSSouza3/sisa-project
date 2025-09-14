@@ -213,24 +213,27 @@
 
   .login-container {
     flex-direction: column;
-    max-width: 500px;
-    margin: 0 auto;
-    min-height: 600px;
-    max-height: none;
-    height: auto;
-    border-radius: 16px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
     align-items: center;
     justify-content: center;
+    max-width: none;
+    min-height: 100vh;
   }
   
   .login-left {
     flex: 1;
+    width: 100vw;
+    height: 100vh;
     padding: 2rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
+    background: #ffffff;
   }
   
   .login-card {
@@ -418,15 +421,24 @@
 
 @media (max-width: 768px) {
   .login-container {
-    max-width: 450px;
-    min-height: 550px;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
     align-items: center;
     justify-content: center;
-    margin: 0 auto;
+    max-width: none;
+    min-height: 100vh;
   }
 
   .login-left {
-    width: 100%;
+    width: 100vw;
+    height: 100vh;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
   }
   
   .login-card {
@@ -449,17 +461,24 @@
 
 @media (max-width: 480px) {
   .login-container {
-    max-width: 350px;
-    min-height: 500px;
-    margin: 10px auto; /* Centraliza o container na horizontal */
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
     align-items: center;
     justify-content: center;
+    max-width: none;
+    min-height: 100vh;
   }
   
   .login-left {
+    width: 100vw;
+    height: 100vh;
     padding: 1rem;
-    width: 100%;
-
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #ffffff;
   }
   
   .login-card {

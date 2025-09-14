@@ -323,15 +323,14 @@ export default function Storage() {
                 }
             </div>
 
-            <div className="storage-items-list">
-                <div className="storage-item">
-                    <form
-                        className="storage-form"
-                        onSubmit={(e) => { 
-                            e.preventDefault(); 
-                            handleNewStorageItem(); 
-                        }}
-                    >
+            <div className="storage-form-container">
+                <form
+                    className="storage-form"
+                    onSubmit={(e) => { 
+                        e.preventDefault(); 
+                        handleNewStorageItem(); 
+                    }}
+                >
                         <div className="form-field">
                             <label htmlFor="name">{language === "english" ? "Name" : "Nome"}</label>
                             <input 
@@ -385,8 +384,10 @@ export default function Storage() {
                         > 
                         {language === "english" ? "Create" : "Criar"}
                         </button>
-                    </form>
-                </div>
+                </form>
+            </div>
+
+            <div className="storage-items-list">
                 <div className="storage-items-list-titles">
                     <h3>{language === "english" ? "Name" : "Nome"}</h3>
                     <h3>{language === "english" ? "Description" : "Descrição"}</h3>
@@ -466,7 +467,7 @@ export default function Storage() {
                                     });
                                 }}
                             >
-                            {language === "english" ? "Product Log" : "Historico do Produto"}
+                            {language === "english" ? "Product Log" : "Historico"}
                             </button>
                         </div>
                         <div className="storage-item-delete">
