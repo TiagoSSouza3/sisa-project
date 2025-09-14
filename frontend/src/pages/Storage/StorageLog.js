@@ -25,35 +25,87 @@ export default function StorageLog() {
             console.log("Storage Log Data:", data);
             
             // Calcular variação de preço para cada log
-            const storageWithPriceChange = data.map((item, index) => {
-                let priceChange = null;
-                
-                // Simular cálculo de variação baseado no índice
-                const currentPrice = parseFloat(item.last_price) || 0;
-                const previousLog = data[index + 1] || null;
+            let storageWithPriceChange;
+            
+            if (id) {
+                // Quando há ID, calcular variação sequencialmente (lógica original)
+                storageWithPriceChange = data.map((item, index) => {
+                    let priceChange = null;
+                    
+                    const currentPrice = parseFloat(item.last_price) || 0;
+                    const previousLog = data[index + 1] || null;
+                    const previousPrice = previousLog ? previousLog.last_price : null;
 
-                const previousPrice = previousLog ? previousLog.last_price : null;
-
-                console.log(currentPrice, index)
-                console.log(previousPrice, index+1)
-                
-                if (!!previousPrice && previousPrice > 0) {
-                    const change = ((currentPrice - previousPrice) / previousPrice) * 100;
-                    priceChange = {
-                        percentage: change,
-                        isPositive: change > 0,
-                        isNegative: change < 0,
-                        isNeutral: change === 0
+                    console.log(currentPrice, index)
+                    console.log(previousPrice, index+1)
+                    
+                    if (!!previousPrice && previousPrice > 0) {
+                        const change = ((currentPrice - previousPrice) / previousPrice) * 100;
+                        priceChange = {
+                            percentage: change,
+                            isPositive: change > 0,
+                            isNegative: change < 0,
+                            isNeutral: change === 0
+                        };
+                    }
+                    
+                    return {
+                        ...item,
+                        priceChange: priceChange
                     };
-
-
-                }
+                });
+            } else {
+                // Quando não há ID, agrupar por produto e calcular variação dentro de cada grupo
+                const groupedByProduct = {};
                 
-                return {
-                    ...item,
-                    priceChange: priceChange
-                };
-            });
+                // Agrupar logs por id_item
+                data.forEach(item => {
+                    if (!groupedByProduct[item.id_item]) {
+                        groupedByProduct[item.id_item] = [];
+                    }
+                    groupedByProduct[item.id_item].push(item);
+                });
+                
+                // Ordenar cada grupo por data (mais recente primeiro)
+                Object.keys(groupedByProduct).forEach(productId => {
+                    groupedByProduct[productId].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                });
+                
+                // Calcular variação para cada grupo
+                const allLogsWithPriceChange = [];
+                Object.keys(groupedByProduct).forEach(productId => {
+                    const productLogs = groupedByProduct[productId];
+                    
+                    productLogs.forEach((item, index) => {
+                        let priceChange = null;
+                        
+                        const currentPrice = parseFloat(item.last_price) || 0;
+                        const previousLog = productLogs[index + 1] || null;
+                        const previousPrice = previousLog ? previousLog.last_price : null;
+
+                        console.log(`Produto ${productId} - Log ${index}:`, currentPrice)
+                        console.log(`Produto ${productId} - Log anterior:`, previousPrice)
+                        
+                        if (!!previousPrice && previousPrice > 0) {
+                            const change = ((currentPrice - previousPrice) / previousPrice) * 100;
+                            priceChange = {
+                                percentage: change,
+                                isPositive: change > 0,
+                                isNegative: change < 0,
+                                isNeutral: change === 0
+                            };
+                        }
+                        
+                        allLogsWithPriceChange.push({
+                            ...item,
+                            priceChange: priceChange
+                        });
+                    });
+                });
+                
+                // Ordenar todos os logs por data (mais recente primeiro) para exibição
+                storageWithPriceChange = allLogsWithPriceChange.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            }
             
             setStorage(storageWithPriceChange);
 
