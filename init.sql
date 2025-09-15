@@ -105,9 +105,10 @@ CREATE TABLE IF NOT EXISTS subject_professor (
 
 -- Students to Subjects
 CREATE TABLE IF NOT EXISTS subject_students (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     subject_id INT,
     students_id INT,
-    PRIMARY KEY (subject_id, students_id),
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE,
     FOREIGN KEY (students_id) REFERENCES students(id) ON DELETE CASCADE
 );

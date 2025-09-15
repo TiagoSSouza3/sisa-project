@@ -62,13 +62,8 @@ export default function SubjectInscription() {
             return;
           }
       
-          const updatedStudentIds = [...currentStudentIds, student_id];
-      
-          await API.put(`/subjects/${id}`, {
-            name: subject.name,
-            description: subject.description,
-            students: updatedStudentIds
-          });
+          // Usar a nova rota específica para adicionar aluno
+          await API.post(`/subjects/${id}/students/${student_id}`);
     
           setSubject({
             ...subject,
@@ -78,6 +73,11 @@ export default function SubjectInscription() {
           navigate(`/subject_infos/${id}`);
         } catch (error) {
           console.error("Não foi possível inscrever o aluno", error);
+          if (error.response?.data?.error) {
+            alert(error.response.data.error);
+          } else {
+            alert("Erro ao inscrever aluno na disciplina");
+          }
         }
       };
       

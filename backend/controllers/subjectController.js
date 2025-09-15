@@ -1,6 +1,7 @@
 const Subject = require('../models/Subject');
 const Students = require('../models/Students');
 const User = require('../models/User');
+const SubjectStudent = require('../models/SubjectStudent');
 
 exports.getAllSubjects = async (req, res) => {
   const subjects = await Subject.findAll();
@@ -57,7 +58,14 @@ exports.createSubject = async (req, res) => {
     }
 
     if (Array.isArray(students)) {
-      await subject.setStudents(students);
+      // Criar relações com createdAt explícito
+      for (const studentId of students) {
+        await SubjectStudent.create({
+          subject_id: subject.id,
+          students_id: studentId,
+          createdAt: new Date()
+        });
+      }
     }
 
     res.status(201).json(subject);
@@ -86,7 +94,18 @@ exports.updateSubject = async (req, res) => {
     if (Array.isArray(students)) {
       const validStudents = await Students.findAll({ where: { id: students } });
       const validStudentIds = validStudents.map(s => s.id);
-      await subject.setStudents(validStudentIds);
+      
+      // Primeiro, remover todas as relações existentes
+      await subject.setStudents([]);
+      
+      // Depois, criar novas relações com createdAt explícito
+      for (const studentId of validStudentIds) {
+        await SubjectStudent.create({
+          subject_id: subject.id,
+          students_id: studentId,
+          createdAt: new Date()
+        });
+      }
     }
 
     const updated = await Subject.findByPk(id, {
@@ -111,6 +130,70 @@ exports.updateSubject = async (req, res) => {
     res.json(updated);
   } catch (error) {
     console.error("Erro ao atualizar disciplina:", error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
+exports.addStudentToSubject = async (req, res) => {
+  try {
+    const { subjectId, studentId } = req.params;
+    
+    // Verificar se a disciplina existe
+    const subject = await Subject.findByPk(subjectId);
+    if (!subject) {
+      return res.status(404).json({ error: "Disciplina não encontrada" });
+    }
+    
+    // Verificar se o aluno existe
+    const student = await Students.findByPk(studentId);
+    if (!student) {
+      return res.status(404).json({ error: "Aluno não encontrado" });
+    }
+    
+    // Verificar se a relação já existe
+    const existingRelation = await SubjectStudent.findOne({
+      where: {
+        subject_id: subjectId,
+        students_id: studentId
+      }
+    });
+    
+    if (existingRelation) {
+      return res.status(400).json({ error: "Aluno já está inscrito nesta disciplina" });
+    }
+    
+    // Criar a relação com createdAt explícito
+    await SubjectStudent.create({
+      subject_id: subjectId,
+      students_id: studentId,
+      createdAt: new Date()
+    });
+    
+    res.status(201).json({ message: "Aluno adicionado à disciplina com sucesso" });
+  } catch (error) {
+    console.error("Erro ao adicionar aluno à disciplina:", error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
+exports.removeStudentFromSubject = async (req, res) => {
+  try {
+    const { subjectId, studentId } = req.params;
+    
+    const deleted = await SubjectStudent.destroy({
+      where: {
+        subject_id: subjectId,
+        students_id: studentId
+      }
+    });
+    
+    if (deleted) {
+      res.status(200).json({ message: "Aluno removido da disciplina com sucesso" });
+    } else {
+      res.status(404).json({ error: "Relação não encontrada" });
+    }
+  } catch (error) {
+    console.error("Erro ao remover aluno da disciplina:", error);
     res.status(400).json({ error: error.message });
   }
 };
