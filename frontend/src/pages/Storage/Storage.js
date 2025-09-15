@@ -455,17 +455,7 @@ export default function Storage() {
                             </div>
                             <button 
                                 className="edit-button"
-                                onClick={() => {
-                                    showConfirmation({
-                                        type: 'edit',
-                                        title: language === "english" ? "View Product Log" : "Ver Histórico do Produto",
-                                        message: language === "english" 
-                                            ? `Do you want to view the log for "${item.name}"?`
-                                            : `Deseja visualizar o histórico de "${item.name}"?`,
-                                        confirmText: language === "english" ? "View Log" : "Ver Histórico",
-                                        onConfirm: () => navigate(`/storage_log/${item.id}`)
-                                    });
-                                }}
+                                onClick={() => navigate(`/storage_log/${item.id}`)}
                             >
                             {language === "english" ? "Product Log" : "Historico"}
                             </button>

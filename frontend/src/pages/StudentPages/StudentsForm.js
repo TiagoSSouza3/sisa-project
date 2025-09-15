@@ -5,7 +5,8 @@ import { cpf } from "cpf-cnpj-validator";
 import { useLanguage } from '../../components/LanguageContext';
 import { validadeAge, validateEmail } from '../../utils/validation';
 import { dateToString, StringToDate } from '../../utils/utils';
-
+import useConfirmation from '../../hooks/useConfirmation';
+import ConfirmationModal from '../../components/ConfirmationModal';
 import '../../styles/global.css';
 import '../../styles/students-creation.css';
 
@@ -20,6 +21,7 @@ export default function StudentsForm() {
     const [emailError, setEmailError] = useState("");
     const [childAge, setChildAge] = useState("");
     const [ageError, setAgeError] = useState("");
+    const { confirmationState, showConfirmation, hideConfirmation, handleConfirm } = useConfirmation();
 
     const [student, setStudent] = useState({
         name: "",
@@ -243,21 +245,24 @@ export default function StudentsForm() {
             }
         }
 
-        try {
-            if (id) {
-                await API.put(`/students/${id}`, student);
-            } else {
-                console.log(student)
-                await API.post("/students", student);
+        showConfirmation({
+            type: 'edit',
+            title: language === "english" ? "Edit Student" : "Editar Aluno",
+            message: language === "english" 
+              ? `Do you want to edit student "${student?.name}"?`
+              : `Deseja editar o aluno "${student?.name}"?`,
+            confirmText: language === "english" ? "Edit" : "Editar",
+            onConfirm: async () => {
+                if (id) {
+                    await API.put(`/students/${id}`, student);
+                } else {
+                    console.log(student)
+                    await API.post("/students", student);
+                }
+                navigate("/students");
             }
-            navigate("/students");
-        } catch (err) {
-            console.error("Erro ao salvar aluno:", {
-                message: err.message,
-                response: err.response?.data,
-                status: err.response?.status
-            });
-        }
+        });
+
     };
 
     return (
@@ -481,6 +486,18 @@ export default function StudentsForm() {
                     }
                 </button>
             </form>
+
+            <ConfirmationModal
+                isOpen={confirmationState.isOpen}
+                onClose={hideConfirmation}
+                onConfirm={handleConfirm}
+                title={confirmationState.title}
+                message={confirmationState.message}
+                confirmText={confirmationState.confirmText}
+                cancelText={confirmationState.cancelText}
+                type={confirmationState.type}
+                isLoading={confirmationState.isLoading}
+            />
         </div>
     );
 };

@@ -8,7 +8,6 @@ import { useLanguage } from '../../components/LanguageContext';
 import ConfirmationModal from '../../components/ConfirmationModal';
 import useConfirmation from '../../hooks/useConfirmation';
 
-
 export default function Users() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { language } = useLanguage();
@@ -55,17 +54,7 @@ export default function Users() {
   };
 
   const handleEdit = async (id) => {
-    const user = users.find(u => u.id === id);
-    
-    showConfirmation({
-      type: 'edit',
-      title: language === "english" ? "Edit User" : "Editar Usuário",
-      message: language === "english" 
-        ? `Do you want to edit user "${user?.name}"?`
-        : `Deseja editar o usuário "${user?.name}"?`,
-      confirmText: language === "english" ? "Edit" : "Editar",
-      onConfirm: () => navigate(`/users_form/${id}`)
-    });
+    navigate(`/users_form/${id}`)
   };
 
   if(isLoggedIn && localStorage.getItem("occupation_id") === occupationEnum.professor){

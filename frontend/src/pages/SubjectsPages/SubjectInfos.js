@@ -3,7 +3,8 @@ import API from "../../api";
 import { useNavigate, useParams } from "react-router-dom";
 import { occupationEnum } from "../../enums/occupationEnum";
 import { useLanguage } from '../../components/LanguageContext';
-
+import ConfirmationModal from '../../components/ConfirmationModal';
+import useConfirmation from '../../hooks/useConfirmation';
 import '../../styles/global.css';
 import '../../styles/subject-infos.css';
 
@@ -16,6 +17,7 @@ export default function SubjectInfos() {
         name: "",
         description: ""
     });
+    const { confirmationState, showConfirmation, hideConfirmation, handleConfirm } = useConfirmation();
     const [students, setStudents] = useState([])
 
     useEffect(() => {
@@ -53,37 +55,48 @@ export default function SubjectInfos() {
     };
       
     const handleRemoveToSubject = async (student_id) => {
-        try {
-            const currentStudentIds = subject.students?.map(s => s.id) || [];
+        const student = subject.students?.filter(s => s.id === student_id)
+        console.log(student)
+        showConfirmation({
+            type: 'delete',
+            title: language === "english" ? "Unsubscribe User" : "Desinscrever Usuário",
+            message: language === "english" 
+                ? `Are you sure you want to unsubscribe the student "${student[0]?.name}"?`
+                : `Tem certeza que deseja desinscrever o aluno "${student[0]?.name}"?`,
+            onConfirm: async () => {
+                try {
+                    const currentStudentIds = subject.students?.map(s => s.id) || [];
+                
+                    const updatedStudentIds = currentStudentIds.filter(i => i !== student_id);
+                
+                    const updated = await API.put(`/subjects/${id}`, {
+                        name: subject.name,
+                        description: subject.description,
+                        students: updatedStudentIds
+                    });
         
-            const updatedStudentIds = currentStudentIds.filter(i => i !== student_id);
+                    setSubject({
+                        ...updated.data,
+                        students: subject.students.filter(s => s.id !== student_id)
+                    });
         
-            const updated = await API.put(`/subjects/${id}`, {
-                name: subject.name,
-                description: subject.description,
-                students: updatedStudentIds
-            });
-
-            setSubject({
-                ...updated.data,
-                students: subject.students.filter(s => s.id !== student_id)
-            });
-
-            if (subject.students) {
-                setStudents(subject.students.filter(s => s.id !== student_id));
-            } else if(subject.students) {
-                const studentData = await Promise.all(
-                    subject.students.map(async (studentId) => {
-                        const res = await API.get(`/students/${studentId}`);
-                        return res.data;
-                    })
-                );
-                setStudents(studentData.data.filter(s => s.id !== student_id));
-            } else setStudents([])
-
-        } catch (error) {
-            console.error("Não foi possível desinscrever o aluno", error);
-        }
+                    if (subject.students) {
+                        setStudents(subject.students.filter(s => s.id !== student_id));
+                    } else if(subject.students) {
+                        const studentData = await Promise.all(
+                            subject.students.map(async (studentId) => {
+                                const res = await API.get(`/students/${studentId}`);
+                                return res.data;
+                            })
+                        );
+                        setStudents(studentData.data.filter(s => s.id !== student_id));
+                    } else setStudents([])
+        
+                } catch (error) {
+                    console.error("Não foi possível desinscrever o aluno", error);
+                }
+            }
+        });
     }
 
     return (
@@ -145,6 +158,18 @@ export default function SubjectInfos() {
                     </div>
                 ))}
             </div>
+
+            <ConfirmationModal
+                isOpen={confirmationState.isOpen}
+                onClose={hideConfirmation}
+                onConfirm={handleConfirm}
+                title={confirmationState.title}
+                message={confirmationState.message}
+                confirmText={confirmationState.confirmText}
+                cancelText={confirmationState.cancelText}
+                type={confirmationState.type}
+                isLoading={confirmationState.isLoading}
+            />
         </div>
     );
 }

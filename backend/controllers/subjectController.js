@@ -200,10 +200,14 @@ exports.removeStudentFromSubject = async (req, res) => {
 
 exports.deleteSubject = async (req, res) => {
   try {
-    const subject = await Subject.findByPk(req.params.id);
+    const subjectId = req.params.id;
+    const subject = await Subject.findByPk(subjectId);
     if (!subject) {
       return res.status(404).json({ error: "Disciplina não encontrada" });
     }
+    // Remover relações com alunos antes de excluir a disciplina
+    await SubjectStudent.destroy({ where: { subject_id: subjectId } });
+    // Excluir a disciplina
     await subject.destroy();
     res.status(204).send();
   } catch (error) {

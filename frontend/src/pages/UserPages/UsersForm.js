@@ -4,6 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { occupationEnum } from "../../enums/occupationEnum";
 import { useLanguage } from '../../components/LanguageContext';
 import { validateEmail } from '../../utils/validation';
+import ConfirmationModal from '../../components/ConfirmationModal';
+import useConfirmation from '../../hooks/useConfirmation';
 
 import '../../styles/global.css';
 import '../../styles/users-creation.css';
@@ -15,6 +17,7 @@ export default function UsersForm() {
     const { language } = useLanguage();
     const [error, setError] = useState("");
     const [emailError, setEmailError] = useState("");
+    const { confirmationState, showConfirmation, hideConfirmation, handleConfirm } = useConfirmation();
     const [user, setUser] = useState({
         name: "",
         email: "",
@@ -80,20 +83,29 @@ export default function UsersForm() {
             return;
         }
 
-        try {
-            if (id) await API.put(`/users/${id}`, user);
-            else await API.post("/users", user);
-            setUser({
-                name: "",
-                email: "",
-                occupation_id: ""
-            });
-            navigate("/users");
-        } catch (err) {
-            console.error("Erro ao salvar usuário:", err);
-            setError(err.response?.data?.error || (language === "english" ? "Error creating/editing user" : "Erro ao criar/editar usuário"));
+        if (!id) {
+            await API.post("/users", user);
         }
-    };
+        else {
+            showConfirmation({
+                type: 'edit',
+                title: language === "english" ? "Edit User" : "Editar Usuário",
+                message: language === "english" 
+                ? `Do you want to edit user "${user?.name}"?`
+                : `Deseja editar o usuário "${user?.name}"?`,
+                confirmText: language === "english" ? "Edit" : "Editar",
+                onConfirm: async () => {
+                    await API.put(`/users/${id}`, user);
+                    setUser({
+                        name: "",
+                        email: "",
+                        occupation_id: ""
+                    });
+                    navigate("/users");
+                }
+            });
+        }
+    }
 
     const handleCancel = () => {
         navigate("/users");
@@ -179,6 +191,18 @@ export default function UsersForm() {
                     </button>
                 </div>
             </div>
+
+            <ConfirmationModal
+                isOpen={confirmationState.isOpen}
+                onClose={hideConfirmation}
+                onConfirm={handleConfirm}
+                title={confirmationState.title}
+                message={confirmationState.message}
+                confirmText={confirmationState.confirmText}
+                cancelText={confirmationState.cancelText}
+                type={confirmationState.type}
+                isLoading={confirmationState.isLoading}
+            />
         </div>
     );
 }

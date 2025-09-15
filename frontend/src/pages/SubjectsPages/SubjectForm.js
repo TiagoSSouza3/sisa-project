@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import API from "../../api";
 import { useNavigate, useParams } from "react-router-dom";
 import { useLanguage } from '../../components/LanguageContext';
-
+import ConfirmationModal from '../../components/ConfirmationModal';
+import useConfirmation from '../../hooks/useConfirmation';
 import '../../styles/global.css';
 import '../../styles/subject-creation.css';
 
@@ -10,6 +11,7 @@ export default function SubjectForm() {
     const navigate = useNavigate();
     const { id } = useParams();
     const { language } = useLanguage();
+    const { confirmationState, showConfirmation, hideConfirmation, handleConfirm } = useConfirmation();
 
     const [subject, setSubject] = useState({
         name: "",
@@ -57,27 +59,37 @@ export default function SubjectForm() {
     };
 
     const handleSubmit = async () => {
-        try {
-            const payload = {
-                ...subject,
-                professores: selectedProfessor.filter(p => p !== '')
-            };
+        const payload = {
+            ...subject,
+            professores: selectedProfessor.filter(p => p !== '')
+        };
 
-            if (id) {
-                await API.put(`/subjects/${id}`, payload);
-                navigate(`/subject_infos/${id}`);
-            } else {
-                await API.post("/subjects", payload);
-                navigate("/subjects");
-            }
-
-        } catch (err) {
-            console.error("Erro ao salvar disciplina:", {
-                message: err.message,
-                response: err.response?.data,
-                status: err.response?.status
-            });
+        if(!id){
+            await API.post("/subjects", payload);
+            navigate("/subjects");
         }
+
+        showConfirmation({
+            type: 'edit',
+            title: language === "english" ? "Edit subject" : "Editar Disciplina",
+            message: language === "english" 
+            ? `Do you want to edit subject "${subject?.name}"?`
+            : `Deseja editar a Disciplina "${subject?.name}"?`,
+            confirmText: language === "english" ? "Edit" : "Editar",
+            onConfirm: async () => {
+                try {
+                    await API.put(`/subjects/${id}`, payload);
+                    
+                    navigate(`/subject_infos/${id}`);
+                } catch (err) {
+                    console.error("Erro ao salvar disciplina:", {
+                        message: err.message,
+                        response: err.response?.data,
+                        status: err.response?.status
+                    });
+                }
+            }
+        });
     };
 
     const removeProfessor = (index) => {
@@ -95,6 +107,30 @@ export default function SubjectForm() {
         newProfessor[index] = value;
         setSelectedProfessor(newProfessor);
     };
+
+    const handleCancell = () => {
+        if(id) navigate(`/subject_infos/${id}`);
+        else navigate("/subjects");
+    }
+
+    const handleDelete = async () => {
+        if(!id) return;
+        showConfirmation({
+            type: 'delete',
+            title: language === "english" ? "Delete Subject" : "Excluir Disciplina",
+            message: language === "english" 
+                ? `Are you sure you want to delete subject "${subject?.name}"? This action cannot be undone.`
+                : `Tem certeza que deseja excluir a disciplina "${subject?.name}"? Esta ação não pode ser desfeita.`,
+            onConfirm: async () => {
+                try {
+                    await API.delete(`/subjects/${id}`);
+                    navigate('/subjects');
+                } catch (err) {
+                    console.error('Erro ao excluir disciplina:', err);
+                }
+            }
+        });
+    }
 
     return (
         <div className="subject-creation-container">
@@ -171,10 +207,19 @@ export default function SubjectForm() {
                     <button 
                         type="button" 
                         className="cancel-button"
-                        onClick={() => navigate("/subjects")}
+                        onClick={handleCancell}
                     >
                         {language === "english" ? "Cancel" : "Cancelar"}
                     </button>
+                    {id && (
+                        <button 
+                            type="button" 
+                            className="delete-button"
+                            onClick={handleDelete}
+                        >
+                            {language === "english" ? "Delete" : "Excluir"}
+                        </button>
+                    )}
                     <button type="submit" className="submit-button">
                         {id 
                             ? language === "english" ? "Edit Subject" : "Editar Disciplina"
@@ -183,6 +228,18 @@ export default function SubjectForm() {
                     </button>
                 </div>
             </form>
+
+            <ConfirmationModal
+                isOpen={confirmationState.isOpen}
+                onClose={hideConfirmation}
+                onConfirm={handleConfirm}
+                title={confirmationState.title}
+                message={confirmationState.message}
+                confirmText={confirmationState.confirmText}
+                cancelText={confirmationState.cancelText}
+                type={confirmationState.type}
+                isLoading={confirmationState.isLoading}
+            />
         </div>
     );
 }
