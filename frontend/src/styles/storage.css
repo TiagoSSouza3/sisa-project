@@ -27,7 +27,7 @@
   font-weight: 700;
   text-align: left;
   flex: 1;
-  margin-left: 80px;
+  margin-left: 115px;
   margin-right: 200px;
 }
 
@@ -82,6 +82,28 @@
   margin-right: auto;
   max-width: 1400px;
   width: 100%;
+  display: block;
+}
+
+/* Center wrapper for Storage Log page only */
+.storage-log-center {
+  width: 100%;
+  max-width: none;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Center the titles and rows inside the scroll container */
+.storage-items-list .storage-items-list-titles,
+.storage-items-list .storage-item {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Allow grid children to shrink instead of overflowing/vanishing */
+.storage-item-info > *,
+.storage-items-list-titles h3 {
+  min-width: 0;
 }
 
 /* Storage Form Container */
@@ -100,7 +122,7 @@
 /* Storage Items List Titles */
 .storage-items-list-titles {
   display: grid;
-  grid-template-columns: 120px 150px 200px 120px 120px 120px 200px 120px 60px;
+  grid-template-columns: 120px 150px 200px 120px 120px 120px 200px;
   align-items: center;
   justify-items: center;
   gap: 1rem;
@@ -115,10 +137,14 @@
 /* Storage Log specific titles */
 .storage-log-titles {
   display: grid;
-  grid-template-columns: 120px 150px 200px 120px 120px 120px 1fr;
+  grid-template-columns: 120px 150px 200px 120px 120px 1fr;
   align-items: center;
   justify-items: center;
   gap: 1rem;
+  width: 100%;
+  min-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .storage-items-list-titles h3 {
@@ -156,7 +182,7 @@
 
 .storage-items-list-titles h3:nth-child(7) {
   grid-column: 7;
-  text-align: left;
+  text-align: center;
 }
 
 .storage-items-list-titles h3:nth-child(8) {
@@ -239,15 +265,15 @@
 }
 
 .storage-form input[type="text"]:focus {
-  border-color: var(--primary-color);
+  border-color: 2px solid #e0e0e0;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
   outline: none;
-  background-color: #f8fafc;
+  background-color: var(--surface-color);
 }
 
 .storage-form input[type="text"]:valid {
-  border-color: var(--success-color);
-  background-color: #f0fdf4;
+  border-color: 2px solid #e0e0e0;
+  background-color: var(--surface-color);
 }
 
 .create-item-button {
@@ -287,7 +313,7 @@
 /* Storage Item Cards */
 .storage-item {
   display: grid;
-  grid-template-columns: 120px 150px 200px 120px 120px 120px 200px 120px 60px;
+  grid-template-columns: 120px 150px 200px 120px 120px 120px 200px;
   align-items: center;
   justify-items: center;
   gap: 1rem;
@@ -297,6 +323,7 @@
   background: var(--surface-color);
   min-width: 1200px;
   min-height: 80px;
+  width: 100%;
 }
 
 /* Storage Log specific items */
@@ -306,6 +333,9 @@
   align-items: center;
   justify-items: center;
   gap: 1rem;
+  min-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .storage-item:last-child {
@@ -328,34 +358,40 @@
 
 .storage-item-title {
   font-weight: bold;
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   color: var(--primary-color);
   font-weight: 600;
   text-align: left;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
   display: flex;
   align-items: center;
   height: 100%;
   grid-column: 1;
   justify-self: start;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  text-overflow: unset
 }
 
 .storage-item-description {
   font-weight: bold;
   color: var(--text-color);
-  font-size: 1rem;
+  font-size: 1.2rem;
   text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
   grid-column: 2;
   justify-self: center;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  text-overflow: unset
 }
 
 .storage-item-last-price {
@@ -445,12 +481,14 @@
   font-size: 0.95rem;
   font-weight: 500;
   text-align: center;
+  grid-column: 6;
+  justify-self: center;
+  width: 120px;
+  height: 40px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
-  grid-column: 6;
-  justify-self: center;
 }
 
 .storage-item-date {
@@ -463,6 +501,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  grid-column: 7;
 }
 
 .storage-item-price-change {
@@ -492,19 +535,84 @@
 .storage-item-price-change.neutral {
   color: var(--text-color);
   background-color: rgba(107, 114, 128, 0.1);
+  width: 120px;
+  height: 40px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Storage Log specific styles */
 .storage-item-date {
   color: var(--primary-color);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 1.2rem;
   width: 120px;
   flex-shrink: 0;
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  grid-column: 7;
+  grid-row: 1;
+}
+
+/* Storage Log titles ordering: put Name first and Date last (col 7) */
+.storage-log-titles h3:nth-child(2) { /* NOME */
+  grid-column: 1;
+  text-align: left;
+}
+
+.storage-log-titles h3:nth-child(3) { /* DESCRIÇÃO */
+  grid-column: 2;
+}
+
+.storage-log-titles h3:nth-child(4) { /* ÚLTIMO PREÇO */
+  grid-column: 3;
+}
+
+.storage-log-titles h3:nth-child(5) { /* VARIAÇÃO DE PREÇO */
+  grid-column: 4;
+}
+
+.storage-log-titles h3:nth-child(6) { /* DATA DA ÚLTIMA COMPRA */
+  grid-column: 5;
+}
+
+.storage-log-titles h3:nth-child(7) { /* QUANTIDADE */
+  grid-column: 6;
+}
+
+.storage-log-titles h3:nth-child(1) { /* DATA */
+  grid-column: 7;
+}
+
+/* Storage Log items ordering to match titles */
+.storage-log-item .storage-item-title { /* NOME */
+  grid-column: 1;
+  justify-self: start;
+}
+
+.storage-log-item .storage-item-description { /* DESCRIÇÃO */
+  grid-column: 2;
+}
+
+.storage-log-item .storage-item-last-price { /* ÚLTIMO PREÇO */
+  grid-column: 3;
+}
+
+.storage-log-item .storage-item-price-change { /* VARIAÇÃO DE PREÇO */
+  grid-column: 4;
+}
+
+.storage-log-item .storage-item-last-price-date { /* DATA DA ÚLTIMA COMPRA */
+  grid-column: 5;
+}
+
+.storage-log-item .storage-item-amount { /* QUANTIDADE */
+  grid-column: 6;
+}
+
+.storage-log-item .storage-item-date { /* DATA */
+  grid-column: 7;
+  grid-row: 2;
 }
 
 /* Storage Item Actions */
@@ -637,7 +745,7 @@
   transition: all 0.2s ease;
   position: absolute;
   left: 2rem;
-  top: 50%;
+  top: 40%;
   transform: translateY(-50%);
   display: flex;
   align-items: center;

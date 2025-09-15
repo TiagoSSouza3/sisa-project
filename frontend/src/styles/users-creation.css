@@ -66,7 +66,7 @@
 }
 
 .info-message {
-  background-color: #e3f2fd;
+  background-color: var(--surface-color);
   border: 1px solid #2196f3;
   border-radius: var(--border-radius);
   padding: 1rem;

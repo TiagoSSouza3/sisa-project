@@ -8,16 +8,53 @@
     padding: 10px;
 }
 
-.link-button{
-    width: 600px;
+.links-div {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.link-button {
+    width: 100%;
+    padding: 20px;
+    font-size: 18px;
+    border: none;
+    border-radius: 8px;
+    background: #3366ff;
+    color: white;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out;
+    display: block;
 }
 
 .title{
     font-weight: bold;
+    color: white;
 }
 
 #link{
     text-decoration: none;
-    color: var(--background-color);
+    color: white;
     font-size: 23px;
+}
+
+@media (max-width: 768px) {
+    .links-div {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .link-button {
+        font-size: 16px;
+        min-height: 70px;
+    }
+}
+
+@media (min-width: 2200px) {
+    .links-div {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
