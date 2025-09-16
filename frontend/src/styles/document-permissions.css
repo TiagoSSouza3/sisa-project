@@ -140,21 +140,24 @@
 
 .view-details-button {
   background-color: #17a2b8;
-  color: white;
+
+  color: var(--text-light);
   border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
+  padding: 10px 16px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
-  font-weight: 500;
-  transition: background-color 0.2s ease;
+  font-weight: 600;
+  transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .view-details-button:hover {
-  background-color: #138496;
+  background-color: var(--primary-light);
+  transform: translateY(-1px);
 }
 
 .view-details-button i {

@@ -5,6 +5,7 @@ import { useLanguage } from '../../components/LanguageContext';
 
 import '../../styles/global.css';
 import '../../styles/storage.css';
+import '../../styles/storage-log.css';
 
 export default function StorageLog() {
     const { id } = useParams();
@@ -181,7 +182,7 @@ export default function StorageLog() {
     };
 
     return (
-        <div className="storage-container">
+        <div className="storage-container storage-log-page">
             <div className="storage-header">
                 <button onClick={() => navigate("/storage")} className="transparent-button">
                     <svg
@@ -194,7 +195,7 @@ export default function StorageLog() {
                         <path fillRule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
                     </svg>
                 </button>
-                <h2>{language === "english" ? "Storage Log" : "Historico Estoque"}</h2>
+                <h2>{language === "english" ? "Storage Log" : "Histórico"}</h2>
             </div>
 
             <div className="storage-items-list">

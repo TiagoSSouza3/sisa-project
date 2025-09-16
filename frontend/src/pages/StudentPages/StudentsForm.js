@@ -352,12 +352,29 @@ export default function StudentsForm() {
                 </div>
                 <div className="form-group">
                     <label htmlFor="birth_date">{language === "english" ? "Birth Date" : "Data de Nascimento"}</label>
-                    <input 
-                        id="birth_date"
-                        type="date"
-                        value={dateToString(student.birth_date)}
-                        onChange={handleBirthDate}
-                    />
+                    <div className="dob-wrapper">
+                        <input 
+                            id="birth_date"
+                            className="dob-input"
+                            type="date"
+                            max={new Date().toISOString().split('T')[0]}
+                            value={dateToString(student.birth_date)}
+                            onChange={handleBirthDate}
+                        />
+                        <button
+                            type="button"
+                            className="calendar-button"
+                            aria-label={language === "english" ? "Open calendar" : "Abrir calendário"}
+                            onClick={() => {
+                                const el = document.getElementById('birth_date');
+                                if (el) el.showPicker ? el.showPicker() : el.focus();
+                            }}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7 10h5v5H7z"/><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v13c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 17H5V9h14v12z"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 <div className="form-group">
                     <label htmlFor="birth_date">{language === "english" ? "Child's age: " : "Idade Da Criança: "} {childAge}</label>

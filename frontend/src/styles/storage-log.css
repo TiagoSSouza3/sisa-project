@@ -1,0 +1,211 @@
+/* Estilos específicos da página StorageLog */
+.storage-log-page .storage-items-list {
+  position: relative;
+  overflow-x: auto; /* padrão: permite rolagem se necessário */
+}
+
+/* Ajustes do cabeçalho da página para o StorageLog */
+.storage-log-page .storage-header {
+  position: relative;
+  padding-left: 4.5rem; /* reserva espaço generoso para o botão voltar */
+}
+
+.storage-log-page .storage-header h2 {
+  margin-left: 10px !important;
+  margin-top: 1rem;
+}
+
+/* Garante que o botão voltar fique sempre visível e com espaçamento do título */
+.storage-log-page .storage-header .transparent-button {
+  left: 1rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 20;
+}
+
+.storage-log-page .storage-log-center {
+  width: 100%;
+  max-width: none;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.storage-log-page .storage-items-list-titles {
+  display: grid;
+  grid-template-columns: 1.2fr 1.8fr 1fr 1fr 1.2fr 0.8fr 1.2fr; /* largura fluida em desktop */
+  align-items: center;
+  justify-items: center;
+  column-gap: 1rem;
+  padding: 1.2rem 1.5rem;
+  background: var(--primary-color);
+  color: var(--text-light);
+  font-weight: 600;
+  border-bottom: 2px solid var(--primary-light);
+  width: 100%;
+}
+
+.storage-log-page .storage-item {
+  display: grid;
+  grid-template-columns: 1.2fr 1.8fr 1fr 1fr 1.2fr 0.8fr 1.2fr; /* largura fluida em desktop */
+  align-items: center;
+  justify-items: center;
+  column-gap: 1rem;
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  transition: var(--transition);
+  background: var(--surface-color);
+  min-height: 70px;
+  width: 100%;
+}
+
+.storage-item-date {
+    grid-row: 1;
+}
+
+.storage-log-page .storage-item-info { display: contents; }
+
+.storage-log-page .storage-item-title { grid-column: 1; justify-self: start; }
+.storage-log-page .storage-item-description { grid-column: 2; }
+.storage-log-page .storage-item-last-price { grid-column: 3; }
+.storage-log-page .storage-item-price-change { grid-column: 4; }
+.storage-log-page .storage-item-last-price-date { grid-column: 5; }
+.storage-log-page .storage-item-amount { grid-column: 6; }
+.storage-log-page .storage-item-date { grid-column: 7; }
+
+/* Garantir que todos fiquem na mesma linha e centralizados verticalmente */
+.storage-log-page .storage-item-info > *,
+.storage-log-page .storage-items-list-titles h3 {
+  align-self: center;
+  justify-self: center;
+}
+
+/* Tamanhos um pouco menores para caber bem */
+/* tamanhos padrão */
+.storage-log-page .storage-items-list-titles h3 { font-size: 1.05rem; }
+.storage-log-page .storage-item-title { font-size: 1.2rem; }
+.storage-log-page .storage-item-description,
+.storage-log-page .storage-item-last-price,
+.storage-log-page .storage-item-price-change,
+.storage-log-page .storage-item-last-price-date,
+.storage-log-page .storage-item-amount,
+.storage-log-page .storage-item-date { font-size: 1rem; }
+
+/* Responsivo: a partir de 1200px para baixo aplica layout fluido sem barra e header fixo */
+@media (max-width: 1200px) {
+  .storage-log-page .storage-items-list {
+    overflow-x: hidden;
+  }
+
+  .storage-log-page .storage-items-list-titles {
+    grid-template-columns: minmax(70px,1.2fr) minmax(90px,1.8fr) minmax(70px,1fr) minmax(70px,1fr) minmax(90px,1.2fr) minmax(70px,0.8fr) minmax(90px,1.2fr);
+    column-gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    min-width: 0;
+    width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+
+  .storage-log-page .storage-item {
+    grid-template-columns: minmax(70px,1.2fr) minmax(90px,1.8fr) minmax(70px,1fr) minmax(70px,1fr) minmax(90px,1.2fr) minmax(70px,0.8fr) minmax(90px,1.2fr);
+    column-gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    min-height: 56px;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .storage-log-page .storage-item-info > *,
+  .storage-log-page .storage-items-list-titles h3 {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .storage-log-page .storage-items-list-titles h3 { font-size: clamp(0.72rem, 1.2vw, 1rem); }
+  .storage-log-page .storage-item-title { font-size: clamp(0.9rem, 1.4vw, 1.2rem); }
+  .storage-log-page .storage-item-description { font-size: clamp(0.8rem, 1.2vw, 1rem); }
+  .storage-log-page .storage-item-last-price { font-size: clamp(0.8rem, 1.2vw, 1rem); }
+  .storage-log-page .storage-item-price-change { font-size: clamp(0.75rem, 1.1vw, 0.95rem); }
+  .storage-log-page .storage-item-last-price-date { font-size: clamp(0.75rem, 1.1vw, 0.95rem); }
+  .storage-log-page .storage-item-amount { font-size: clamp(0.75rem, 1.1vw, 0.95rem); }
+  .storage-log-page .storage-item-date { font-size: clamp(0.75rem, 1.1vw, 0.95rem); }
+}
+
+/* 980px: ainda mais compacto, mantendo uma única linha */
+@media (max-width: 980px) {
+  .storage-log-page .storage-header { padding-left: 4rem; }
+  .storage-log-page .storage-header h2 { font-size: 1.4rem; }
+  .storage-log-page .storage-header .transparent-button { left: 0.8rem !important; }
+  .storage-log-page .storage-items-list-titles {
+    grid-template-columns: minmax(60px,1.1fr) minmax(80px,1.6fr) minmax(60px,0.9fr) minmax(60px,0.9fr) minmax(80px,1.1fr) minmax(60px,0.7fr) minmax(80px,1.1fr);
+    column-gap: 0.6rem;
+    padding: 0.65rem 0.75rem;
+    max-width: 900px;
+  }
+  .storage-log-page .storage-item {
+    grid-template-columns: minmax(60px,1.1fr) minmax(80px,1.6fr) minmax(60px,0.9fr) minmax(60px,0.9fr) minmax(80px,1.1fr) minmax(60px,0.7fr) minmax(80px,1.1fr);
+    column-gap: 0.6rem;
+    padding: 0.65rem 0.75rem;
+    max-width: 900px;
+  }
+  .storage-log-page .storage-items-list-titles h3 { font-size: clamp(0.7rem, 1.2vw, 0.95rem); }
+  .storage-log-page .storage-item-title { font-size: clamp(0.85rem, 1.4vw, 1.1rem); }
+  .storage-log-page .storage-item-description,
+  .storage-log-page .storage-item-last-price,
+  .storage-log-page .storage-item-price-change,
+  .storage-log-page .storage-item-last-price-date,
+  .storage-log-page .storage-item-amount,
+  .storage-log-page .storage-item-date { font-size: clamp(0.72rem, 1.1vw, 0.95rem); }
+}
+
+/* 769px: super compacto; sempre uma linha */
+@media (max-width: 769px) {
+  .storage-log-page .storage-header { padding-left: 4.6rem; min-height: 56px; }
+  .storage-log-page .storage-header h2 { font-size: 1.25rem; max-width: calc(100% - 5.2rem); }
+  .storage-log-page .storage-header .transparent-button { left: 0.75rem !important; }
+  .storage-log-page .storage-items-list-titles {
+    grid-template-columns: minmax(52px,1fr) minmax(70px,1.4fr) minmax(52px,0.85fr) minmax(52px,0.85fr) minmax(70px,1fr) minmax(52px,0.65fr) minmax(70px,1fr);
+    column-gap: 0.5rem;
+    padding: 0.55rem 0.6rem;
+    max-width: 820px;
+  }
+  .storage-log-page .storage-item {
+    grid-template-columns: minmax(52px,1fr) minmax(70px,1.4fr) minmax(52px,0.85fr) minmax(52px,0.85fr) minmax(70px,1fr) minmax(52px,0.65fr) minmax(70px,1fr);
+    column-gap: 0.5rem;
+    padding: 0.55rem 0.6rem;
+    max-width: 820px;
+  }
+  .storage-log-page .storage-items-list-titles h3 { font-size: clamp(0.66rem, 1.3vw, 0.9rem); }
+}
+
+/* 400px: tamanhos mínimos e fontes menores, sem quebrar linha */
+@media (max-width: 400px) {
+  .storage-log-page .storage-header { padding-left: 3.8rem; min-height: 52px; }
+  .storage-log-page .storage-header h2 { font-size: 1.08rem; max-width: calc(100% - 4.4rem); }
+  .storage-log-page .storage-header .transparent-button { left: 0.6rem !important; }
+  .storage-log-page .storage-items-list-titles {
+    grid-template-columns: minmax(46px,0.95fr) minmax(60px,1.2fr) minmax(46px,0.8fr) minmax(46px,0.8fr) minmax(60px,0.95fr) minmax(46px,0.6fr) minmax(60px,0.95fr);
+    column-gap: 0.4rem;
+    padding: 0.5rem;
+    max-width: 360px;
+  }
+  .storage-log-page .storage-item {
+    grid-template-columns: minmax(46px,0.95fr) minmax(60px,1.2fr) minmax(46px,0.8fr) minmax(46px,0.8fr) minmax(60px,0.95fr) minmax(46px,0.6fr) minmax(60px,0.95fr);
+    column-gap: 0.4rem;
+    padding: 0.5rem;
+    max-width: 360px;
+  }
+  .storage-log-page .storage-items-list-titles h3 { font-size: 0.66rem; }
+  .storage-log-page .storage-item-title { font-size: 0.8rem; }
+  .storage-log-page .storage-item-description,
+  .storage-log-page .storage-item-last-price,
+  .storage-log-page .storage-item-price-change,
+  .storage-log-page .storage-item-last-price-date,
+  .storage-log-page .storage-item-amount,
+  .storage-log-page .storage-item-date { font-size: 0.7rem; }
+}
+
+

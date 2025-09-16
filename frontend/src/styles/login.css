@@ -18,7 +18,8 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background: #ffffff;
+  background: var(--background-color);
+  height: 100vh;
 }
 
 /* Garante centralização do card em telas grandes também */
@@ -30,6 +31,9 @@
   width: 100%;
   max-width: 400px;
   padding: 2.5rem;
+  background: var(--surface-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
 }
 
 /* removido: .login-header não é utilizado */
@@ -52,7 +56,7 @@
 .login-title {
   font-size: 1.8rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text-color);
   margin-bottom: 2rem;
   text-align: left;
 }
@@ -72,7 +76,7 @@
 .input-label {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #64748b;
+  color: var(--text-color);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -80,22 +84,24 @@
 .login-form input {
   width: 100%;
   padding: 0.8rem 1rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid rgba(0,0,0,0.1);
   border-radius: 8px;
   font-size: 1rem;
   transition: all 0.2s ease;
-  background: #f8fafc;
+  background: var(--surface-color);
+  color: var(--text-color);
 }
 
 .login-form input:focus {
   outline: none;
-  border-color: #3b82f6;
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--primary-color);
+  background: var(--surface-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 .login-form input::placeholder {
-  color: #94a3b8;
+  color: var(--text-color);
+  opacity: 0.6;
 }
 
 .login-button {
