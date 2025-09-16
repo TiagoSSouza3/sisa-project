@@ -228,29 +228,8 @@ export default function UsersForm() {
             } else {
                 setError(language === "english" ? "Error saving permissions" : "Erro ao salvar permissões");
             }
-        if (!id) {
-            await API.post("/users", user);
         }
-        else {
-            showConfirmation({
-                type: 'edit',
-                title: language === "english" ? "Edit User" : "Editar Usuário",
-                message: language === "english" 
-                ? `Do you want to edit user "${user?.name}"?`
-                : `Deseja editar o usuário "${user?.name}"?`,
-                confirmText: language === "english" ? "Edit" : "Editar",
-                onConfirm: async () => {
-                    await API.put(`/users/${id}`, user);
-                    setUser({
-                        name: "",
-                        email: "",
-                        occupation_id: ""
-                    });
-                    navigate("/users");
-                }
-            });
-        }
-    }
+    };
 
     const handleCancel = () => {
         navigate("/users");

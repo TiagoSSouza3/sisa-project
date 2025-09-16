@@ -737,7 +737,7 @@ export default function Users() {
     <div className="users-container">
       <div className="users-header">
         <h2>{language === "english" ? "User Management" : "Gerenciamento de Usuários"}</h2>
-        {isLoggedIn && localStorage.getItem("occupation_id") === occupationEnum.administrador && activeTab === "users" && (
+        {isLoggedIn && localStorage.getItem("occupation_id") === occupationEnum.administrador && (
           <button className="add-user-button" onClick={() => navigate('/users_form')}>
             {language === "english" ? "Add New User" : "Adicionar Novo Usuário"}
           </button>
@@ -749,45 +749,8 @@ export default function Users() {
 
       <div className="tab-content">
         {renderUsersTab()}
-  return (
-    <div className="users-container">
-      <div className="users-header">
-        <h2>{language === "english" ? "Users" : "Usuários"}</h2>
-        {isLoggedIn && localStorage.getItem("occupation_id") === occupationEnum.administrador
-          ? <button className="add-user-button" onClick={() => navigate('/users_form')}>
-            {language === "english" ? "Add New User" : "Adicionar Novo Usuário"}
-          </button>
-          : ""
-        }
-        
       </div>
 
-      {error && <div className="error">{error}</div>}
-      {success && <div className="success">{success}</div>}
-
-      <div className="users-list">
-        {users.map(user => (
-          <div key={user.id} className="user-item">
-            <div className="user-info">
-              <div className="user-name">{user.name}</div>
-              <div className="user-email">{user.email}</div>
-              <span className="user-role">{user.occupation_id}</span>
-            </div>
-            { isLoggedIn && localStorage.getItem("occupation_id") === occupationEnum.administrador
-              ? <div className="user-actions">
-                <button className="edit-button" onClick={() => handleEdit(user.id)}>
-                  {language === "english" ? "Edit" : "Editar"}
-                </button>
-                <button className="delete-button" onClick={() => handleDelete(user.id)}>
-                  {language === "english" ? "Delete" : "Excluir"}
-                </button>
-              </div>
-              : ""
-            }
-          </div>
-        ))}
-      </div>
-      
       <ConfirmationModal
         isOpen={confirmationState.isOpen}
         onClose={hideConfirmation}

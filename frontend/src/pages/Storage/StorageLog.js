@@ -202,7 +202,7 @@ export default function StorageLog() {
                     <div className="empty-state">{language === "english" ? "Empty Storage" : "Estoque Vazio"}</div>
                 ) : (
                 <div className="storage-log-center">
-                    <div className="storage-items-list-titles">
+                    <div className="storage-items-list-titles storage-log-titles">
                         <h3>{language === "english" ? "Name" : "Nome"}</h3>
                         <h3>{language === "english" ? "Description" : "Descrição"}</h3>
                         <h3>{language === "english" ? "Last Price" : "Ultimo Preço"}</h3>
@@ -212,7 +212,7 @@ export default function StorageLog() {
                         <h3>{language === "english" ? "Date" : "Data"}</h3>
                     </div>
                     {storage.map((item, index) => (
-                        <div key={item.id} className="storage-item">
+                        <div key={item.id} className="storage-item storage-log-item">
                             <div className="storage-item-info">
                                 <h3 className="storage-item-date">{formatDate(item.created_at)}<br />{formatTime(item.created_at)}</h3>
                                 <h3 className="storage-item-title">{item.name}</h3>
