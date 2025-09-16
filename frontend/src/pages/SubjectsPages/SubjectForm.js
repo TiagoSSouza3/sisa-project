@@ -51,7 +51,14 @@ export default function SubjectForm() {
     const loadProfessor = async () => {
         try {
             const response = await API.get(`/users/`);
-            setProfessor(response.data);
+            // Filtrar apenas usuários com occupation_id = "3" (professores) ou "PROFESSOR"
+            const professores = response.data.filter(user => 
+                user.occupation_id === "3" || 
+                user.occupation_id === 3 || 
+                user.occupation_id === "PROFESSOR"
+            );
+            setProfessor(professores);
+            console.log("Professores encontrados:", professores); // Debug
         } catch (err) {
             console.error("Erro ao carregar professores:", err);
             navigate(`/subject_infos/${id}`);

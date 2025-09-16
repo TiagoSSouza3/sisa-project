@@ -35,13 +35,6 @@ export default function Dashboard() {
     setShowFirstAccessModal(false);
   };
 
-  console.log('📊 Dashboard: Carregando dashboard', {
-    name: name,
-    firstName: firstName,
-    hasToken: !!localStorage.getItem("token"),
-    showFirstAccessModal: showFirstAccessModal
-  });
-
   return (
     <div className="container">
       <div className="title-div">

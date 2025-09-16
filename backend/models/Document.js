@@ -17,7 +17,7 @@ const Document = sequelize.define("document", {
     },
     template_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true, // Permitir null para flexibilidade
         references: {
             model: 'document_templates',
             key: 'id'
@@ -49,8 +49,12 @@ const Document = sequelize.define("document", {
             notEmpty: true
         }
     },
+    placeholders: {
+        type: DataTypes.JSON,
+        allowNull: true
+    },
     status: {
-        type: DataTypes.ENUM('draft', 'published', 'archived'),
+        type: DataTypes.ENUM('draft', 'published', 'archived', 'template'),
         defaultValue: 'draft',
         allowNull: false
     },

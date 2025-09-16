@@ -21,11 +21,11 @@ API.interceptors.request.use((config) => {
 API.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error('Erro na requisição:', {
-      config: error.config,
-      response: error.response,
-      message: error.message
-    });
+    console.error('Erro na requisição:', error);
+    console.error('URL:', error.config?.url);
+    console.error('Method:', error.config?.method);
+    console.error('Status:', error.response?.status);
+    console.error('Data:', error.response?.data);
     return Promise.reject(error);
   }
 );

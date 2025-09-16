@@ -2,16 +2,20 @@ import React, { useState, useEffect } from 'react';
 import API from '../../api';
 import '../../styles/document-form.css';
 import { useLanguage } from '../../components/LanguageContext';
+import { useDocumentPermissions } from '../../hooks/useDocumentPermissions_simple';
 
 export default function DocumentForm({ layout, onCancel }) {
   const { language } = useLanguage();
+  const { isAdmin } = useDocumentPermissions();
   const [formData, setFormData] = useState({});
   const [generating, setGenerating] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [outputFormat, setOutputFormat] = useState('docx'); // docx or pdf
   const [previewHtml, setPreviewHtml] = useState('');
   const [loadingPreview, setLoadingPreview] = useState(false);
-
+  
   // Função para garantir que placeholders seja sempre um array
   const getPlaceholdersArray = (placeholders) => {
     if (!placeholders) return [];
@@ -221,6 +225,51 @@ export default function DocumentForm({ layout, onCancel }) {
     }
   };
 
+  // Função para salvar template parcial (apenas para admins)
+  const handleSavePartial = async () => {
+    // Verificar se há pelo menos um campo preenchido
+    const filledFields = Object.entries(formData).filter(([key, value]) => value && value.trim());
+    if (filledFields.length === 0) {
+      setError('Preencha pelo menos um campo antes de salvar');
+      return;
+    }
+
+    setSaving(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      console.log('Salvando template parcial...');
+      
+      // Usar o nome do layout como título padrão
+      const defaultTitle = `${layout.name} - Template Parcial`;
+      
+      const response = await API.post(`/document-layouts/${layout.id}/save-partial`, {
+        data: formData,
+        title: defaultTitle,
+        description: `Template parcial baseado no layout ${layout.name}`
+      });
+
+      console.log('Template parcial salvo:', response.data);
+      
+      setSuccess('Template salvo com sucesso! Agora está disponível em "Todos os Documentos" para outros usuários completarem.');
+      
+      // Limpar formulário após salvar
+      const clearedData = {};
+      placeholdersArray.forEach(placeholder => {
+        clearedData[placeholder] = '';
+      });
+      setFormData(clearedData);
+      loadInitialPreview();
+
+    } catch (err) {
+      console.error('Erro ao salvar template parcial:', err);
+      setError(err.response?.data?.message || 'Erro ao salvar template parcial');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const getFieldType = (placeholder) => {
     const lowerPlaceholder = placeholder.toLowerCase();
     if (lowerPlaceholder.includes('data') || lowerPlaceholder.includes('date')) {
@@ -284,6 +333,13 @@ export default function DocumentForm({ layout, onCancel }) {
         <div className="form-error">
           <span className="error-icon">⚠️</span>
           <p>{error}</p>
+        </div>
+      )}
+
+      {success && (
+        <div className="form-success">
+          <span className="success-icon">✅</span>
+          <p>{success}</p>
         </div>
       )}
 
@@ -370,6 +426,28 @@ export default function DocumentForm({ layout, onCancel }) {
               >
                 ❌ {language === "english" ? "Cancel" : "Cancelar"}
               </button>
+              
+              {/* Botão Salvar (apenas para admins) */}
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={handleSavePartial}
+                  disabled={saving || !Object.values(formData).some(value => value && value.trim())}
+                  className="btn btn-warning"
+                >
+                  {saving ? (
+                    <>
+                      <span className="loading-spinner"></span>
+                      {language === "english" ? "Saving..." : "Salvando..."}
+                    </>
+                  ) : (
+                    <>
+                      💾 {language === "english" ? "Save" : "Salvar"}
+                    </>
+                  )}
+                </button>
+              )}
+              
               <button
                 type="submit"
                 disabled={generating || !placeholdersArray.some(p => formData[p])}
@@ -416,6 +494,7 @@ export default function DocumentForm({ layout, onCancel }) {
           </div>
         </div>
       </div>
-    </div>
+
+          </div>
   );
 }

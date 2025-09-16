@@ -18,27 +18,9 @@ const DocumentTemplate = sequelize.define('DocumentTemplate', {
         type: DataTypes.TEXT,
         allowNull: true
     },
-    filename: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    file_path: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    placeholders: {
+    structure: {
         type: DataTypes.JSON,
-        allowNull: false,
-        defaultValue: []
-    },
-    placeholder_config: {
-        type: DataTypes.JSON,
-        allowNull: false,
-        defaultValue: {}
-    },
-    is_active: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true
+        allowNull: false
     },
     created_by: {
         type: DataTypes.INTEGER,

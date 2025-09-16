@@ -315,7 +315,7 @@ export default function Storage() {
                     </button>
                     <button 
                         className="cash-flow-button"
-                        onClick={() => navigate("/cash-flow")}
+                        onClick={() => navigate("/cash_flow")}
                     >
                         {language === "english" ? "Cash Flow" : "Fluxo de Caixa"}
                     </button>

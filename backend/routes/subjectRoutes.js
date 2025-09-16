@@ -4,6 +4,7 @@ const subjectController = require('../controllers/subjectController');
 const authenticateToken = require('../middleware/authMiddleware');
 
 router.get("/", authenticateToken, subjectController.getAllSubjects);
+router.get("/professor/:professorId", authenticateToken, subjectController.getSubjectsByProfessor);
 router.get("/:type/:id", authenticateToken, subjectController.getSubjectById);
 router.post("/", authenticateToken, subjectController.createSubject);
 router.put("/:id", authenticateToken, subjectController.updateSubject);

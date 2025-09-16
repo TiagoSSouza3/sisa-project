@@ -4,6 +4,7 @@ const PizZip = require('pizzip');
 const Docxtemplater = require('docxtemplater');
 const mammoth = require('mammoth');
 const DocumentLayout = require('../models/DocumentLayout');
+const Document = require('../models/Document');
 
 // Função para extrair placeholders de um documento DOCX
 const extractPlaceholders = (filePath) => {
@@ -98,8 +99,13 @@ const getAllLayouts = async (req, res) => {
 // Buscar layout por ID
 const getLayout = async (req, res) => {
   try {
+    console.log('🔍 getLayout chamado com ID:', req.params.id);
+    console.log('🔍 URL original:', req.originalUrl);
+    console.log('🔍 Path:', req.path);
+    
     const layout = await DocumentLayout.findByPk(req.params.id);
     if (!layout) {
+      console.log('❌ Layout não encontrado para ID:', req.params.id);
       return res.status(404).json({ message: 'Layout não encontrado' });
     }
     
@@ -702,6 +708,405 @@ const generatePDF = async (doc, layout, res) => {
   }
 };
 
+// Salvar layout parcialmente preenchido como template
+const savePartialTemplate = async (req, res) => {
+  try {
+    console.log('Salvando template parcial para layout:', req.params.id);
+    console.log('Dados recebidos:', req.body);
+    
+    const { data, title, description } = req.body;
+    
+    if (!title || !title.trim()) {
+      return res.status(400).json({ message: 'Título é obrigatório' });
+    }
+    
+    const layout = await DocumentLayout.findByPk(req.params.id);
+    if (!layout) {
+      return res.status(404).json({ message: 'Layout não encontrado' });
+    }
+
+        
+    // Criar documento parcialmente preenchido
+    // Não usar template_id para evitar problemas de foreign key
+    // Em vez disso, armazenar a referência no content como metadata
+    const partialDocument = await Document.create({
+      template_id: null, // Não referenciar diretamente para evitar constraint
+      title: title.trim(),
+      content: {
+        ...data, // Dados preenchidos pelo admin
+        _metadata: {
+          original_layout_id: layout.id,
+          original_layout_name: layout.name,
+          original_layout_description: layout.description,
+          is_partial_template: true
+        }
+      },
+      placeholders: layout.placeholders, // Manter os placeholders originais
+      status: 'template', // Status especial para templates parciais
+      version: 1,
+      created_by: req.user?.id || 1,
+      last_modified_by: req.user?.id || 1,
+      subject_id: null, // Não está vinculado a uma disciplina específica
+      file_name: null,
+      file_type: null,
+      file_data: null
+    });
+
+    console.log('Template parcial criado com ID:', partialDocument.id);
+
+    // Retornar o documento criado
+    const responseDocument = {
+      id: partialDocument.id,
+      template_id: null,
+      title: partialDocument.title,
+      content: partialDocument.content,
+      placeholders: JSON.parse(partialDocument.placeholders || '[]'),
+      status: partialDocument.status,
+      created_by: partialDocument.created_by,
+      created_at: partialDocument.createdAt,
+      layout_name: layout.name,
+      layout_description: layout.description,
+      original_layout_id: layout.id
+    };
+
+    res.status(201).json({
+      message: 'Template parcial salvo com sucesso',
+      document: responseDocument
+    });
+  } catch (error) {
+    console.error('Erro ao salvar template parcial:', error);
+    res.status(500).json({ 
+      message: 'Erro interno do servidor',
+      error: error.message 
+    });
+  }
+};
+
+// Listar templates parciais (documentos com status 'template')
+const getPartialTemplates = async (req, res) => {
+  try {
+    console.log('Buscando templates parciais...');
+    
+    const templates = await Document.findAll({
+      where: { status: 'template' },
+      order: [['createdAt', 'DESC']]
+    });
+    
+    console.log(`Encontrados ${templates.length} templates parciais`);
+    
+    // Formatar resposta
+    const formattedTemplates = templates.map(template => {
+      const templateData = template.toJSON();
+      
+      // Garantir que placeholders seja sempre um array
+      let placeholders = [];
+      if (typeof templateData.placeholders === 'string') {
+        try {
+          placeholders = JSON.parse(templateData.placeholders);
+        } catch (e) {
+          console.error('Erro ao fazer parse dos placeholders:', e);
+          placeholders = [];
+        }
+      } else if (Array.isArray(templateData.placeholders)) {
+        placeholders = templateData.placeholders;
+      }
+      
+      // Extrair informações do layout da metadata
+      let layoutName = 'Layout não encontrado';
+      let layoutDescription = '';
+      
+      if (templateData.content && templateData.content._metadata) {
+        layoutName = templateData.content._metadata.original_layout_name || layoutName;
+        layoutDescription = templateData.content._metadata.original_layout_description || layoutDescription;
+      }
+      
+      return {
+        ...templateData,
+        placeholders: placeholders,
+        layout_name: layoutName,
+        layout_description: layoutDescription
+      };
+    });
+    
+    res.json(formattedTemplates);
+  } catch (error) {
+    console.error('Erro ao buscar templates parciais:', error);
+    res.status(500).json({ message: 'Erro interno do servidor' });
+  }
+};
+
+// Buscar template parcial por ID
+const getPartialTemplate = async (req, res) => {
+  try {
+    const template = await Document.findOne({
+      where: { 
+        id: req.params.id,
+        status: 'template'
+      }
+    });
+    
+    if (!template) {
+      return res.status(404).json({ message: 'Template parcial não encontrado' });
+    }
+    
+    const templateData = template.toJSON();
+    
+    // Garantir que placeholders seja sempre um array
+    let placeholders = [];
+    if (typeof templateData.placeholders === 'string') {
+      try {
+        placeholders = JSON.parse(templateData.placeholders);
+      } catch (e) {
+        console.error('Erro ao fazer parse dos placeholders:', e);
+        placeholders = [];
+      }
+    } else if (Array.isArray(templateData.placeholders)) {
+      placeholders = templateData.placeholders;
+    }
+    
+    // Extrair informações do layout da metadata
+    let layoutName = 'Layout não encontrado';
+    let layoutDescription = '';
+    
+    if (templateData.content && templateData.content._metadata) {
+      layoutName = templateData.content._metadata.original_layout_name || layoutName;
+      layoutDescription = templateData.content._metadata.original_layout_description || layoutDescription;
+    }
+    
+    const responseTemplate = {
+      ...templateData,
+      placeholders: placeholders,
+      layout_name: layoutName,
+      layout_description: layoutDescription
+    };
+    
+    res.json(responseTemplate);
+  } catch (error) {
+    console.error('Erro ao buscar template parcial:', error);
+    res.status(500).json({ message: 'Erro interno do servidor' });
+  }
+};
+
+// Preview de template parcial com dados em tempo real
+const previewPartialTemplate = async (req, res) => {
+  try {
+    console.log('Gerando preview do template parcial:', req.params.id);
+    console.log('Dados recebidos:', req.body);
+    
+    const { data } = req.body;
+    
+    // Buscar o template parcial
+    const partialTemplate = await Document.findOne({
+      where: { 
+        id: req.params.id,
+        status: 'template'
+      }
+    });
+    
+    if (!partialTemplate) {
+      return res.status(404).json({ message: 'Template parcial não encontrado' });
+    }
+    
+    // Buscar o layout original pela metadata
+    let layout = null;
+    if (partialTemplate.content && partialTemplate.content._metadata) {
+      const originalLayoutId = partialTemplate.content._metadata.original_layout_id;
+      if (originalLayoutId) {
+        layout = await DocumentLayout.findByPk(originalLayoutId);
+      }
+    }
+    
+    if (!layout) {
+      return res.status(404).json({ message: 'Layout original não encontrado' });
+    }
+    
+    if (!fs.existsSync(layout.file_path)) {
+      console.error('Arquivo do layout não encontrado:', layout.file_path);
+      return res.status(404).json({ 
+        message: 'Arquivo do layout foi removido do sistema. O template não pode ser processado.',
+        error: 'MISSING_LAYOUT_FILE'
+      });
+    }
+    
+    // Combinar dados do template parcial com os novos dados
+    // Remover metadata antes de combinar
+    const adminData = { ...partialTemplate.content };
+    delete adminData._metadata; // Remover metadata dos dados
+    
+    const combinedData = { ...adminData, ...data };
+    
+    console.log('Dados combinados para preview:', combinedData);
+    
+    // Ler o arquivo template
+    const content = fs.readFileSync(layout.file_path, 'binary');
+    const zip = new PizZip(content);
+    
+    const doc = new Docxtemplater(zip, {
+      paragraphLoop: true,
+      linebreaks: true,
+      delimiters: {
+        start: '{{',
+        end: '}}'
+      }
+    });
+
+    // Substituir placeholders usando a nova API
+    doc.render(combinedData);
+
+    // Gerar DOCX temporário
+    const buf = doc.getZip().generate({ type: 'nodebuffer' });
+    
+    // Salvar temporariamente
+    const tempPath = path.join(__dirname, '../temp', `preview-partial-${Date.now()}.docx`);
+    const tempDir = path.dirname(tempPath);
+    
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir, { recursive: true });
+    }
+    
+    fs.writeFileSync(tempPath, buf);
+
+    try {
+      // Converter para HTML para preview
+      const result = await mammoth.convertToHtml({ path: tempPath });
+      const html = result.value;
+
+      // Limpar arquivo temporário
+      if (fs.existsSync(tempPath)) {
+        fs.unlinkSync(tempPath);
+      }
+
+      // Retornar HTML para preview
+      res.json({
+        html: html,
+        messages: result.messages
+      });
+    } catch (previewError) {
+      // Limpar arquivo temporário em caso de erro
+      if (fs.existsSync(tempPath)) {
+        fs.unlinkSync(tempPath);
+      }
+      throw previewError;
+    }
+  } catch (error) {
+    console.error('Erro ao gerar preview do template parcial:', error);
+    res.status(500).json({ 
+      message: 'Erro ao gerar preview do template parcial',
+      error: error.message 
+    });
+  }
+};
+
+// Deletar template parcial
+const deletePartialTemplate = async (req, res) => {
+  try {
+    console.log('Deletando template parcial:', req.params.id);
+    
+    const template = await Document.findOne({
+      where: { 
+        id: req.params.id,
+        status: 'template'
+      }
+    });
+    
+    if (!template) {
+      return res.status(404).json({ message: 'Template parcial não encontrado' });
+    }
+    
+    // Deletar o registro do banco de dados
+    await template.destroy();
+    
+    console.log('Template parcial deletado com sucesso:', req.params.id);
+    res.json({ message: 'Template parcial excluído com sucesso' });
+  } catch (error) {
+    console.error('Erro ao deletar template parcial:', error);
+    res.status(500).json({ 
+      message: 'Erro ao deletar template parcial',
+      error: error.message 
+    });
+  }
+};
+
+// Completar template parcial (para professores/colaboradores)
+const completePartialTemplate = async (req, res) => {
+  try {
+    console.log('Completando template parcial:', req.params.id);
+    console.log('Dados recebidos:', req.body);
+    
+    const { data, format = 'docx' } = req.body;
+    
+    // Buscar o template parcial
+    const partialTemplate = await Document.findOne({
+      where: { 
+        id: req.params.id,
+        status: 'template'
+      }
+    });
+    
+    if (!partialTemplate) {
+      return res.status(404).json({ message: 'Template parcial não encontrado' });
+    }
+    
+    // Buscar o layout original pela metadata
+    let layout = null;
+    if (partialTemplate.content && partialTemplate.content._metadata) {
+      const originalLayoutId = partialTemplate.content._metadata.original_layout_id;
+      if (originalLayoutId) {
+        layout = await DocumentLayout.findByPk(originalLayoutId);
+      }
+    }
+    
+    if (!layout || !fs.existsSync(layout.file_path)) {
+      return res.status(404).json({ message: 'Arquivo do layout não encontrado' });
+    }
+    
+    // Combinar dados do template parcial com os novos dados
+    // Remover metadata antes de combinar
+    const adminData = { ...partialTemplate.content };
+    delete adminData._metadata; // Remover metadata dos dados
+    
+    const combinedData = { ...adminData, ...data };
+    
+    console.log('Dados combinados:', combinedData);
+    
+    // Gerar documento usando a mesma lógica do generateDocument
+    const content = fs.readFileSync(layout.file_path, 'binary');
+    const zip = new PizZip(content);
+    
+    const doc = new Docxtemplater(zip, {
+      paragraphLoop: true,
+      linebreaks: true,
+      delimiters: {
+        start: '{{',
+        end: '}}'
+      }
+    });
+
+    // Substituir placeholders com dados combinados
+    doc.render(combinedData);
+
+    if (format === 'docx') {
+      // Gerar DOCX
+      const buf = doc.getZip().generate({ type: 'nodebuffer' });
+      
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(partialTemplate.title)}.docx"`);
+      res.end(buf, 'binary');
+    } else if (format === 'pdf') {
+      // Gerar PDF usando a mesma função
+      await generatePDF(doc, { name: partialTemplate.title }, res);
+    } else {
+      res.status(400).json({ message: 'Formato não suportado. Use "docx" ou "pdf".' });
+    }
+  } catch (error) {
+    console.error('Erro ao completar template parcial:', error);
+    res.status(500).json({ 
+      message: 'Erro ao completar template parcial',
+      error: error.message 
+    });
+  }
+};
+
 module.exports = {
   getAllLayouts,
   getLayout,
@@ -709,5 +1114,11 @@ module.exports = {
   deleteLayout,
   previewLayout,
   previewDocument,
-  generateDocument
+  generateDocument,
+  savePartialTemplate,
+  getPartialTemplates,
+  getPartialTemplate,
+  previewPartialTemplate,
+  deletePartialTemplate,
+  completePartialTemplate
 };

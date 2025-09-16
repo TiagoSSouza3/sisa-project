@@ -15,15 +15,54 @@ export default function Subjects() {
   
   const loadSubjects = async () => {
     try {
-
-      const subject = 
-      localStorage.getItem("occupation_id") === occupationEnum.professor 
-        ? await API.get(`subjects/professor/${localStorage.getItem("id")}`)
-        : await API.get(`/subjects`)
-      setSubjects(subject.data);
+      let subject;
+      
+      const userOccupation = localStorage.getItem("occupation_id");
+      const userId = localStorage.getItem("id");
+      
+      console.log("🔍 DEBUG - User occupation:", userOccupation);
+      console.log("🔍 DEBUG - User ID:", userId);
+      console.log("🔍 DEBUG - occupationEnum.professor:", occupationEnum.professor);
+      
+      if (userOccupation === occupationEnum.professor || userOccupation === "3" || userOccupation === 3) {
+        console.log("✅ Usuário identificado como PROFESSOR");
+        console.log("📡 Fazendo requisição para:", `/subjects/professor/${userId}`);
+        
+        // Para professores, carregar apenas as matérias atribuídas a eles
+        subject = await API.get(`/subjects/professor/${userId}`);
+        console.log("📦 Resposta da API para professor:", subject.data);
+      } else {
+        console.log("✅ Usuário identificado como ADMIN/COLABORADOR");
+        console.log("📡 Fazendo requisição para:", `/subjects`);
+        
+        // Para admins e colaboradores, carregar todas as matérias
+        subject = await API.get(`/subjects`);
+        console.log("📦 Resposta da API para admin:", subject.data);
+      }
+      
+      // Verificar se a resposta é um array ou um objeto
+      console.log("🔍 Tipo da resposta:", typeof subject.data);
+      console.log("🔍 É array?", Array.isArray(subject.data));
+      
+      if (Array.isArray(subject.data)) {
+        console.log("✅ Definindo subjects como array direto");
+        setSubjects(subject.data);
+      } else if (subject.data && Array.isArray(subject.data.subjects)) {
+        console.log("✅ Definindo subjects do objeto.subjects");
+        setSubjects(subject.data.subjects);
+      } else if (subject.data && subject.data.length !== undefined) {
+        console.log("✅ Tentando tratar como array-like");
+        setSubjects([subject.data]);
+      } else {
+        console.log("❌ Nenhum formato reconhecido, definindo array vazio");
+        console.log("🔍 Estrutura completa da resposta:", JSON.stringify(subject.data, null, 2));
+        setSubjects([]);
+      }
 
     } catch (err) {
-      console.log("Erro ao carregar disciplinas");
+      console.error("❌ Erro ao carregar disciplinas:", err);
+      console.error("❌ Detalhes do erro:", err.response?.data);
+      setSubjects([]);
     }
   };
 

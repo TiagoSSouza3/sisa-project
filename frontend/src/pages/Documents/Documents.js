@@ -4,14 +4,32 @@ import DocumentUploader from './DocumentUploader';
 import LayoutsList from './LayoutsList';
 import DocumentForm from './DocumentForm';
 import AllDocuments from './AllDocuments';
+import TemplateCompletion from './TemplateCompletion';
 import '../../styles/documents.css';
 import { useLanguage } from '../../components/LanguageContext';
+import { useDocumentPermissions } from '../../hooks/useDocumentPermissions_simple';
 
 export default function Documents() {
   const { language } = useLanguage();
+  const {
+    loading: permissionsLoading,
+    canViewLayouts,
+    canEditLayouts,
+    canUploadLayouts,
+    canViewDocuments,
+    canEditDocuments,
+    canUploadDocuments,
+    canAccessDocuments,
+    isAdmin,
+    userRole,
+    filterLayoutsWithGranularPermissions,
+    filterDocumentsWithGranularPermissions
+  } = useDocumentPermissions();
+  
   const [layouts, setLayouts] = useState([]);
   const [selectedLayout, setSelectedLayout] = useState(null);
-  const [activeTab, setActiveTab] = useState('layouts'); // layouts, upload, form, all-documents
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [activeTab, setActiveTab] = useState('layouts'); // layouts, upload, form, all-documents, template-form
   const [loading, setLoading] = useState(true); // Inicia como true
   const [error, setError] = useState('');
   const [hasLoaded, setHasLoaded] = useState(false); // Controla se já carregou uma vez
@@ -54,6 +72,19 @@ export default function Documents() {
     };
   }, []);
 
+  // Definir aba inicial baseada nas permissões
+  useEffect(() => {
+    if (!permissionsLoading) {
+      if (canViewLayouts()) {
+        setActiveTab('layouts');
+      } else if (canViewDocuments()) {
+        setActiveTab('all-documents');
+      } else if (canUploadLayouts()) {
+        setActiveTab('upload');
+      }
+    }
+  }, [permissionsLoading, canViewLayouts, canViewDocuments, canUploadLayouts]);
+
   // Adicionar novo layout
   const handleLayoutCreated = (newLayout) => {
     setLayouts([newLayout, ...layouts]);
@@ -68,8 +99,48 @@ export default function Documents() {
     }
   };
 
+  // Verificar se está carregando permissões
+  if (permissionsLoading) {
+    return (
+      <div className="documents-container">
+        <div className="documents-loading">
+          <div className="loading-spinner-large"></div>
+          <p>{language === "english" ? "Loading permissions..." : "Carregando permissões..."}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Verificar se tem acesso geral a documentos
+  if (!canAccessDocuments) {
+    return (
+      <div className="documents-container">
+        <div className="access-denied">
+          <div className="access-denied-icon">🚫</div>
+          <h2>{language === "english" ? "Access Denied" : "Acesso Negado"}</h2>
+          <p>
+            {language === "english" 
+              ? "You don't have permission to access the document management system." 
+              : "Você não tem permissão para acessar o sistema de gerenciamento de documentos."
+            }
+          </p>
+          <div className="access-info">
+            <p><strong>{language === "english" ? "Your role:" : "Sua função:"}</strong> {userRole || "N/A"}</p>
+            <p>
+              {language === "english" 
+                ? "Contact an administrator to request access." 
+                : "Entre em contato com um administrador para solicitar acesso."
+              }
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="documents-container">
+            
       <div className="documents-wrapper">
         {/* Header */}
         <div className="documents-header">
@@ -85,6 +156,18 @@ export default function Documents() {
               : "Gerencie layouts com placeholders e documentos gerais"
             }
           </p>
+          {!isAdmin && (
+            <div className="user-role-info">
+              <span className="role-badge">
+                {language === "english" ? "Role:" : "Função:"} {
+                  userRole === "professor" ? "Professor" : 
+                  userRole === "colaborador" ? "Colaborador" :
+                  userRole === "administrador" ? "Administrador" :
+                  `Desconhecido (${userRole})`
+                }
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Error Message */}
@@ -99,43 +182,64 @@ export default function Documents() {
         <div className="main-content-container">
           {/* Navigation Tabs */}
           <div className="nav-tabs">
-            <button
-              onClick={() => setActiveTab('layouts')}
-              className={`nav-tab ${activeTab === 'layouts' ? 'active' : ''}`}
-            >
-              <span className="nav-tab-icon">📄</span>
-              <span>Layouts ({layouts.length})</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('upload')}
-              className={`nav-tab ${activeTab === 'upload' ? 'active' : ''}`}
-            >
-              <span className="nav-tab-icon">📤</span>
-              <span>Upload Layout</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('all-documents')}
-              className={`nav-tab ${activeTab === 'all-documents' ? 'active' : ''}`}
-            >
-              <span className="nav-tab-icon">📁</span>
-              <span>{language === "english" ? "All Documents" : "Todos os Documentos"}</span>
-            </button>
-            {selectedLayout && (
+            {canViewLayouts() && (
+              <button
+                onClick={() => setActiveTab('layouts')}
+                className={`nav-tab ${activeTab === 'layouts' ? 'active' : ''}`}
+              >
+                <span className="nav-tab-icon">📄</span>
+                <span>Layouts ({layouts.length})</span>
+              </button>
+            )}
+            
+            {canUploadLayouts() && (
+              <button
+                onClick={() => setActiveTab('upload')}
+                className={`nav-tab ${activeTab === 'upload' ? 'active' : ''}`}
+              >
+                <span className="nav-tab-icon">📤</span>
+                <span>Upload Layout</span>
+              </button>
+            )}
+            
+            {canViewDocuments() && (
+              <button
+                onClick={() => setActiveTab('all-documents')}
+                className={`nav-tab ${activeTab === 'all-documents' ? 'active' : ''}`}
+              >
+                <span className="nav-tab-icon">📁</span>
+                <span>{language === "english" ? "All Documents" : "Todos os Documentos"}</span>
+              </button>
+            )}
+            
+                        
+            {selectedLayout && canViewLayouts() && (
               <button
                 onClick={() => setActiveTab('form')}
                 className={`nav-tab ${activeTab === 'form' ? 'active' : ''}`}
               >
                 <span className="nav-tab-icon">✏️</span>
-                <span>{language === "english" ? "Fill out form" : "Preencher Fomulario"}</span>
+                <span>{language === "english" ? "Fill out form" : "Preencher Formulário"}</span>
+              </button>
+            )}
+
+            {selectedTemplate && canViewDocuments() && (
+              <button
+                onClick={() => setActiveTab('template-form')}
+                className={`nav-tab ${activeTab === 'template-form' ? 'active' : ''}`}
+              >
+                <span className="nav-tab-icon">📋</span>
+                <span>{language === "english" ? "Complete Template" : "Completar Template"}</span>
               </button>
             )}
           </div>
 
           {/* Content Area */}
           <div className="content-area">
-            {activeTab === 'layouts' && (
+            
+            {activeTab === 'layouts' && canViewLayouts() && (
               <LayoutsList
-                layouts={layouts}
+                layouts={filterLayoutsWithGranularPermissions(layouts)}
                 loading={loading}
                 hasLoaded={hasLoaded}
                 onSelectLayout={setSelectedLayout}
@@ -144,25 +248,78 @@ export default function Documents() {
                   setSelectedLayout(layout);
                   setActiveTab('form');
                 }}
+                canEdit={canEditLayouts()}
+                canDelete={canEditLayouts()}
               />
             )}
 
-            {activeTab === 'upload' && (
+            {activeTab === 'upload' && canUploadLayouts() && (
               <DocumentUploader
                 onLayoutCreated={handleLayoutCreated}
                 onCancel={() => setActiveTab('layouts')}
               />
             )}
 
-            {activeTab === 'all-documents' && (
-              <AllDocuments />
+            {activeTab === 'all-documents' && canViewDocuments() && (
+              <AllDocuments 
+                canEdit={canEditDocuments()}
+                canUpload={canUploadDocuments()}
+                canDelete={canEditDocuments()}
+                onUseTemplate={(template) => {
+                  setSelectedTemplate(template);
+                  setActiveTab('template-form');
+                }}
+              />
             )}
 
-            {activeTab === 'form' && selectedLayout && (
+            
+            {activeTab === 'form' && selectedLayout && canViewLayouts() && (
               <DocumentForm
                 layout={selectedLayout}
                 onCancel={() => setActiveTab('layouts')}
               />
+            )}
+
+            {activeTab === 'template-form' && selectedTemplate && canViewDocuments() && (
+              <TemplateCompletion
+                template={selectedTemplate}
+                onCancel={() => {
+                  setSelectedTemplate(null);
+                  setActiveTab('all-documents');
+                }}
+                onComplete={() => {
+                  setSelectedTemplate(null);
+                  setActiveTab('all-documents');
+                }}
+              />
+            )}
+
+            {/* Mensagem quando não há abas disponíveis */}
+            {!canViewLayouts() && !canViewDocuments() && (
+              <div className="no-permissions">
+                <div className="no-permissions-icon">📋</div>
+                <h3>{language === "english" ? "No Permissions Available" : "Nenhuma Permissão Disponível"}</h3>
+                <p>
+                  {language === "english" 
+                    ? "You don't have permission to view any document sections." 
+                    : "Você não tem permissão para visualizar nenhuma seção de documentos."
+                  }
+                </p>
+                <div className="permissions-info">
+                  <p><strong>{language === "english" ? "Available permissions:" : "Permissões disponíveis:"}</strong></p>
+                  <ul>
+                    <li>✅ {language === "english" ? "Access to Documents" : "Acesso a Documentos"}</li>
+                    <li>❌ {language === "english" ? "View Layouts" : "Visualizar Layouts"}</li>
+                    <li>❌ {language === "english" ? "View Documents" : "Visualizar Documentos"}</li>
+                  </ul>
+                  <p>
+                    {language === "english" 
+                      ? "Contact an administrator to request additional permissions." 
+                      : "Entre em contato com um administrador para solicitar permissões adicionais."
+                    }
+                  </p>
+                </div>
+              </div>
             )}
           </div>
         </div>
