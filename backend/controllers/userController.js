@@ -77,12 +77,16 @@ exports.createUser = async (req, res) => {
       reset_token_expires: resetTokenExpires
     });
 
-    // Enviar email de primeiro acesso
-    const emailResult = await sendFirstAccessEmail(email, resetToken, name);
-    
-    if (!emailResult.success) {
-      console.error('Erro ao enviar email de primeiro acesso:', emailResult.error);
-    }
+    // Disparar email de primeiro acesso em background (não bloquear a resposta)
+    sendFirstAccessEmail(email, resetToken, name)
+      .then((emailResult) => {
+        if (!emailResult.success) {
+          console.error('Erro ao enviar email de primeiro acesso:', emailResult.error);
+        }
+      })
+      .catch((error) => {
+        console.error('Erro ao enviar email de primeiro acesso (async):', error);
+      });
 
     res.status(201).json({
       id: user.id,

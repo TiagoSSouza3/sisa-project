@@ -54,6 +54,8 @@ export default function UsersForm() {
     const [effectivePermissions, setEffectivePermissions] = useState({});
     const [individualPermissions, setIndividualPermissions] = useState({});
     const [usingGlobalSeed, setUsingGlobalSeed] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [savingText, setSavingText] = useState("");
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -137,17 +139,32 @@ export default function UsersForm() {
         }
 
         try {
-            if (id) await API.put(`/users/${id}`, user);
-            else await API.post("/users", user);
-            setUser({
-                name: "",
-                email: "",
-                occupation_id: ""
-            });
-            navigate("/users");
+            setIsSaving(true);
+            setSavingText(id ? (language === "english" ? "Saving..." : "Salvando...") : (language === "english" ? "Creating user..." : "Criando usuário..."));
+
+            if (id) {
+                await API.put(`/users/${id}`, user);
+                navigate("/users");
+            } else {
+                // Executa a criação e garante mínimo de 3s de loading
+                await Promise.all([
+                    API.post("/users", user),
+                    new Promise((resolve) => setTimeout(resolve, 3000)),
+                ]);
+
+                setSavingText(language === "english" ? "User created successfully!" : "Usuário criado com sucesso!");
+
+                // Aguarda breve tempo para o usuário ver a mensagem de sucesso e então retorna
+                await new Promise((resolve) => setTimeout(resolve, 1000));
+
+                navigate("/users");
+            }
         } catch (err) {
             console.error("Erro ao salvar usuário:", err);
             setError(err.response?.data?.error || (language === "english" ? "Error creating/editing user" : "Erro ao criar/editar usuário"));
+        } finally {
+            setIsSaving(false);
+            setSavingText("");
         }
     };
 
@@ -524,6 +541,13 @@ export default function UsersForm() {
     return (
         <div className="users-creation-container">
             <div className="users-creation-form">
+                {isSaving && (
+                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+                        <div style={{ background: 'rgba(0,0,0,0.6)', color: '#fff', padding: '16px 24px', borderRadius: '8px', fontSize: '16px', fontWeight: 600 }}>
+                            ⏳ {savingText || (language === "english" ? (id ? "Saving..." : "Creating user...") : (id ? "Salvando..." : "Criando usuário..."))}
+                        </div>
+                    </div>
+                )}
                 { id != null
                     ? <h2>{language === "english" ? "Edit User" : "Editar Usuario"}</h2>
                     : <h2>{language === "english" ? "Create New user" : "Criar Novo Usuário"}</h2> 
@@ -560,13 +584,17 @@ export default function UsersForm() {
                 {/* Form Actions - only show for user info tab */}
                 {(!id || activeTab === 'info') && (
                     <div className="form-actions">
-                        <button className="cancel-button" onClick={handleCancel}>
+                        <button className="cancel-button" onClick={handleCancel} disabled={isSaving} aria-disabled={isSaving}>
                             {language === "english" ? "Cancel" : "Cancelar"}
                         </button>
-                        <button className="submit-button" onClick={handleSave}>
-                            { id 
-                                ? language === "english" ? "Edit User" : "Editar usuário" 
-                                : language === "english" ? "Create User" : "Criar usuário"
+                        <button className="submit-button" onClick={handleSave} disabled={isSaving} aria-busy={isSaving}>
+                            { isSaving
+                                ? (id 
+                                    ? (language === "english" ? "Saving..." : "Salvando...")
+                                    : (language === "english" ? "Creating..." : "Criando..."))
+                                : (id 
+                                    ? (language === "english" ? "Edit User" : "Editar usuário") 
+                                    : (language === "english" ? "Create User" : "Criar usuário"))
                             }
                         </button>
                     </div>
