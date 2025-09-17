@@ -714,7 +714,7 @@ const savePartialTemplate = async (req, res) => {
     console.log('Salvando template parcial para layout:', req.params.id);
     console.log('Dados recebidos:', req.body);
     
-    const { data, title, description } = req.body;
+    const { data, title, description, audience } = req.body;
     
     if (!title || !title.trim()) {
       return res.status(400).json({ message: 'Título é obrigatório' });
@@ -729,6 +729,10 @@ const savePartialTemplate = async (req, res) => {
     // Criar documento parcialmente preenchido
     // Não usar template_id para evitar problemas de foreign key
     // Em vez disso, armazenar a referência no content como metadata
+    const allowedAudience = ['professor', 'colaborador', 'all'];
+    if (!audience || !allowedAudience.includes(audience)) {
+      return res.status(400).json({ message: 'Audiência é obrigatória e deve ser "professor", "colaborador" ou "all"' });
+    }
     const partialDocument = await Document.create({
       template_id: null, // Não referenciar diretamente para evitar constraint
       title: title.trim(),
@@ -738,7 +742,8 @@ const savePartialTemplate = async (req, res) => {
           original_layout_id: layout.id,
           original_layout_name: layout.name,
           original_layout_description: layout.description,
-          is_partial_template: true
+          is_partial_template: true,
+          visibility_audience: audience
         }
       },
       placeholders: layout.placeholders, // Manter os placeholders originais

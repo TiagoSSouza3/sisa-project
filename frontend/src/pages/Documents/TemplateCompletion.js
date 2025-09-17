@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import API from '../../api';
 import '../../styles/document-form.css';
 import { useLanguage } from '../../components/LanguageContext';
+import { useDocumentPermissions } from '../../hooks/useDocumentPermissions_simple';
 
 export default function TemplateCompletion({ template, onCancel, onComplete }) {
   const { language } = useLanguage();
+  const { isAdmin } = useDocumentPermissions();
   const [formData, setFormData] = useState({});
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState('');
@@ -12,6 +14,8 @@ export default function TemplateCompletion({ template, onCancel, onComplete }) {
   const [outputFormat, setOutputFormat] = useState('docx');
   const [previewHtml, setPreviewHtml] = useState('');
   const [loadingPreview, setLoadingPreview] = useState(false);
+  const [selectedAudience, setSelectedAudience] = useState(null);
+  const [savingPartial, setSavingPartial] = useState(false);
   
   // Função para garantir que placeholders seja sempre um array
   const getPlaceholdersArray = (placeholders) => {
@@ -34,6 +38,21 @@ export default function TemplateCompletion({ template, onCancel, onComplete }) {
   // Remover metadata dos dados do admin
   const cleanAdminData = { ...adminData };
   delete cleanAdminData._metadata;
+
+  // Detectar se o item é um layout (template sintético) ou um template parcial salvo
+  const isLayout = !!(
+    template && (
+      template.source === 'layout' ||
+      (typeof template.id === 'string' && template.id.startsWith('layout_')) ||
+      template.layoutId
+    )
+  );
+  const layoutId = template && (
+    template.layoutId ||
+    (typeof template.id === 'string' && template.id.startsWith('layout_')
+      ? parseInt(template.id.replace('layout_', ''), 10)
+      : null)
+  );
 
   useEffect(() => {
     // Inicializar formData apenas com campos que não foram preenchidos pelo admin
@@ -59,8 +78,13 @@ export default function TemplateCompletion({ template, onCancel, onComplete }) {
     try {
       // Combinar dados do admin com dados do formulário
       const allData = { ...cleanAdminData, ...currentFormData };
+
+      // Selecionar endpoint conforme a origem
+      const previewUrl = isLayout && layoutId
+        ? `/document-layouts/${layoutId}/preview`
+        : `/document-layouts/partial-templates/${template.id}/preview`;
       
-      const response = await API.post(`/document-layouts/partial-templates/${template.id}/preview`, {
+      const response = await API.post(previewUrl, {
         data: allData
       });
       
@@ -96,17 +120,36 @@ export default function TemplateCompletion({ template, onCancel, onComplete }) {
     try {
       console.log('Completando template:', template.id);
       console.log('Dados do usuário:', formData);
+
+      // Combinar dados do admin com os dados do formulário
+      const allData = { ...cleanAdminData, ...formData };
       
-      const response = await API.post(`/document-layouts/partial-templates/${template.id}/complete`, {
-        data: formData,
-        format: outputFormat
-      }, {
-        responseType: 'blob',
-        timeout: 120000,
-        headers: {
-          'Accept': outputFormat === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-        }
-      });
+      let response;
+      if (isLayout && layoutId) {
+        // Gerar documento diretamente do layout
+        response = await API.post(`/document-layouts/${layoutId}/generate`, {
+          data: allData,
+          format: outputFormat
+        }, {
+          responseType: 'blob',
+          timeout: 120000,
+          headers: {
+            'Accept': outputFormat === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+          }
+        });
+      } else {
+        // Completar template parcial salvo
+        response = await API.post(`/document-layouts/partial-templates/${template.id}/complete`, {
+          data: formData,
+          format: outputFormat
+        }, {
+          responseType: 'blob',
+          timeout: 120000,
+          headers: {
+            'Accept': outputFormat === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+          }
+        });
+      }
 
       console.log('Resposta recebida:', {
         status: response.status,
@@ -211,6 +254,44 @@ export default function TemplateCompletion({ template, onCancel, onComplete }) {
       }
     } finally {
       setGenerating(false);
+    }
+  };
+
+  // Salvar como template parcial a partir de um layout, exigindo apenas a seleção de público
+  const handleSavePartial = async () => {
+    try {
+      setError('');
+      setSuccess('');
+
+      if (!isLayout || !layoutId) {
+        setError('Esta ação está disponível apenas ao usar um layout.');
+        return;
+      }
+      if (!selectedAudience) {
+        setError('Selecione quem poderá acessar este template (Professores, Colaboradores ou Todos).');
+        return;
+      }
+
+      setSavingPartial(true);
+
+      // Dados do admin + usuário (não é obrigatório ter preenchimento)
+      const allData = { ...cleanAdminData, ...formData };
+      const body = {
+        data: allData,
+        title: template.title || 'Template do Layout',
+        description: template.description || '',
+        audience: selectedAudience
+      };
+
+      const resp = await API.post(`/document-layouts/${layoutId}/save-partial`, body);
+
+      setSuccess('Template salvo com sucesso!');
+      if (onComplete) onComplete();
+    } catch (err) {
+      console.error('Erro ao salvar template parcial:', err);
+      setError(err.response?.data?.message || 'Erro ao salvar template parcial');
+    } finally {
+      setSavingPartial(false);
     }
   };
 
@@ -331,9 +412,61 @@ export default function TemplateCompletion({ template, onCancel, onComplete }) {
                   </span>
                 </label>
               </div>
-            </div>
-
-            {/* Campos já preenchidos pelo admin */}
+              </div>
+              
+              {/* Seleção de visibilidade (somente admin) */}
+              {isLayout && isAdmin && (
+              <div className="format-selection">
+              <h3 className="format-title">
+              {language === 'english' ? 'Visibility' : 'Visibilidade'}
+              </h3>
+              <div className="format-options">
+              <label className={`format-option ${selectedAudience === 'professor' ? 'active' : ''}`}>
+              <input
+              type="radio"
+              value="professor"
+              checked={selectedAudience === 'professor'}
+              onChange={() => setSelectedAudience('professor')}
+              />
+              <span className="format-label">
+              <span className="format-icon">🎓</span>
+              <span>{language === 'english' ? 'Professors' : 'Professores'}</span>
+              </span>
+              </label>
+              <label className={`format-option ${selectedAudience === 'colaborador' ? 'active' : ''}`}>
+              <input
+              type="radio"
+              value="colaborador"
+              checked={selectedAudience === 'colaborador'}
+              onChange={() => setSelectedAudience('colaborador')}
+              />
+              <span className="format-label">
+              <span className="format-icon">👨‍💼</span>
+              <span>{language === 'english' ? 'Collaborators' : 'Colaboradores'}</span>
+              </span>
+              </label>
+              <label className={`format-option ${selectedAudience === 'all' ? 'active' : ''}`}>
+              <input
+              type="radio"
+              value="all"
+              checked={selectedAudience === 'all'}
+              onChange={() => setSelectedAudience('all')}
+              />
+              <span className="format-label">
+              <span className="format-icon">🌐</span>
+              <span>{language === 'english' ? 'Everyone' : 'Todos'}</span>
+              </span>
+              </label>
+              </div>
+              <p className="field-hint">
+              {language === 'english'
+              ? 'Select who can access and edit this template.'
+              : 'Selecione quem poderá acessar e editar este template.'}
+              </p>
+              </div>
+              )}
+              
+              {/* Campos já preenchidos pelo admin */}
             {filledFields.length > 0 && (
               <div className="filled-fields-section">
                 <h3 className="section-title">
@@ -405,6 +538,27 @@ export default function TemplateCompletion({ template, onCancel, onComplete }) {
               >
                 ❌ {language === "english" ? "Cancel" : "Cancelar"}
               </button>
+
+              {isLayout && isAdmin && (
+                <button
+                  type="button"
+                  disabled={savingPartial || !selectedAudience}
+                  onClick={handleSavePartial}
+                  className="btn btn-primary"
+                  title={language === 'english' ? 'Save as Template (requires visibility selection)' : 'Salvar como Template (requer seleção de visibilidade)'}
+                >
+                  {savingPartial ? (
+                    <>
+                      <span className="loading-spinner"></span>
+                      {language === 'english' ? 'Saving...' : 'Salvando...'}
+                    </>
+                  ) : (
+                    <>
+                      💾 {language === 'english' ? 'Save Template' : 'Salvar Template'}
+                    </>
+                  )}
+                </button>
+              )}
               
               <button
                 type="submit"
@@ -462,23 +616,7 @@ export default function TemplateCompletion({ template, onCancel, onComplete }) {
             )}
           </div>
           
-          <div className="preview-footer">
-            <div className="template-stats">
-              <div className="stat-item">
-                <span className="stat-label">{language === "english" ? "Total:" : "Total:"}</span>
-                <span className="stat-value">{placeholdersArray.length}</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-label">{language === "english" ? "Filled:" : "Preenchidos:"}</span>
-                <span className="stat-value">{filledFields.length}</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-label">{language === "english" ? "Remaining:" : "Restantes:"}</span>
-                <span className="stat-value">{fieldsToComplete.length}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+                  </div>
       </div>
     </div>
   );

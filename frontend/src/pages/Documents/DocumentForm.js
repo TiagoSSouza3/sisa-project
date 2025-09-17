@@ -15,6 +15,7 @@ export default function DocumentForm({ layout, onCancel }) {
   const [outputFormat, setOutputFormat] = useState('docx'); // docx or pdf
   const [previewHtml, setPreviewHtml] = useState('');
   const [loadingPreview, setLoadingPreview] = useState(false);
+  const [selectedAudience, setSelectedAudience] = useState(null); // 'professor' | 'colaborador' | 'all'
   
   // Função para garantir que placeholders seja sempre um array
   const getPlaceholdersArray = (placeholders) => {
@@ -227,33 +228,33 @@ export default function DocumentForm({ layout, onCancel }) {
 
   // Função para salvar template parcial (apenas para admins)
   const handleSavePartial = async () => {
-    // Verificar se há pelo menos um campo preenchido
-    const filledFields = Object.entries(formData).filter(([key, value]) => value && value.trim());
-    if (filledFields.length === 0) {
-      setError('Preencha pelo menos um campo antes de salvar');
-      return;
-    }
-
-    setSaving(true);
-    setError('');
-    setSuccess('');
-
     try {
-      console.log('Salvando template parcial...');
-      
+      setError('');
+      setSuccess('');
+
+      if (!selectedAudience) {
+        setError('Selecione a visibilidade (Professores, Colaboradores ou Todos) antes de salvar.');
+        return;
+      }
+
+      setSaving(true);
+
       // Usar o nome do layout como título padrão
       const defaultTitle = `${layout.name} - Template Parcial`;
-      
-      const response = await API.post(`/document-layouts/${layout.id}/save-partial`, {
+
+      // Pode salvar mesmo sem campos preenchidos; enviaremos quaisquer dados atuais (vazios ou não)
+      const body = {
         data: formData,
         title: defaultTitle,
-        description: `Template parcial baseado no layout ${layout.name}`
-      });
+        description: `Template parcial baseado no layout ${layout.name}`,
+        audience: selectedAudience
+      };
+
+      const response = await API.post(`/document-layouts/${layout.id}/save-partial`, body);
 
       console.log('Template parcial salvo:', response.data);
-      
-      setSuccess('Template salvo com sucesso! Agora está disponível em "Todos os Documentos" para outros usuários completarem.');
-      
+      setSuccess('Template salvo com sucesso! Agora está disponível em "Todos os Documentos" para o público selecionado.');
+
       // Limpar formulário após salvar
       const clearedData = {};
       placeholdersArray.forEach(placeholder => {
@@ -261,7 +262,6 @@ export default function DocumentForm({ layout, onCancel }) {
       });
       setFormData(clearedData);
       loadInitialPreview();
-
     } catch (err) {
       console.error('Erro ao salvar template parcial:', err);
       setError(err.response?.data?.message || 'Erro ao salvar template parcial');
@@ -376,9 +376,59 @@ export default function DocumentForm({ layout, onCancel }) {
                   </span>
                 </label>
               </div>
-            </div>
-
-            {/* Form Fields */}
+              </div>
+              
+              {/* Seleção de visibilidade */}
+              {isAdmin && (
+              <div className="format-selection">
+              <h3 className="format-title">{language === 'english' ? 'Visibility' : 'Visibilidade'}</h3>
+              <div className="format-options">
+              <label className={`format-option ${selectedAudience === 'professor' ? 'active' : ''}`}>
+              <input
+              type="radio"
+              value="professor"
+              checked={selectedAudience === 'professor'}
+              onChange={() => setSelectedAudience('professor')}
+              />
+              <span className="format-label">
+              <span className="format-icon">🎓</span>
+              <span>{language === 'english' ? 'Professors' : 'Professores'}</span>
+              </span>
+              </label>
+              <label className={`format-option ${selectedAudience === 'colaborador' ? 'active' : ''}`}>
+              <input
+              type="radio"
+              value="colaborador"
+              checked={selectedAudience === 'colaborador'}
+              onChange={() => setSelectedAudience('colaborador')}
+              />
+              <span className="format-label">
+              <span className="format-icon">👨‍💼</span>
+              <span>{language === 'english' ? 'Collaborators' : 'Colaboradores'}</span>
+              </span>
+              </label>
+              <label className={`format-option ${selectedAudience === 'all' ? 'active' : ''}`}>
+              <input
+              type="radio"
+              value="all"
+              checked={selectedAudience === 'all'}
+              onChange={() => setSelectedAudience('all')}
+              />
+              <span className="format-label">
+              <span className="format-icon">🌐</span>
+              <span>{language === 'english' ? 'Everyone' : 'Todos'}</span>
+              </span>
+              </label>
+              </div>
+              <p className="field-hint">
+              {language === 'english'
+              ? 'Select who can access and edit this template.'
+              : 'Selecione quem poderá acessar e editar este template.'}
+              </p>
+              </div>
+              )}
+              
+              {/* Form Fields */}
             <div className="form-fields">
               {placeholdersArray.map((placeholder) => (
                 <div key={placeholder} className="field-group">
@@ -432,8 +482,9 @@ export default function DocumentForm({ layout, onCancel }) {
                 <button
                   type="button"
                   onClick={handleSavePartial}
-                  disabled={saving || !Object.values(formData).some(value => value && value.trim())}
+                  disabled={saving || !selectedAudience}
                   className="btn btn-warning"
+                  title={language === 'english' ? 'Save as Template (requires visibility selection)' : 'Salvar como Template (requer seleção de visibilidade)'}
                 >
                   {saving ? (
                     <>

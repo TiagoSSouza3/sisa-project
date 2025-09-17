@@ -41,56 +41,16 @@ let nextId = 1;
 const getAllDocuments = async (req, res) => {
   try {
     console.log('Buscando todos os documentos...');
-    
-    // Buscar documentos do array em memória (documentos carregados)
-    const memoryDocuments = allDocuments.sort((a, b) => 
+
+    // Buscar documentos do array em memória (apenas documentos carregados)
+    const memoryDocuments = allDocuments.sort((a, b) =>
       new Date(b.created_at) - new Date(a.created_at)
     );
-    
-    // Buscar templates parciais do banco de dados
-    const { Document } = require('../models');
-    console.log('Buscando templates parciais no banco...');
-    const partialTemplates = await Document.findAll({
-      where: { status: 'template' },
-      order: [['createdAt', 'DESC']]
-    });
-    console.log(`Templates parciais encontrados no banco: ${partialTemplates.length}`);
-    if (partialTemplates.length > 0) {
-      console.log('Primeiro template:', partialTemplates[0].toJSON());
-    }
-    
-    // Converter templates parciais para o formato esperado
-    const formattedTemplates = partialTemplates.map(template => {
-      const templateData = template.toJSON();
-      
-      // Extrair informações do layout original da metadata
-      const metadata = templateData.content?._metadata || {};
-      
-      return {
-        id: `template_${templateData.id}`, // Prefixo para evitar conflito de IDs
-        name: templateData.title,
-        description: templateData.description || metadata.original_layout_description || '',
-        file_path: null, // Templates parciais não têm arquivo físico
-        original_filename: `${templateData.title}.docx`,
-        file_size: 0,
-        created_by: templateData.created_by,
-        created_at: templateData.createdAt,
-        updated_at: templateData.updatedAt,
-        type: 'partial_template', // Identificar como template parcial
-        template_data: templateData // Dados completos do template
-      };
-    });
-    
-    // Combinar documentos em memória com templates parciais
-    const allDocs = [...memoryDocuments, ...formattedTemplates];
-    
-    // Ordenar todos por data de criação
-    const sortedDocuments = allDocs.sort((a, b) => 
-      new Date(b.created_at) - new Date(a.created_at)
+
+    console.log(
+      `Encontrados ${memoryDocuments.length} documentos (apenas documentos carregados; templates parciais são listados pela rota dedicada)`
     );
-    
-    console.log(`Encontrados ${sortedDocuments.length} documentos (${memoryDocuments.length} carregados + ${formattedTemplates.length} templates parciais)`);
-    res.json(sortedDocuments);
+    res.json(memoryDocuments);
   } catch (error) {
     console.error('Erro ao buscar documentos:', error);
     res.status(500).json({ message: 'Erro interno do servidor' });

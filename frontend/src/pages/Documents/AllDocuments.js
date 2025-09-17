@@ -52,7 +52,8 @@ export default function AllDocuments({ canEdit = false, canUpload = false, canDe
       console.log('📋 Templates parciais recebidos do backend:', templatesResponse.data?.length || 0);
       console.log('📋 Primeiro template recebido:', templatesResponse.data?.[0]);
       setPartialTemplates(templatesResponse.data || []);
-      
+
+            
       console.log('✅ === CARREGAMENTO CONCLUÍDO ===');
     } catch (err) {
       console.error('❌ === ERRO NO CARREGAMENTO ===');
@@ -438,17 +439,33 @@ export default function AllDocuments({ canEdit = false, canUpload = false, canDe
   console.log('🔍 DEBUG - Templates antes do filtro:', partialTemplates.length);
   console.log('🔍 DEBUG - Primeiro template:', partialTemplates[0]);
   
-  // TAMBÉM filtrar templates parciais com permissões granulares
+  // Filtrar templates parciais e layouts com permissões granulares
   const filteredTemplates = filterDocumentsWithGranularPermissions(partialTemplates);
-  
-  // DEBUG: Log depois do filtro
+
+  // Filtrar templates parciais por audiência (professor | colaborador | all)
+  const filteredTemplatesByAudience = filteredTemplates.filter(t => {
+    try {
+      const aud = t?.content?._metadata?.visibility_audience;
+      if (!aud || aud === 'all') return true;
+      if (isAdmin) return true;
+      if (aud === 'professor') return userRole === 'professor';
+      if (aud === 'colaborador') return userRole === 'colaborador';
+      return true;
+    } catch (e) {
+      return true;
+    }
+  });
+
+  // DEBUG: Log depois do filtro de templates e layouts
   console.log('🔍 DEBUG - Templates depois do filtro:', filteredTemplates.length);
   console.log('🔍 DEBUG - Primeiro template filtrado:', filteredTemplates[0]);
-  
-  // Combinar documentos normais com templates parciais (ambos filtrados)
+  console.log('🔍 DEBUG - Templates após audiência:', filteredTemplatesByAudience.length);
+  console.log('🔍 DEBUG - Primeiro template após audiência:', filteredTemplatesByAudience[0]);
+
+  // Combinar documentos e templates parciais (sem incluir layouts)
   const allItems = [
     ...filteredDocuments.map(doc => ({ ...doc, type: 'document' })),
-    ...filteredTemplates.map(template => ({ ...template, type: 'template' }))
+    ...filteredTemplatesByAudience.map(t => ({ ...t, type: 'template', source: 'partial' }))
   ].sort((a, b) => new Date(b.created_at || b.createdAt) - new Date(a.created_at || a.createdAt));
 
   // DEBUG: Log final
@@ -667,7 +684,7 @@ export default function AllDocuments({ canEdit = false, canUpload = false, canDe
                       <div className="template-badge">
                         {language === "english" ? "Template" : "Template"}
                       </div>
-                      {canDelete && (
+                      {canDelete && item.source !== 'layout' && (
                         <button
                           onClick={() => handleDeleteTemplate(item.id)}
                           disabled={deletingId === item.id}

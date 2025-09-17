@@ -8,12 +8,14 @@ export default function Dashboard() {
   const { language } = useLanguage();
   const [showFirstAccessModal, setShowFirstAccessModal] = useState(false);
   const [userEmail, setUserEmail] = useState('');
+  const [permissions, setPermissions] = useState({});
   const name = localStorage.getItem("name");
   const userId = localStorage.getItem("id");
   const firstName = name ? name.split(" ")[0] : "Usuário";
 
   useEffect(() => {
     checkFirstAccess();
+    loadUserPermissions();
   }, []);
 
   const checkFirstAccess = async () => {
@@ -29,6 +31,81 @@ export default function Dashboard() {
     } catch (error) {
       console.error('Erro ao verificar primeiro acesso:', error);
     }
+  };
+
+  const loadUserPermissions = async () => {
+    try {
+      const userId = localStorage.getItem("id");
+      const occupationIdRaw = localStorage.getItem("occupation_id");
+      
+      // Normalizar occupation_id
+      let occupationId = occupationIdRaw;
+      if (occupationIdRaw === "PROFESSOR" || occupationIdRaw === "professor") {
+        occupationId = "3";
+      } else if (occupationIdRaw === "COLABORADOR" || occupationIdRaw === "colaborador") {
+        occupationId = "2";
+      } else if (occupationIdRaw === "ADMINISTRADOR" || occupationIdRaw === "administrador") {
+        occupationId = "1";
+      }
+      
+      // Administrador vê tudo
+      if (occupationId === "1" || occupationId === 1 || occupationId === "ADMINISTRADOR") {
+        const adminPermissions = {
+          can_access_dashboard: true,
+          can_access_users: true,
+          can_access_students: true,
+          can_access_subjects: true,
+          can_access_documents: true,
+          can_access_storage: true,
+          can_access_summary_data: true,
+        };
+        setPermissions(adminPermissions);
+        return;
+      }
+
+      if (userId && occupationId) {
+        // Efetivas (individuais + globais)
+        const response = await API.get(`/permissions/${userId}/effective?occupation_id=${occupationId}`);
+        setPermissions(response.data);
+      }
+    } catch (error) {
+      // Fallback: individuais
+      try {
+        const userId = localStorage.getItem("id");
+        if (userId) {
+          const response = await API.get(`/permissions/${userId}`);
+          setPermissions(response.data);
+        }
+      } catch (fallbackError) {
+        // Permissões padrão restritivas
+        const defaultPermissions = {
+          can_access_dashboard: true,
+          can_access_users: false,
+          can_access_students: false,
+          can_access_subjects: false,
+          can_access_documents: false,
+          can_access_storage: false,
+          can_access_summary_data: false,
+        };
+        setPermissions(defaultPermissions);
+      }
+    }
+  };
+
+  const hasPermission = (permission) => {
+    const occupationIdRaw = localStorage.getItem("occupation_id");
+    let occupationId = occupationIdRaw;
+    if (occupationIdRaw === "PROFESSOR" || occupationIdRaw === "professor") {
+      occupationId = "3";
+    } else if (occupationIdRaw === "COLABORADOR" || occupationIdRaw === "colaborador") {
+      occupationId = "2";
+    } else if (occupationIdRaw === "ADMINISTRADOR" || occupationIdRaw === "administrador") {
+      occupationId = "1";
+    }
+    if (occupationId === "1" || occupationId === 1) {
+      return true;
+    }
+    return permissions[permission] === true;
   };
 
   const handleCloseModal = () => {
@@ -51,30 +128,42 @@ export default function Dashboard() {
         </h1>
       </div>
       <div className="links-div">
-        <LinkShortCut 
-          name={language === "english" ? "Users" : "Usuários"}
-          linkToPage="/users"
-        />
-        <LinkShortCut 
-          name={language === "english" ? "Students" : "Alunos"}
-          linkToPage="/students"
-        />
-        <LinkShortCut 
-          name={language === "english" ? "Subjects" : "Atividades"}
-          linkToPage="/subjects"
-        />
-        <LinkShortCut 
-          name={language === "english" ? "Documents" : "Documentos"}
-          linkToPage="/documents"
-        />
-        <LinkShortCut 
-          name={language === "english" ? "Storage" : "Estoque"}
-          linkToPage="/storage"
-        />
-        <LinkShortCut 
-          name={language === "english" ? "Summary Data" : "Dados Resumidos"}
-          linkToPage="/summary_data"
-        />
+        {hasPermission('can_access_users') && (
+          <LinkShortCut 
+            name={language === "english" ? "Users" : "Usuários"}
+            linkToPage="/users"
+          />
+        )}
+        {hasPermission('can_access_students') && (
+          <LinkShortCut 
+            name={language === "english" ? "Students" : "Alunos"}
+            linkToPage="/students"
+          />
+        )}
+        {hasPermission('can_access_subjects') && (
+          <LinkShortCut 
+            name={language === "english" ? "Subjects" : "Atividades"}
+            linkToPage="/subjects"
+          />
+        )}
+        {hasPermission('can_access_documents') && (
+          <LinkShortCut 
+            name={language === "english" ? "Documents" : "Documentos"}
+            linkToPage="/documents"
+          />
+        )}
+        {hasPermission('can_access_storage') && (
+          <LinkShortCut 
+            name={language === "english" ? "Storage" : "Estoque"}
+            linkToPage="/storage"
+          />
+        )}
+        {hasPermission('can_access_summary_data') && (
+          <LinkShortCut 
+            name={language === "english" ? "Summary Data" : "Dados Resumidos"}
+            linkToPage="/summary_data"
+          />
+        )}
       </div>
     </div>
   );
