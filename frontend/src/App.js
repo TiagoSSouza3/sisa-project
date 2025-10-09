@@ -61,6 +61,7 @@ function AppContent() {
         <Route path="/documents" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_documents"><Documents /></PermissionProtectedRoute></ProtectedRoute>} />
         <Route path="/storage" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_storage"><Storage /></PermissionProtectedRoute></ProtectedRoute>} />
         <Route path="/storage_log/:id" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_storage"><StorageLog /></PermissionProtectedRoute></ProtectedRoute>} />
+        <Route path="/storage_log/" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_storage"><StorageLog /></PermissionProtectedRoute></ProtectedRoute>} />
         <Route path="/cash_flow" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_storage"><CashFlow /></PermissionProtectedRoute></ProtectedRoute>} />
       </Routes>
     </>

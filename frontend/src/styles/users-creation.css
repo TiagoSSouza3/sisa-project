@@ -145,6 +145,16 @@
   border-radius: var(--border-radius);
   padding: 1rem;
   transition: var(--transition);
+  display: flex;
+  align-items: center; /* Alinha o switch com o texto */
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Ajusta o texto para não empurrar o switch para cima */
+.permission-item .permission-label {
+  margin: 0;
+  line-height: 1.2;
 }
 
 .permission-item:hover {

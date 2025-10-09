@@ -52,30 +52,28 @@ export default function Navbar() {
       <div>
         {/* Menu completo - APENAS quando logado E NÃO nas páginas de redefinição */}
         {isLoggedIn && !isPasswordResetPage && (
-          <div className="slider-div">
+          <div className="slider-div navbar-controls">
             <button onClick={() => setMenuAberto(true)} className="menu-button">
               ☰ Menu
             </button>
             <Sidebar isOpen={menuAberto} onClose={() => setMenuAberto(false)} />
-            <div className="slider-div">
-              {/* Language Toggle */}
-              <div className="toggle-group">
-                <img
-                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/960px-Flag_of_Brazil.svg.png"
+            {/* Language Toggle (sem wrapper adicional) */}
+            <div className="toggle-group">
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/960px-Flag_of_Brazil.svg.png"
+              />
+              <label className="switch">
+                <input 
+                  type="checkbox" 
+                  onChange={handleLanguageChange}
+                  checked={isLanguageChecked} 
                 />
-                <label className="switch">
-                  <input 
-                    type="checkbox" 
-                    onChange={handleLanguageChange}
-                    checked={isLanguageChecked} 
-                  />
-                  <span className="slider round"></span>
-                </label>
-                <img
-                  src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg"
-                  alt="English"
-                />
-              </div>
+                <span className="slider round"></span>
+              </label>
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg"
+                alt="English"
+              />
             </div>
           </div>
         )}

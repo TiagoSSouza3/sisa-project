@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
+dotenv.config();
 const path = require("path");
 
 const authRoutes = require("./routes/authRoutes");
@@ -104,6 +105,9 @@ if (process.env.NODE_ENV === 'production') {
 
 const app = express();
 
+const FRONTEND_URL = (process.env.FRONTEND_URL || '').replace(/\/$/, '');
+const isProduction = process.env.NODE_ENV === 'production';
+
 const uploadsDir = path.join(__dirname, 'uploads');
 
 
@@ -137,8 +141,12 @@ try {
 
 // Configuração CORS mais detalhada
 if (process.env.NODE_ENV === 'production') {
+  const allowed = [FRONTEND_URL, 'https://sisa-project.up.railway.app', 'https://amused-friendship-production.up.railway.app'].filter(Boolean);
   app.use(cors({
-    origin: ['https://amused-friendship-production.up.railway.app'],
+    origin: (origin, callback) => {
+      if (!origin || allowed.includes(origin)) return callback(null, true);
+      return callback(new Error(`CORS: Origin ${origin} not allowed`));
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true

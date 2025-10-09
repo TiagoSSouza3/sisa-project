@@ -73,7 +73,7 @@ export default function Students() {
       const searchTermLower = searchTerm.toLowerCase();
       filtered = filtered.filter(student =>
         student.name.toLowerCase().includes(searchTermLower) ||
-        String(student.registration).toLowerCase().includes(searchTermLower) ||
+        String(student.id).toLowerCase().includes(searchTermLower) ||
         (student.email && student.email.toLowerCase().includes(searchTermLower))
       );
     }
@@ -83,7 +83,7 @@ export default function Students() {
         return false;
       }
 
-      if (filters.registration && !String(student.registration).includes(filters.registration)) {
+      if (filters.registration && !String(student.id).includes(filters.registration)) {
         return false;
       }
 
