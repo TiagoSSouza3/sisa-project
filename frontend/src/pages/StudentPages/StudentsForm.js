@@ -21,6 +21,8 @@ export default function StudentsForm() {
     const [emailError, setEmailError] = useState("");
     const [childAge, setChildAge] = useState("");
     const [ageError, setAgeError] = useState("");
+    const [cepError, setCepError] = useState("");
+    const [loadingCep, setLoadingCep] = useState(false);
     const { confirmationState, showConfirmation, hideConfirmation, handleConfirm } = useConfirmation();
 
     const [student, setStudent] = useState({
@@ -129,27 +131,180 @@ export default function StudentsForm() {
         
         if (!cleanRG) return true;
         
-        if (cleanRG.length < 8 || cleanRG.length > 14) {
+        if (cleanRG.length < 6 || cleanRG.length > 11) {
             return false;
         }
         
         return true;
     };
 
+    const validateName = (name) => {
+        if (!name) return true;
+        
+        // Remove espaços extras e divide em palavras
+        const words = name.trim().split(/\s+/);
+        
+        // Verifica se tem no máximo 10 palavras
+        if (words.length > 10) {
+            return false;
+        }
+        
+        // Verifica se cada palavra contém apenas letras
+        const nameRegex = /^[a-zA-ZÀ-ÿ\s'-]+$/;
+        return nameRegex.test(name);
+    };
+
+    const sanitizeText = (text) => {
+        if (!text) return '';
+        
+        // Remove caracteres perigosos que podem ser usados para injeção de código
+        // Remove <, >, {, }, [, ], \, /, script tags, etc
+        const dangerous = /<|>|{|}|\[|\]|\\|\/script|<script|javascript:|onerror=|onclick=/gi;
+        
+        return text.replace(dangerous, '');
+    };
+
+    const validateFreeText = (text, maxLength = 150) => {
+        if (!text) return true;
+        
+        // Remove espaços para contar apenas caracteres
+        const textWithoutSpaces = text.replace(/\s/g, '');
+        
+        // Verifica se excede o limite
+        if (textWithoutSpaces.length > maxLength) {
+            return false;
+        }
+        
+        // Verifica se contém caracteres perigosos
+        const dangerous = /<|>|{|}|\[|\]|\\|\/script|<script|javascript:|onerror=|onclick=/gi;
+        if (dangerous.test(text)) {
+            return false;
+        }
+        
+        return true;
+    };
+
+    const handleNameChange = (e) => {
+        const nameValue = e.target.value;
+        
+        // Limita a 10 palavras
+        const words = nameValue.trim().split(/\s+/);
+        if (words.length <= 10 && validateName(nameValue)) {
+            setStudent({ ...student, name: nameValue });
+        }
+    };
+
+    const handleNeighborhoodChange = (e) => {
+        const value = sanitizeText(e.target.value);
+        const textWithoutSpaces = value.replace(/\s/g, '');
+        
+        // Limita a 150 caracteres (sem contar espaços)
+        if (textWithoutSpaces.length <= 150) {
+            setStudent({ ...student, neighborhood: value });
+        }
+    };
+
+    const handleAddressChange = (e) => {
+        const value = sanitizeText(e.target.value);
+        const textWithoutSpaces = value.replace(/\s/g, '');
+        
+        // Limita a 150 caracteres (sem contar espaços)
+        if (textWithoutSpaces.length <= 150) {
+            setStudent({ ...student, address: value });
+        }
+    };
+
+    const handleNotesChange = (e) => {
+        const value = sanitizeText(e.target.value);
+        const textWithoutSpaces = value.replace(/\s/g, '');
+        
+        // Limita a 700 caracteres (sem contar espaços)
+        if (textWithoutSpaces.length <= 700) {
+            setStudent({ ...student, notes: value });
+        }
+    };
+
+    const formatCEP = (cep) => {
+        const cleanCEP = cep.replace(/\D/g, '');
+        if (cleanCEP.length <= 8) {
+            if (cleanCEP.length === 8) {
+                return cleanCEP.replace(/^(\d{5})(\d{3})$/, '$1-$2');
+            }
+            return cleanCEP;
+        }
+        return cep.substring(0, 9); // Limita ao formato XXXXX-XXX
+    };
+
+    const handleCEPChange = async (e) => {
+        const cepValue = e.target.value;
+        const formattedCEP = formatCEP(cepValue);
+        
+        setStudent({ ...student, cep: formattedCEP });
+        
+        const cleanCEP = cepValue.replace(/\D/g, '');
+        
+        // Se o CEP tiver 8 dígitos, busca na API ViaCEP
+        if (cleanCEP.length === 8) {
+            setLoadingCep(true);
+            setCepError("");
+            
+            try {
+                const response = await fetch(`https://viacep.com.br/ws/${cleanCEP}/json/`);
+                const data = await response.json();
+                
+                if (data.erro) {
+                    setCepError(language === "english" ? "CEP not found" : "CEP não encontrado");
+                } else {
+                    // Preenche automaticamente os campos
+                    setStudent(prev => ({
+                        ...prev,
+                        cep: formattedCEP,
+                        address: data.logradouro || prev.address,
+                        neighborhood: data.bairro || prev.neighborhood,
+                        // Você pode adicionar cidade/estado se tiver esses campos
+                    }));
+                    setCepError("");
+                }
+            } catch (error) {
+                setCepError(language === "english" ? "Error searching CEP" : "Erro ao buscar CEP");
+            } finally {
+                setLoadingCep(false);
+            }
+        }
+    };
+
     const formatCPF = (cpfNumber) => {
         const cleanCPF = cpfNumber.replace(/\D/g, '');
-        if (cleanCPF.length === 11) {
-            return cpf.format(cleanCPF);
+        
+        // Limita a 11 dígitos
+        if (cleanCPF.length > 11) {
+            return cpfNumber.substring(0, 14);
         }
-        return cpfNumber;
+        
+        // Formata em tempo real conforme digita
+        if (cleanCPF.length <= 3) {
+            return cleanCPF;
+        } else if (cleanCPF.length <= 6) {
+            // XXX.XXX
+            return `${cleanCPF.slice(0, 3)}.${cleanCPF.slice(3)}`;
+        } else if (cleanCPF.length <= 9) {
+            // XXX.XXX.XXX
+            return `${cleanCPF.slice(0, 3)}.${cleanCPF.slice(3, 6)}.${cleanCPF.slice(6)}`;
+        } else {
+            // XXX.XXX.XXX-XX
+            return `${cleanCPF.slice(0, 3)}.${cleanCPF.slice(3, 6)}.${cleanCPF.slice(6, 9)}-${cleanCPF.slice(9, 11)}`;
+        }
     };
 
     const formatRG = (rg) => {
         const cleanRG = rg.replace(/\D/g, '');
-        if (cleanRG.length >= 8) {
-            return cleanRG.replace(/^(\d{2})(\d{3})(\d{3})(\d{1}|X).*/, '$1.$2.$3-$4');
+        if (cleanRG.length > 11) {
+            return rg.substring(0, 14); // Limita a 11 dígitos com formatação
         }
-        return rg;
+        if (cleanRG.length >= 8) {
+            return cleanRG.replace(/^(\d{2})(\d{3})(\d{3})(\d{1,3}).*/, '$1.$2.$3-$4');
+        }
+        return cleanRG;
     };
 
     const handleCPFChange = (e) => {
@@ -172,7 +327,7 @@ export default function StudentsForm() {
         setStudent({ ...student, RG: formattedRG });
         
         if (rgValue && !validateRG(rgValue)) {
-            setRgError("RG inválido. Deve conter entre 8 e 14 caracteres.");
+            setRgError("RG inválido.");
         } else {
             setRgError("");
         }
@@ -195,17 +350,17 @@ export default function StudentsForm() {
     };
 
     const handleBirthDate = (e) => {
-
-        const birthDate = StringToDate(e.target.value)
-
-        const res = validadeAge(birthDate)
+        const birthDate = StringToDate(e.target.value);
+        const res = validadeAge(birthDate);
 
         if(typeof res != "number"){
-            setAgeError(res.message)
+            setAgeError(res.message);
             setChildAge("");
-            
+        } else if (res > 120) {
+            setAgeError(language === "english" ? "Age cannot exceed 120 years" : "Idade não pode exceder 120 anos");
+            setChildAge("");
         } else {
-            setAgeError("")
+            setAgeError("");
             setStudent({ ...student, birth_date: birthDate});
             setChildAge(res);
         }
@@ -301,9 +456,14 @@ export default function StudentsForm() {
                     type="text"
                     placeholder={language === "english" ? "Write the Student's Name" : "Digite o Nome do Aluno"}
                     value={student?.name}
-                    onChange={(e) => setStudent({ ...student, name: e.target.value })}
+                    onChange={handleNameChange}
                     required
                 />
+                {student?.name && !validateName(student.name) && (
+                    <span className="error-message">
+                        {language === "english" ? "Name must contain only letters and max 10 words" : "Nome deve conter apenas letras e no máximo 10 palavras"}
+                    </span>
+                )}
                 </div>
                 <div className="form-group">
                 <label htmlFor="CPF">CPF</label>
@@ -358,6 +518,7 @@ export default function StudentsForm() {
                             className="dob-input"
                             type="date"
                             max={new Date().toISOString().split('T')[0]}
+                            min={new Date(new Date().setFullYear(new Date().getFullYear() - 120)).toISOString().split('T')[0]}
                             value={dateToString(student.birth_date)}
                             onChange={handleBirthDate}
                         />
@@ -381,24 +542,38 @@ export default function StudentsForm() {
                     {ageError && <span className="error-message">{ageError}</span>}
                 </div>
                 <div className="form-group">
-                    <label htmlFor="neighborhood">{language === "english" ? "neighborhood" : "Bairro"}</label>
+                    <label htmlFor="neighborhood">{language === "english" ? "Neighborhood" : "Bairro"}</label>
                     <input 
-                    id="neighborhood"
-                    type="text"
-                    placeholder={language === "english" ? "Write the neighborhood " : "Digite a Bairro"}
-                    value={student.neighborhood}
-                    onChange={(e) => setStudent({ ...student, neighborhood: e.target.value })}
+                        id="neighborhood"
+                        type="text"
+                        placeholder={language === "english" ? "Write the neighborhood" : "Digite o Bairro"}
+                        value={student.neighborhood}
+                        onChange={handleNeighborhoodChange}
                     />
+                    {student.neighborhood && !validateFreeText(student.neighborhood) && (
+                        <span className="error-message">
+                            {language === "english" 
+                                ? "Invalid text (max 150 characters, no special code characters)" 
+                                : "Texto inválido (máx 150 caracteres, sem caracteres especiais de código)"}
+                        </span>
+                    )}
                 </div>
                 <div className="form-group">
-                    <label htmlFor="skin_color">{language === "english" ? "Skin Color" : "Cor Da Pele"}</label>
-                    <input 
+                    <label htmlFor="skin_color">{language === "english" ? "Skin Color" : "Cor da Pele"}</label>
+                    <select 
                         id="skin_color"
-                        type="text"
-                        placeholder={language === "english" ? "Write the Student's Skin Color" : "Digite a cor da pele"}
                         value={student.skin_color}
                         onChange={(e) => setStudent({ ...student, skin_color: e.target.value })}
-                    />
+                    >
+                        <option value="">{language === "english" ? "Select skin color" : "Selecione a cor da pele"}</option>
+                        <option value="Branca">{language === "english" ? "White" : "Branca"}</option>
+                        <option value="Preta">{language === "english" ? "Black" : "Preta"}</option>
+                        <option value="Parda">{language === "english" ? "Brown" : "Parda"}</option>
+                        <option value="Amarela">{language === "english" ? "Yellow" : "Amarela"}</option>
+                        <option value="Indígena">{language === "english" ? "Indigenous" : "Indígena"}</option>
+                        <option value="Não informado">{language === "english" ? "Not informed" : "Não informado"}</option>
+                        <option value="Prefiro não declarar">{language === "english" ? "Prefer not to say" : "Prefiro não declarar"}</option>
+                    </select>
                 </div>
                 <div className="form-group">
                     <label htmlFor="email">Email para Contato</label>
@@ -457,44 +632,98 @@ export default function StudentsForm() {
                     </div>
                 </div>
                 <div className="form-group">
-                    <label htmlFor="school_year">{language === "english" ? "School's Year" : "Ano Escolar"}</label>
+                    <label htmlFor="school_year">{language === "english" ? "School Year" : "Ano Escolar"}</label>
                     <input 
                         id="school_year"
                         type="text"
-                        placeholder={language === "english" ? "Write the school year of student" : "Digite o ano da escola que o aluno esta"}
+                        placeholder={language === "english" ? "Write the school year" : "Digite o ano escolar"}
                         value={student.school_year}
-                        onChange={(e) => setStudent({ ...student, school_year: e.target.value })}
+                        onChange={(e) => {
+                            const value = sanitizeText(e.target.value);
+                            // Limita a 80 caracteres
+                            if (value.length <= 80) {
+                                setStudent({ ...student, school_year: value });
+                            }
+                        }}
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="school_name">{language === "english" ? "School's Name" : "Nome da Escola"}</label>
+                    <label htmlFor="school_name">{language === "english" ? "School Name" : "Nome da Escola"}</label>
                     <input 
                         id="school_name"
                         type="text"
-                        placeholder={language === "english" ? "Write the School's Name" : "Digite Nome da Escola"}
+                        placeholder={language === "english" ? "Write the School's Name" : "Digite o Nome da Escola"}
                         value={student.school_name}
-                        onChange={(e) => setStudent({ ...student, school_name: e.target.value })}
+                        onChange={(e) => {
+                            const value = sanitizeText(e.target.value);
+                            // Limita a 80 caracteres
+                            if (value.length <= 80) {
+                                setStudent({ ...student, school_name: value });
+                            }
+                        }}
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="school_period">{language === "english" ? "School's period" : "Periodo Escolar"}</label>
+                    <label htmlFor="school_period">{language === "english" ? "School Period" : "Período Escolar"}</label>
                     <input 
-                        id="school_name"
+                        id="school_period"
                         type="text"
-                        placeholder={language === "english" ? "Write the School's period" : "Digite Periodo que a criança estuda"}
+                        placeholder={language === "english" ? "Write the School's period" : "Digite o Período escolar"}
                         value={student.school_period}
-                        onChange={(e) => setStudent({ ...student, school_period: e.target.value })}
+                        onChange={(e) => {
+                            const value = sanitizeText(e.target.value);
+                            // Limita a 80 caracteres
+                            if (value.length <= 80) {
+                                setStudent({ ...student, school_period: value });
+                            }
+                        }}
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="neighborhood">{language === "english" ? "Notes" : "Informações Adicionais"}</label>
+                    <label htmlFor="cep">CEP</label>
                     <input 
-                    id="notes"
-                    type="text"
-                    placeholder={language === "english" ? "Write addictional notes " : "Digite as Informações Adicionais"}
-                    value={student.neighborhood}
-                    onChange={(e) => setStudent({ ...student, neighborhood: e.target.value })}
+                        id="cep"
+                        type="text"
+                        placeholder={language === "english" ? "Write the CEP (auto-fills address)" : "Digite o CEP (preenche endereço automaticamente)"}
+                        value={student.cep}
+                        onChange={handleCEPChange}
                     />
+                    {loadingCep && <span className="info-message">{language === "english" ? "Searching CEP..." : "Buscando CEP..."}</span>}
+                    {cepError && <span className="error-message">{cepError}</span>}
+                </div>
+                <div className="form-group">
+                    <label htmlFor="address">{language === "english" ? "Address" : "Endereço"}</label>
+                    <input 
+                        id="address"
+                        type="text"
+                        placeholder={language === "english" ? "Write the address" : "Digite o endereço"}
+                        value={student.address}
+                        onChange={handleAddressChange}
+                    />
+                    {student.address && !validateFreeText(student.address) && (
+                        <span className="error-message">
+                            {language === "english" 
+                                ? "Invalid text (max 150 characters, no special code characters)" 
+                                : "Texto inválido (máx 150 caracteres, sem caracteres especiais de código)"}
+                        </span>
+                    )}
+                </div>
+                <div className="form-group">
+                    <label htmlFor="notes">{language === "english" ? "Additional Notes" : "Informações Adicionais"}</label>
+                    <textarea 
+                        id="notes"
+                        rows="4"
+                        placeholder={language === "english" ? "Write additional notes" : "Digite as Informações Adicionais"}
+                        value={student.notes}
+                        onChange={handleNotesChange}
+                    />
+                    {student.notes && !validateFreeText(student.notes, 700) && (
+                        <span className="error-message">
+                            {language === "english" 
+                                ? "Invalid text (no special code characters)" 
+                                : "Texto inválido (sem caracteres especiais de código)"}
+                        </span>
+                    )}
                 </div>
                 <button type="submit" className="add-student-button">
                     {id 

@@ -59,6 +59,12 @@ export default function UsersForm() {
     const [usingGlobalSeed, setUsingGlobalSeed] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [savingText, setSavingText] = useState("");
+    // Logged-in user and role info
+    const loggedUserId = localStorage.getItem("id");
+    const loggedOccupation = localStorage.getItem("occupation_id");
+    const isSelf = id && loggedUserId && String(id) === String(loggedUserId);
+    const isAdminLogged = loggedOccupation === occupationEnum.administrador || loggedOccupation === "1" || loggedOccupation === 1;
+    // const [initialOccupationId, setInitialOccupationId] = useState(null); // ATIVAR para bloquear rebaixar admin
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -79,6 +85,7 @@ export default function UsersForm() {
         try {
             const response = await API.get(`/users/${id}`);
             setUser(response.data);
+            // setInitialOccupationId(response.data?.occupation_id); // ATIVAR para bloquear rebaixar admin (guarda função original)
         } catch (err) {
             console.error("Erro ao buscar usuário:", err);
             navigate("/users");
@@ -141,6 +148,16 @@ export default function UsersForm() {
             return;
         }
 
+        // ATIVAR caso queira PARA IMPEDIR QUE ADMIN REBAIXE OUTRO ADMIN
+        // if (isAdminLogged && !isSelf) {
+        //     const wasAdmin = String(initialOccupationId) === "1" || initialOccupationId === occupationEnum.administrador;
+        //     const changingToNonAdmin = String(user.occupation_id) !== "1" && user.occupation_id !== occupationEnum.administrador;
+        //     if (wasAdmin && changingToNonAdmin) {
+        //         setError(language === "english" ? "Administrators cannot downgrade other administrators" : "Administradores não podem rebaixar outros administradores");
+        //         return;
+        //     }
+        // }
+
         try {
             setIsSaving(true);
             setSavingText(id ? (language === "english" ? "Saving..." : "Salvando...") : (language === "english" ? "Creating user..." : "Criando usuário..."));
@@ -197,6 +214,10 @@ export default function UsersForm() {
     };
 
     const handleSavePermissions = async () => {
+        if (isSelf) {
+            setError(language === "english" ? "You cannot edit your own permissions" : "Você não pode editar suas próprias permissões");
+            return;
+        }
         try {
             console.log('=== SALVANDO PERMISSÕES ===');
             console.log('User ID:', id);
@@ -286,12 +307,21 @@ export default function UsersForm() {
                     value={user.occupation_id}
                     onChange={(e) => setUser({ ...user, occupation_id: e.target.value})}
                     required
+                    disabled={isSelf && isAdminLogged /* || (isAdminLogged && !isSelf && (String(user.occupation_id) === "1" || user.occupation_id === occupationEnum.administrador)) */}
                 >
                     <option value="">{language === "english" ? "Select the occupation" : "Selecione a função"}</option>
                     <option value="1">Administrador</option>
                     <option value="3">Professor</option>
                     <option value="2">Colaborador</option>
                 </select>
+                {isSelf && isAdminLogged && (
+                    <div className="info-message" style={{ marginTop: '8px' }}>
+                        <p>{language === "english" 
+                            ? "Administrators cannot change their own role."
+                            : "Administradores não podem alterar a própria função."
+                        }</p>
+                    </div>
+                )}
             </div>
         </>
     );
@@ -568,12 +598,14 @@ export default function UsersForm() {
                             >
                                 {language === "english" ? "User Info" : "Informações"}
                             </button>
-                            <button 
-                                className={`tab ${activeTab === 'permissions' ? 'active' : ''}`}
-                                onClick={() => setActiveTab('permissions')}
-                            >
-                                {language === "english" ? "Permissions" : "Permissões"}
-                            </button>
+                            {!isSelf && (
+                                <button 
+                                    className={`tab ${activeTab === 'permissions' ? 'active' : ''}`}
+                                    onClick={() => setActiveTab('permissions')}
+                                >
+                                    {language === "english" ? "Permissions" : "Permissões"}
+                                </button>
+                            )}
                         </div>
                     </div>
                 )}
@@ -581,7 +613,7 @@ export default function UsersForm() {
                 {/* Tab Content */}
                 <div className="tab-content">
                     {(!id || activeTab === 'info') && renderUserInfoTab()}
-                    {id && activeTab === 'permissions' && renderPermissionsTab()}
+                    {id && !isSelf && activeTab === 'permissions' && renderPermissionsTab()}
                 </div>
 
                 {/* Form Actions - only show for user info tab */}

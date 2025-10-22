@@ -20,6 +20,17 @@ export default function SubjectForm() {
     });
     const [professor, setProfessor] = useState([]);
     const [selectedProfessor, setSelectedProfessor] = useState([]);
+    const [nameError, setNameError] = useState("");
+    const [descriptionError, setDescriptionError] = useState("");
+
+    // Flag para ativar/desativar validação de palavras inapropriadas
+    const ENABLE_INAPPROPRIATE_WORDS_CHECK = false;
+
+    // Lista de palavras inapropriadas (blacklist) - DESATIVADA
+    // Para ativar, mude ENABLE_INAPPROPRIATE_WORDS_CHECK para true
+    const inappropriateWords = [
+        // Adicione palavras inapropriadas aqui quando necessário
+    ];
 
     useEffect(() => {
         loadProfessor();
@@ -48,6 +59,50 @@ export default function SubjectForm() {
         }
     };
 
+    // Função para normalizar texto (remove pontuação, espaços, etc)
+    const normalizeText = (text) => {
+        return text
+            .toLowerCase()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove acentos
+            .replace(/[^a-z0-9]/g, ''); // Remove tudo exceto letras e números
+    };
+
+    // Função para verificar palavras inapropriadas
+    const containsInappropriateWords = (text) => {
+        // Se a validação estiver desativada, sempre retorna false
+        if (!ENABLE_INAPPROPRIATE_WORDS_CHECK) return false;
+        
+        if (!text) return false;
+        
+        const normalizedText = normalizeText(text);
+        
+        // Verifica cada palavra da blacklist
+        for (const word of inappropriateWords) {
+            const normalizedWord = normalizeText(word);
+            
+            // Verifica se a palavra aparece no texto normalizado
+            if (normalizedText.includes(normalizedWord)) {
+                return true;
+            }
+            
+            // Verifica variações com espaços entre letras (ex: b u n d a)
+            const spacedPattern = normalizedWord.split('').join('.*');
+            const regex = new RegExp(spacedPattern, 'i');
+            if (regex.test(normalizedText)) {
+                return true;
+            }
+        }
+        
+        return false;
+    };
+
+    // Função para sanitizar texto (remove caracteres perigosos)
+    const sanitizeText = (text) => {
+        if (!text) return '';
+        const dangerous = /<|>|{|}|\[|\]|\\|\/script|<script|javascript:|onerror=|onclick=/gi;
+        return text.replace(dangerous, '');
+    };
+
     const loadProfessor = async () => {
         try {
             const response = await API.get(`/users/`);
@@ -66,6 +121,21 @@ export default function SubjectForm() {
     };
 
     const handleSubmit = async () => {
+        // Validações antes de enviar
+        if (containsInappropriateWords(subject.name)) {
+            setNameError(language === "english" 
+                ? "Subject name contains inappropriate content" 
+                : "Nome da disciplina contém conteúdo inapropriado");
+            return;
+        }
+
+        if (containsInappropriateWords(subject.description)) {
+            setDescriptionError(language === "english" 
+                ? "Description contains inappropriate content" 
+                : "Descrição contém conteúdo inapropriado");
+            return;
+        }
+
         const payload = {
             ...subject,
             professores: selectedProfessor.filter(p => p !== '')
@@ -167,9 +237,23 @@ export default function SubjectForm() {
                         type="text"
                         placeholder={language === "english" ? "Write Subject's Name" : "Digite o Nome da Disciplina"}
                         value={subject.name}
-                        onChange={(e) => setSubject({ ...subject, name: e.target.value })} 
+                        onChange={(e) => {
+                            const value = sanitizeText(e.target.value);
+                            if (value.length <= 150) {
+                                setSubject({ ...subject, name: value });
+                                setNameError("");
+                                
+                                // Verifica palavras inapropriadas em tempo real
+                                if (containsInappropriateWords(value)) {
+                                    setNameError(language === "english" 
+                                        ? "Subject name contains inappropriate content" 
+                                        : "Nome da disciplina contém conteúdo inapropriado");
+                                }
+                            }
+                        }} 
                         required 
                     />
+                    {nameError && <span className="error-message">{nameError}</span>}
                 </div>
 
                 <div className="form-group">
@@ -178,10 +262,24 @@ export default function SubjectForm() {
                         id="description"
                         placeholder={language === "english" ? "Write the Description" : "Digite a descrição"}
                         value={subject.description}
-                        onChange={(e) => setSubject({ ...subject, description: e.target.value })} 
+                        onChange={(e) => {
+                            const value = sanitizeText(e.target.value);
+                            const textWithoutSpaces = value.replace(/\s/g, '');
+                            if (textWithoutSpaces.length <= 150) {
+                                setSubject({ ...subject, description: value });
+                                setDescriptionError("");
+                                
+                                // Verifica palavras inapropriadas em tempo real
+                                if (containsInappropriateWords(value)) {
+                                    setDescriptionError(language === "english" 
+                                        ? "Description contains inappropriate content" 
+                                        : "Descrição contém conteúdo inapropriado");
+                                }
+                            }
+                        }} 
                         required
-                        maxLength={300}
                     />
+                    {descriptionError && <span className="error-message">{descriptionError}</span>}
                 </div>
 
                 <div className="form-group">

@@ -33,6 +33,32 @@ export default function AllDocuments({ canEdit = false, canUpload = false, canDe
   const [description, setDescription] = useState('');
   const [dragActive, setDragActive] = useState(false);
 
+  // Segurança e limites de entrada (título e descrição)
+  const NAME_MAX = 120;
+  const DESCRIPTION_MAX = 300;
+  const [nameError, setNameError] = useState('');
+  const [descriptionError, setDescriptionError] = useState('');
+
+  const sanitizeInput = (text) => {
+    if (!text) return '';
+    let t = String(text);
+    // Remover scripts e tags HTML
+    t = t.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '');
+    t = t.replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, '');
+    t = t.replace(/<[^>]*>/g, '');
+    // Remover javascript: e handlers inline
+    t = t.replace(/javascript:[^"'\s]*/gi, '');
+    t = t.replace(/on\w+\s*=\s*(["']).*?\1/gi, '');
+    // Normalizar espaços
+    t = t.replace(/\s+/g, ' ').trim();
+    return t;
+  };
+
+  const hasMaliciousPattern = (text) => {
+    if (!text) return false;
+    return /<[^>]+>|javascript:|on\w+\s*=|data:text\/html/i.test(text);
+  };
+
   // Carregar documentos
   const loadDocuments = async () => {
     setLoading(true);
@@ -288,7 +314,10 @@ export default function AllDocuments({ canEdit = false, canUpload = false, canDe
     if (selectedFile && selectedFile.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
       setFile(selectedFile);
       if (!name) {
-        setName(selectedFile.name.replace('.docx', ''));
+        let baseName = selectedFile.name.replace(/\.docx$/i, '');
+        baseName = sanitizeInput(baseName).slice(0, NAME_MAX);
+        setName(baseName);
+        setNameError(hasMaliciousPattern(selectedFile.name) ? (language === 'english' ? 'Suspicious content detected in file name' : 'Conteúdo suspeito detectado no nome do arquivo') : '');
       }
       setError('');
     } else {
@@ -329,10 +358,27 @@ export default function AllDocuments({ canEdit = false, canUpload = false, canDe
     setError('');
 
     try {
+      // Sanitização e validações finais antes do envio
+      const sanitizedName = sanitizeInput(name).slice(0, NAME_MAX).trim();
+      const sanitizedDescription = sanitizeInput(description).slice(0, DESCRIPTION_MAX).trim();
+
+      if (!sanitizedName) {
+        setError(language === 'english' ? 'Document name is required' : 'Nome do documento é obrigatório');
+        return;
+      }
+      if (name.length > NAME_MAX || description.length > DESCRIPTION_MAX) {
+        setError(language === 'english' ? 'Title or description exceeds the allowed length' : 'Título ou descrição excede o tamanho permitido');
+        return;
+      }
+      if (hasMaliciousPattern(name) || hasMaliciousPattern(description)) {
+        setError(language === 'english' ? 'Remove HTML/JS code from the fields' : 'Remova código HTML/JS dos campos');
+        return;
+      }
+
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('name', name.trim());
-      formData.append('description', description.trim());
+      formData.append('name', sanitizedName);
+      formData.append('description', sanitizedDescription);
 
       const response = await API.post('/all-documents', formData, {
         headers: {
@@ -571,11 +617,22 @@ export default function AllDocuments({ canEdit = false, canUpload = false, canDe
                   type="text"
                   id="name"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  maxLength={NAME_MAX}
+                  onChange={(e) => {
+                    let value = e.target.value;
+                    // Verificar padrões suspeitos antes de sanitizar para feedback
+                    setNameError(hasMaliciousPattern(value) ? (language === 'english' ? 'Remove HTML/JS code from the title' : 'Remova código HTML/JS do título') : '');
+                    value = sanitizeInput(value).slice(0, NAME_MAX);
+                    setName(value);
+                  }}
                   className="field-input"
                   placeholder={language === "english" ? "Ex: Procedures Manual" : "Ex: Manual de Procedimentos"}
                   required
                 />
+                <div className="field-info-row">
+                  <small className="field-hint">{name.length}/{NAME_MAX}</small>
+                  {nameError && <span className="error-message" style={{ marginLeft: '8px' }}>{nameError}</span>}
+                </div>
               </div>
 
               <div className="field-group">
@@ -585,11 +642,21 @@ export default function AllDocuments({ canEdit = false, canUpload = false, canDe
                 <textarea
                   id="description"
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  maxLength={DESCRIPTION_MAX}
+                  onChange={(e) => {
+                    let value = e.target.value;
+                    setDescriptionError(hasMaliciousPattern(value) ? (language === 'english' ? 'Remove HTML/JS code from the description' : 'Remova código HTML/JS da descrição') : '');
+                    value = sanitizeInput(value).slice(0, DESCRIPTION_MAX);
+                    setDescription(value);
+                  }}
                   rows={3}
                   className="field-textarea"
                   placeholder={language === "english" ? "Describe the contents of this document..." : "Descreva o conteúdo deste documento..."}
                 />
+                <div className="field-info-row">
+                  <small className="field-hint">{description.length}/{DESCRIPTION_MAX}</small>
+                  {descriptionError && <span className="error-message" style={{ marginLeft: '8px' }}>{descriptionError}</span>}
+                </div>
               </div>
             </div>
 
@@ -603,7 +670,7 @@ export default function AllDocuments({ canEdit = false, canUpload = false, canDe
               </button>
               <button
                 type="submit"
-                disabled={!file || !name.trim() || uploading}
+                disabled={!file || !name.trim() || uploading || Boolean(nameError) || Boolean(descriptionError)}
                 className="btn btn-primary"
               >
                 {uploading ? (
