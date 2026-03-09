@@ -5,6 +5,8 @@ const Docxtemplater = require('docxtemplater');
 const mammoth = require('mammoth');
 const DocumentLayout = require('../models/DocumentLayout');
 const Document = require('../models/Document');
+const documentLayoutService = require("../services/documentLayoutService");
+const documentService = require("../services/DocumentService");
 
 // Função para extrair placeholders de um documento DOCX
 const extractPlaceholders = (filePath) => {
@@ -59,7 +61,7 @@ const getAllLayouts = async (req, res) => {
   try {
     console.log('Buscando todos os layouts...');
     
-    const layouts = await DocumentLayout.findAll({
+    const layouts = await documentLayoutService.getAll({
       order: [['created_at', 'DESC']]
     });
     
@@ -103,7 +105,7 @@ const getLayout = async (req, res) => {
     console.log('🔍 URL original:', req.originalUrl);
     console.log('🔍 Path:', req.path);
     
-    const layout = await DocumentLayout.findByPk(req.params.id);
+    const layout = await documentLayoutService.findPk(req.params.id);
     if (!layout) {
       console.log('❌ Layout não encontrado para ID:', req.params.id);
       return res.status(404).json({ message: 'Layout não encontrado' });
@@ -158,7 +160,7 @@ const createLayout = async (req, res) => {
     console.log('Placeholders extraídos para salvar:', placeholders);
 
     // Criar registro no banco - usar string JSON diretamente para evitar conflitos com getter/setter
-    const layout = await DocumentLayout.create({
+    const layout = await documentLayoutService.create({
       name: name.trim(),
       description: description?.trim() || '',
       file_path: req.file.path,
@@ -201,7 +203,7 @@ const createLayout = async (req, res) => {
 // Deletar layout
 const deleteLayout = async (req, res) => {
   try {
-    const layout = await DocumentLayout.findByPk(req.params.id);
+    const layout = await documentLayoutService.findPk(req.params.id);
     
     if (!layout) {
       return res.status(404).json({ message: 'Layout não encontrado' });
@@ -212,7 +214,7 @@ const deleteLayout = async (req, res) => {
       fs.unlinkSync(layout.file_path);
     }
 
-    await layout.destroy();
+    await documentLayoutService.destroy(layout.id);
     res.json({ message: 'Layout excluído com sucesso' });
   } catch (error) {
     console.error('Erro ao deletar layout:', error);
@@ -225,7 +227,7 @@ const previewLayout = async (req, res) => {
   try {
     console.log('Gerando preview do layout:', req.params.id);
     
-    const layout = await DocumentLayout.findByPk(req.params.id);
+    const layout = await documentLayoutService.findPk(req.params.id);
     if (!layout) {
       return res.status(404).json({ message: 'Layout não encontrado' });
     }
@@ -260,7 +262,7 @@ const previewDocument = async (req, res) => {
     
     const { data } = req.body;
     
-    const layout = await DocumentLayout.findByPk(req.params.id);
+    const layout = await documentLayoutService.findPk(req.params.id);
     if (!layout) {
       return res.status(404).json({ message: 'Layout não encontrado' });
     }
@@ -337,7 +339,7 @@ const generateDocument = async (req, res) => {
     
     const { data, format = 'docx' } = req.body;
     
-    const layout = await DocumentLayout.findByPk(req.params.id);
+    const layout = await documentLayoutService.findPk(req.params.id);
     if (!layout) {
       return res.status(404).json({ message: 'Layout não encontrado' });
     }
@@ -720,7 +722,7 @@ const savePartialTemplate = async (req, res) => {
       return res.status(400).json({ message: 'Título é obrigatório' });
     }
     
-    const layout = await DocumentLayout.findByPk(req.params.id);
+    const layout = await documentLayoutService.findPk(req.params.id);
     if (!layout) {
       return res.status(404).json({ message: 'Layout não encontrado' });
     }
@@ -733,7 +735,7 @@ const savePartialTemplate = async (req, res) => {
     if (!audience || !allowedAudience.includes(audience)) {
       return res.status(400).json({ message: 'Audiência é obrigatória e deve ser "professor", "colaborador" ou "all"' });
     }
-    const partialDocument = await Document.create({
+    const partialDocument = await documentService.create({
       template_id: null, // Não referenciar diretamente para evitar constraint
       title: title.trim(),
       content: {
@@ -792,7 +794,7 @@ const getPartialTemplates = async (req, res) => {
   try {
     console.log('Buscando templates parciais...');
     
-    const templates = await Document.findAll({
+    const templates = await documentService.getAll({
       where: { status: 'template' },
       order: [['createdAt', 'DESC']]
     });
@@ -843,7 +845,7 @@ const getPartialTemplates = async (req, res) => {
 // Buscar template parcial por ID
 const getPartialTemplate = async (req, res) => {
   try {
-    const template = await Document.findOne({
+    const template = await documentService.findOne({
       where: { 
         id: req.params.id,
         status: 'template'
@@ -901,7 +903,7 @@ const previewPartialTemplate = async (req, res) => {
     const { data } = req.body;
     
     // Buscar o template parcial
-    const partialTemplate = await Document.findOne({
+    const partialTemplate = await documentService.findOne({
       where: { 
         id: req.params.id,
         status: 'template'
@@ -917,7 +919,7 @@ const previewPartialTemplate = async (req, res) => {
     if (partialTemplate.content && partialTemplate.content._metadata) {
       const originalLayoutId = partialTemplate.content._metadata.original_layout_id;
       if (originalLayoutId) {
-        layout = await DocumentLayout.findByPk(originalLayoutId);
+        layout = await documentLayoutService.findPk(originalLayoutId);
       }
     }
     
@@ -1007,7 +1009,7 @@ const deletePartialTemplate = async (req, res) => {
   try {
     console.log('Deletando template parcial:', req.params.id);
     
-    const template = await Document.findOne({
+    const template = await documentService.findOne({
       where: { 
         id: req.params.id,
         status: 'template'
@@ -1019,7 +1021,7 @@ const deletePartialTemplate = async (req, res) => {
     }
     
     // Deletar o registro do banco de dados
-    await template.destroy();
+    await documentService.destroy(template.id);
     
     console.log('Template parcial deletado com sucesso:', req.params.id);
     res.json({ message: 'Template parcial excluído com sucesso' });
@@ -1041,7 +1043,7 @@ const completePartialTemplate = async (req, res) => {
     const { data, format = 'docx' } = req.body;
     
     // Buscar o template parcial
-    const partialTemplate = await Document.findOne({
+    const partialTemplate = await documentService.findOne({
       where: { 
         id: req.params.id,
         status: 'template'
@@ -1057,7 +1059,7 @@ const completePartialTemplate = async (req, res) => {
     if (partialTemplate.content && partialTemplate.content._metadata) {
       const originalLayoutId = partialTemplate.content._metadata.original_layout_id;
       if (originalLayoutId) {
-        layout = await DocumentLayout.findByPk(originalLayoutId);
+        layout = await documentLayoutService.findPk(originalLayoutId);
       }
     }
     

@@ -2,9 +2,13 @@ const Subject = require('../models/Subject');
 const Students = require('../models/Students');
 const User = require('../models/User');
 const SubjectStudent = require('../models/SubjectStudent');
+const subjectService = require("../services/subjectService");
+const subjectStudentService = require("../services/subjectStudentService");
+const studentsService = require("../services/studentsService");
+const userService = require("../services/userService");
 
 exports.getAllSubjects = async (req, res) => {
-  const subjects = await Subject.findAll();
+  const subjects = await subjectService.getAll();
   res.json(subjects);
 };
 
@@ -15,7 +19,7 @@ exports.getSubjectById = async (req, res) => {
 
     const subject = 
     type === "withProfessor"
-      ? await Subject.findByPk(
+      ? await subjectService.findPk(
         id, 
         {
           include: [{
@@ -26,7 +30,7 @@ exports.getSubjectById = async (req, res) => {
             required: false
           }]
         })
-      : await Subject.findByPk(
+      : await subjectService.findPk(
         id, 
         {
           include: [{
@@ -51,7 +55,7 @@ exports.getSubjectById = async (req, res) => {
 exports.createSubject = async (req, res) => {
   const { name, description, professors, students } = req.body;
   try {
-    const subject = await Subject.create({ name, description });
+    const subject = await subjectService.create({ name, description });
 
     if (Array.isArray(professors)) {
       await subject.setProfessores(professors);
@@ -60,7 +64,7 @@ exports.createSubject = async (req, res) => {
     if (Array.isArray(students)) {
       // Criar relações com createdAt explícito
       for (const studentId of students) {
-        await SubjectStudent.create({
+        await subjectStudentService.create({
           subject_id: subject.id,
           students_id: studentId,
           createdAt: new Date()
@@ -79,20 +83,20 @@ exports.updateSubject = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const subject = await Subject.findByPk(id);
+    const subject = await subjectService.findPk(id);
     if (!subject) return res.status(404).json({ error: "Disciplina não encontrada" });
 
-    await subject.update({ name, description });
+    await subjectService.update(subject, { name, description });
 
     // Atualizar professores (validação incluída)
     if (Array.isArray(professores)) {
-      const validUsers = await User.findAll({ where: { id: professores } });
+      const validUsers = await userService.getAll({ where: { id: professores } });
       const validProfIds = validUsers.map(u => u.id);
       await subject.setProfessores(validProfIds);
     }
 
     if (Array.isArray(students)) {
-      const validStudents = await Students.findAll({ where: { id: students } });
+      const validStudents = await studentsService.getAll({ where: { id: students } });
       const validStudentIds = validStudents.map(s => s.id);
       
       // Primeiro, remover todas as relações existentes
@@ -100,7 +104,7 @@ exports.updateSubject = async (req, res) => {
       
       // Depois, criar novas relações com createdAt explícito
       for (const studentId of validStudentIds) {
-        await SubjectStudent.create({
+        await subjectStudentService.create({
           subject_id: subject.id,
           students_id: studentId,
           createdAt: new Date()
@@ -108,7 +112,7 @@ exports.updateSubject = async (req, res) => {
       }
     }
 
-    const updated = await Subject.findByPk(id, {
+    const updated = await subjectService.findPk(id, {
       include: [
         {
           model: User,
@@ -139,19 +143,19 @@ exports.addStudentToSubject = async (req, res) => {
     const { subjectId, studentId } = req.params;
     
     // Verificar se a disciplina existe
-    const subject = await Subject.findByPk(subjectId);
+    const subject = await subjectService.findPk(subjectId);
     if (!subject) {
       return res.status(404).json({ error: "Disciplina não encontrada" });
     }
     
     // Verificar se o aluno existe
-    const student = await Students.findByPk(studentId);
+    const student = await studentsService.findPk(studentId);
     if (!student) {
       return res.status(404).json({ error: "Aluno não encontrado" });
     }
     
     // Verificar se a relação já existe
-    const existingRelation = await SubjectStudent.findOne({
+    const existingRelation = await subjectStudentService.findOne({
       where: {
         subject_id: subjectId,
         students_id: studentId
@@ -163,7 +167,7 @@ exports.addStudentToSubject = async (req, res) => {
     }
     
     // Criar a relação com createdAt explícito
-    await SubjectStudent.create({
+    await subjectStudentService.create({
       subject_id: subjectId,
       students_id: studentId,
       createdAt: new Date()
@@ -179,17 +183,17 @@ exports.addStudentToSubject = async (req, res) => {
 };
 
 const verifyActivity = async (studentId) => {
-  const existingRelation = await SubjectStudent.findOne({
+  const existingRelation = await subjectStudentService.findOne({
     where: {
       students_id: studentId
     }
   });
 
-  const student = await Students.findByPk(studentId);
+  const student = await studentsService.findPk(studentId);
 
   existingRelation 
-  ? await student.update({ active: true })
-  : await student.update({ active: false })
+  ? await studentsService.update(student, { active: true })
+  : await studentsService.update(student, { active: false })
 }
 
 exports.removeStudentFromSubject = async (req, res) => {
@@ -208,14 +212,14 @@ exports.removeStudentFromSubject = async (req, res) => {
 exports.deleteSubject = async (req, res) => {
   try {
     const subjectId = req.params.id;
-    const subject = await Subject.findByPk(subjectId);
+    const subject = await subjectService.findPk(subjectId);
     if (!subject) {
       return res.status(404).json({ error: "Disciplina não encontrada" });
     }
     // Remover relações com alunos antes de excluir a disciplina
-    await SubjectStudent.destroy({ where: { subject_id: subjectId } });
+    await subjectStudentService.destroy({ subject_id: subjectId });
     // Excluir a disciplina
-    await subject.destroy();
+    await subjectService.destroy(subjectId);
     res.status(204).send();
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -229,7 +233,7 @@ exports.getSubjectsByProfessor = async (req, res) => {
     
     console.log("🔍 Buscando matérias para professor ID:", professorId);
     
-    const subjects = await Subject.findAll({
+    const subjects = await subjectService.getAll({
       include: [{
         model: User,
         as: 'professores',

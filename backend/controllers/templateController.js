@@ -1,5 +1,5 @@
 const DocumentTemplateProcessor = require('./documentTemplateProcessor');
-const { DocumentTemplate } = require('../models');
+const documentTemplateService = require("../services/documentTemplateService");
 
 // Upload e processamento de template
 exports.uploadTemplate = async (req, res) => {
@@ -12,7 +12,7 @@ exports.uploadTemplate = async (req, res) => {
         const templateInfo = await DocumentTemplateProcessor.processTemplateUpload(req.file);
         
         // Salvar template no banco de dados
-        const template = await DocumentTemplate.create({
+        const template = await documentTemplateService.create({
             name: req.body.name || templateInfo.originalName,
             description: req.body.description || '',
             file_name: templateInfo.originalName,
@@ -44,7 +44,7 @@ exports.uploadTemplate = async (req, res) => {
 // Listar templates
 exports.getTemplates = async (req, res) => {
     try {
-        const templates = await DocumentTemplate.findAll({
+        const templates = await documentTemplateService.getAll({
             where: { status: 'active' },
             attributes: ['id', 'name', 'description', 'field_count', 'created_at']
         });
@@ -61,7 +61,7 @@ exports.getTemplates = async (req, res) => {
 // Obter template específico
 exports.getTemplate = async (req, res) => {
     try {
-        const template = await DocumentTemplate.findByPk(req.params.id);
+        const template = await documentTemplateService.findPk(req.params.id);
         
         if (!template) {
             return res.status(404).json({ message: 'Template não encontrado' });
@@ -90,7 +90,7 @@ exports.generateDocument = async (req, res) => {
         const { templateId, fieldValues, outputFormat = 'docx' } = req.body;
 
         // Buscar template
-        const template = await DocumentTemplate.findByPk(templateId);
+        const template = await documentTemplateService.findPk(templateId);
         if (!template) {
             return res.status(404).json({ message: 'Template não encontrado' });
         }
@@ -144,7 +144,7 @@ exports.previewDocument = async (req, res) => {
         const { templateId, fieldValues } = req.body;
 
         // Buscar template
-        const template = await DocumentTemplate.findByPk(templateId);
+        const template = await documentTemplateService.findPk(templateId);
         if (!template) {
             return res.status(404).json({ message: 'Template não encontrado' });
         }
@@ -186,13 +186,13 @@ exports.previewDocument = async (req, res) => {
 // Deletar template
 exports.deleteTemplate = async (req, res) => {
     try {
-        const template = await DocumentTemplate.findByPk(req.params.id);
+        const template = await documentTemplateService.findPk(req.params.id);
         
         if (!template) {
             return res.status(404).json({ message: 'Template não encontrado' });
         }
 
-        await template.update({ status: 'deleted' });
+        await documentTemplateService.update(template, { status: 'deleted' });
         
         res.json({ message: 'Template excluído com sucesso' });
     } catch (error) {

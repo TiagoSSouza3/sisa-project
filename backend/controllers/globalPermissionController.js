@@ -1,4 +1,4 @@
-const GlobalPermission = require("../models/GlobalPermission");
+const globalPermissionService = require("../services/globalPermissionService");
 
 // Lista de todas as permissões disponíveis no sistema
 const AVAILABLE_PERMISSIONS = [
@@ -21,7 +21,7 @@ exports.getGlobalPermissions = async (req, res) => {
   try {
     console.log('[GLOBAL_PERMISSIONS] Buscando permissões globais');
     
-    const permissions = await GlobalPermission.findAll({
+    const permissions = await globalPermissionService.getAll({
       order: [['role', 'ASC'], ['permission_name', 'ASC']]
     });
     
@@ -119,7 +119,7 @@ exports.saveGlobalPermissions = async (req, res) => {
           console.log(`[GLOBAL_PERMISSIONS] Salvando: ${role}.${permissionName} = ${isAllowed}`);
           
           // Usar upsert para criar ou atualizar
-          const [permission, created] = await GlobalPermission.upsert({
+          const [permission, created] = await globalPermissionService.upsert({
             role: role,
             permission_name: permissionName,
             is_allowed: Boolean(isAllowed)
@@ -143,7 +143,7 @@ exports.saveGlobalPermissions = async (req, res) => {
     console.log(`[GLOBAL_PERMISSIONS] Processadas ${results.length} permissões globais`);
     
     // Buscar e retornar as permissões atualizadas
-    const permissions_updated = await GlobalPermission.findAll({
+    const permissions_updated = await globalPermissionService.getAll({
       order: [['role', 'ASC'], ['permission_name', 'ASC']]
     });
     
@@ -186,7 +186,7 @@ exports.checkGlobalPermission = async (userRole, permissionName) => {
       return false;
     }
     
-    const permission = await GlobalPermission.findOne({
+    const permission = await globalPermissionService.findOne({
       where: {
         role: userRole,
         permission_name: permissionName

@@ -1,5 +1,6 @@
 const DocumentTemplate = require('../models/DocumentTemplate');
 const User = require('../models/User');
+const documentTemplateService = require("../services/documentTemplateService");
 const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
@@ -128,7 +129,7 @@ const documentTemplateController = {
                 const { placeholders, placeholderConfig } = await extractPlaceholders(req.file.path);
                 
                 // Criar template no banco
-                const template = await DocumentTemplate.create({
+                const template = await documentTemplateService.create({
                     name,
                     description,
                     filename: req.file.originalname,
@@ -158,7 +159,7 @@ const documentTemplateController = {
     // Listar todos os templates
     async getAllTemplates(req, res) {
         try {
-            const templates = await DocumentTemplate.findAll({
+            const templates = await documentTemplateService.getAll({
                 where: { is_active: true },
                 order: [['createdAt', 'DESC']]
             });
@@ -175,7 +176,7 @@ const documentTemplateController = {
         try {
             const { id } = req.params;
             
-            const template = await DocumentTemplate.findByPk(id);
+            const template = await documentTemplateService.findPk(id);
             
             if (!template) {
                 return res.status(404).json({ message: 'Template não encontrado' });
@@ -194,7 +195,7 @@ const documentTemplateController = {
             const { id } = req.params;
             const { name, description, placeholder_config } = req.body;
             
-            const template = await DocumentTemplate.findByPk(id);
+            const template = await documentTemplateService.findPk(id);
             
             if (!template) {
                 return res.status(404).json({ message: 'Template não encontrado' });
@@ -205,7 +206,7 @@ const documentTemplateController = {
                 return res.status(403).json({ message: 'Sem permissão para editar este template' });
             }
             
-            await template.update({
+            await documentTemplateService.update(template, {
                 name: name || template.name,
                 description: description || template.description,
                 placeholder_config: placeholder_config || template.placeholder_config
@@ -226,7 +227,7 @@ const documentTemplateController = {
         try {
             const { id } = req.params;
             
-            const template = await DocumentTemplate.findByPk(id);
+            const template = await documentTemplateService.findPk(id);
             
             if (!template) {
                 return res.status(404).json({ message: 'Template não encontrado' });
@@ -242,7 +243,7 @@ const documentTemplateController = {
                 fs.unlinkSync(template.file_path);
             }
             
-            await template.destroy();
+            await documentTemplateService.destroy(template.id);
             
             res.json({ message: 'Template deletado com sucesso' });
         } catch (error) {
@@ -257,7 +258,7 @@ const documentTemplateController = {
             const { id } = req.params;
             const { fields, format = 'docx' } = req.body;
             
-            const template = await DocumentTemplate.findByPk(id);
+            const template = await documentTemplateService.findPk(id);
             
             if (!template) {
                 return res.status(404).json({ message: 'Template não encontrado' });
@@ -290,7 +291,7 @@ const documentTemplateController = {
             const { id } = req.params;
             const { fields } = req.body;
             
-            const template = await DocumentTemplate.findByPk(id);
+            const template = await documentTemplateService.findPk(id);
             
             if (!template) {
                 return res.status(404).json({ message: 'Template não encontrado' });

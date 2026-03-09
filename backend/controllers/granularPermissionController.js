@@ -1,4 +1,4 @@
-const GranularPermission = require("../models/GranularPermission");
+const granularPermissionService = require("../services/granularPermissionService");
 
 /**
  * Salvar ou atualizar restrições granulares para um usuário
@@ -28,7 +28,7 @@ exports.saveRestrictions = async (req, res) => {
     const restrictedDocuments = restrictions.documents || [];
     
     // Verificar se já existe um registro para este usuário+role
-    const existing = await GranularPermission.findOne({ 
+    const existing = await granularPermissionService.findOne({ 
       where: { 
         user_id: user_id, 
         user_role: user_role 
@@ -39,7 +39,7 @@ exports.saveRestrictions = async (req, res) => {
       // Atualizar registro existente
       console.log(`[GRANULAR] Atualizando restrições existentes para usuário ${user_id} (${user_role})`);
       
-      await GranularPermission.update({
+      await granularPermissionService.updateWhere({
         restricted_layouts: restrictedLayouts,
         restricted_documents: restrictedDocuments
       }, {
@@ -49,7 +49,7 @@ exports.saveRestrictions = async (req, res) => {
         }
       });
       
-      const updated = await GranularPermission.findOne({ 
+      const updated = await granularPermissionService.findOne({ 
         where: { 
           user_id: user_id, 
           user_role: user_role 
@@ -75,7 +75,7 @@ exports.saveRestrictions = async (req, res) => {
       // Criar novo registro
       console.log(`[GRANULAR] Criando novas restrições para usuário ${user_id} (${user_role})`);
       
-      const newRestriction = await GranularPermission.create({
+      const newRestriction = await granularPermissionService.create({
         user_id: user_id,
         user_role: user_role,
         restricted_layouts: restrictedLayouts,
@@ -127,7 +127,7 @@ exports.getRestrictions = async (req, res) => {
       });
     }
     
-    const restrictions = await GranularPermission.findOne({
+    const restrictions = await granularPermissionService.findOne({
       where: {
         user_id: userId,
         user_role: userRole
@@ -174,7 +174,7 @@ exports.getAllRestrictions = async (req, res) => {
   try {
     console.log(`[GRANULAR] Listando todas as restrições granulares`);
     
-    const allRestrictions = await GranularPermission.findAll({
+    const allRestrictions = await granularPermissionService.getAll({
       order: [['user_id', 'ASC'], ['user_role', 'ASC']]
     });
     
@@ -201,11 +201,9 @@ exports.deleteRestrictions = async (req, res) => {
     
     console.log(`[GRANULAR] Removendo restrições para usuário ${userId} (${userRole})`);
     
-    const deleted = await GranularPermission.destroy({
-      where: {
-        user_id: userId,
-        user_role: userRole
-      }
+    const deleted = await granularPermissionService.destroy({
+      user_id: userId,
+      user_role: userRole
     });
     
     if (deleted === 0) {

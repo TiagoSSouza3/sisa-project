@@ -1,10 +1,12 @@
 const Storage = require('../models/Storage');
 const StorageLog = require('../models/StorageLog');
 const { Op, fn, col, where } = require('sequelize');
+const storageService = require("../services/storageService");
+const storageLogService = require("../services/storageLogService");
 
 exports.getStorage = async (req, res) => {
   try {
-    const storage = await Storage.findAll();
+    const storage = await storageService.getAll();
     
     // Abordagem mais simples: adicionar priceChange diretamente
     const storageWithPriceChange = storage.filter((item) => !!item).map((item) => {
@@ -40,7 +42,7 @@ exports.getStorage = async (req, res) => {
 
 exports.getStorageLog = async (req, res) => {
   if(req.params.type != "log") return
-  const storage_log = await StorageLog.findAll({
+  const storage_log = await storageLogService.getAll({
     order: [[ 'created_at', 'DESC' ]]
   });
   res.json(storage_log);
@@ -52,7 +54,7 @@ exports.getStorageLogByMonth = async (req, res) => {
   const { month, year } = req.body;
 
   try {
-    const storage_log = await StorageLog.findAll({
+    const storage_log = await storageLogService.getAll({
       where: where(fn('MONTH', col('created_at')), month),
       where: where(fn('YEAR', col('created_at')), year),
       order: [['created_at', 'DESC']]
@@ -71,7 +73,7 @@ exports.getStorageLogById = async (req, res) => {
 
     if(type != "log")return
 
-    const storage_Logs = await StorageLog.findAll({
+    const storage_Logs = await storageLogService.getAll({
       where: {id_item: id},
       order: [['created_at', 'DESC']]
     });
@@ -116,7 +118,7 @@ exports.createStorageItem = async (req, res) => {
             updated_at: new Date()
         };
 
-        const storage = await Storage.create(item);
+        const storage = await storageService.create(item);
 
         // Cria log de criação
         const item_log = {
@@ -132,7 +134,7 @@ exports.createStorageItem = async (req, res) => {
             value_diference: 0
         };
 
-        await StorageLog.create(item_log);
+        await storageLogService.create(item_log);
 
         res.status(201).json(storage);
     } catch (error) {
@@ -150,7 +152,7 @@ exports.updateStorageItem = async (req, res) => {
       updated_at: new Date()
     };
 
-    const storage = await Storage.findByPk(id);
+    const storage = await storageService.findPk(id);
     if (!storage) {
       return res.status(404).json({ error: "Item não encontrado" });
     }
@@ -223,14 +225,14 @@ exports.updateStorageItem = async (req, res) => {
     });
 
     // Atualiza o item
-    await storage.update(toUpdate);
+    await storageService.update(storage, toUpdate);
 
     // Cria todos os logs necessários
     for (const log of logsToCreate) {
-      await StorageLog.create(log);
+      await storageLogService.create(log);
     }
 
-    const updated = await Storage.findByPk(id);
+    const updated = await storageService.findPk(id);
     res.json(updated);
     
   } catch (error) {
@@ -241,7 +243,7 @@ exports.updateStorageItem = async (req, res) => {
 
 exports.deleteStorageItem = async (req, res) => {
   try {
-    const storage = await Storage.findByPk(req.params.id);
+    const storage = await storageService.findPk(req.params.id);
 
     if (!storage) {
       return res.status(404).json({ error: "Item não encontrado" });
@@ -261,8 +263,8 @@ exports.deleteStorageItem = async (req, res) => {
       value_diference: 0
     };
 
-    await StorageLog.create(item_log);
-    await storage.destroy();
+    await storageLogService.create(item_log);
+    await storageService.destroy(storage.id);
 
     res.status(204).send();
   } catch (error) {

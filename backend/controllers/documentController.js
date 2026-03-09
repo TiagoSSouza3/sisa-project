@@ -1,9 +1,12 @@
-const { Document, DocumentVersion, DocumentTemplate, Subject, User } = require('../models');
+const { DocumentTemplate, Subject, User } = require('../models');
 const PDFDocument = require('pdfkit');
+const documentService = require("../services/DocumentService");
+const documentVersionService = require("../services/documentVersionService");
+const documentTemplateService = require("../services/documentTemplateService");
 
 exports.getDocuments = async (req, res) => {
     try {
-        const docs = await Document.findAll();
+        const docs = await documentService.getAll();
         res.json(docs);
     } catch (error) {
         res.status(500).json({ message: 'Erro ao buscar documentos', error: error.message });
@@ -13,7 +16,7 @@ exports.getDocuments = async (req, res) => {
     // Obter documento específico
 exports.getDocument = async (req, res) => {
     try {
-        const doc = await Document.findByPk(req.params.id);
+        const doc = await documentService.findPk(req.params.id);
 
         if (!doc) {
             return res.status(404).json({ message: 'Documento não encontrado' });
@@ -37,7 +40,7 @@ exports.createDocument = async (req, res) => {
             file_data 
         } = req.body;
 
-        const template = await DocumentTemplate.findByPk(template_id);
+        const template = await documentTemplateService.findPk(template_id);
         if (!template) {
             //return res.status(404).json({ message: 'Template não encontrado' });
         }
@@ -46,7 +49,7 @@ exports.createDocument = async (req, res) => {
             return res.status(400).json({ message: 'Conteúdo não corresponde à estrutura do template' });
         }
 
-        const document = await Document.create({
+        const document = await documentService.create({
             title,
             subject_id,
             template_id,
@@ -61,7 +64,7 @@ exports.createDocument = async (req, res) => {
         });
 
         // Criar primeira versão
-        await DocumentVersion.create({
+        await documentVersionService.create({
             document_id: document.id,
             version: 1,
             content,
@@ -78,7 +81,7 @@ exports.createDocument = async (req, res) => {
 // Atualizar documento
 exports.updateDocument = async (req, res) => {
     try {
-        const document = await Document.findByPk(req.params.id, {
+        const document = await documentService.findPk(req.params.id, {
             include: [{ model: DocumentTemplate, as: 'template' }]
         });
 
@@ -97,15 +100,15 @@ exports.updateDocument = async (req, res) => {
         const newVersion = document.version + 1;
 
         // Atualizar documento
-        content: content || document.content,
-        await document.update({
+        await documentService.update(document, {
+            content: content || document.content,
             status: status || document.status,
             version: newVersion,
             last_modified_by: req.user.id
         });
 
         // Criar nova versão
-        await DocumentVersion.create({
+        await documentVersionService.create({
             document_id: document.id,
             version: newVersion,
             content: content || document.content,
@@ -122,13 +125,13 @@ exports.updateDocument = async (req, res) => {
 // Deletar documento
 exports.deleteDocument = async (req, res) => {
     try {
-        const document = await Document.findByPk(req.params.id);
+        const document = await documentService.findPk(req.params.id);
         
         if (!document) {
             return res.status(404).json({ message: 'Documento não encontrado' });
         }
 
-        await document.destroy();
+        await documentService.destroy(document.id);
         res.json({ message: 'Documento excluído com sucesso' });
     } catch (error) {
         res.status(500).json({ message: 'Erro ao deletar documento', error: error.message });
@@ -138,7 +141,7 @@ exports.deleteDocument = async (req, res) => {
 // Listar versões de um documento
 exports.getDocumentVersions = async (req, res) => {
     try {
-        const versions = await DocumentVersion.findAll({
+        const versions = await documentVersionService.getAll({
             where: { document_id: req.params.id },
             include: [{
                 model: User,
@@ -157,7 +160,7 @@ exports.getDocumentVersions = async (req, res) => {
 // Download do documento
 exports.downloadDocument = async (req, res) => {
     try {
-        const document = await Document.findByPk(req.params.id, {
+        const document = await documentService.findPk(req.params.id, {
             include: [
                 { model: DocumentTemplate, as: 'template' },
                 { model: Subject, as: 'subject' }

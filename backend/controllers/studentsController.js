@@ -1,10 +1,11 @@
 const Student = require("../models/Students");
 const Subject = require("../models/Subject");
 const Parent = require("../models/Parent");
+const studentsService = require("../services/studentsService");
 
 exports.getAllStudents = async (req, res) => {
 
-    const list = await Student.findAll(
+    const list = await studentsService.getAll(
       {
         include: [
           {
@@ -38,7 +39,7 @@ exports.getAllStudents = async (req, res) => {
 
 exports.createStudent = async (req, res) => {
   try {
-    const student = await Student.create(req.body);
+    const student = await studentsService.create(req.body);
     res.status(201).json(student);
   } catch (error) {
     console.error(error, error.mensage)
@@ -49,14 +50,14 @@ exports.createStudent = async (req, res) => {
 exports.updateStudent = async (req, res) => {
   try {
     const { id } = req.params;
-    const student = await Student.findByPk(id);
+    const student = await studentsService.findPk(id);
     
     if (!student) {
       return res.status(404).json({ error: "Aluno não encontrado" });
     }
 
-    await student.update(req.body);
-    const updatedStudent = await Student.findByPk(id);
+    await studentsService.update(student, req.body);
+    const updatedStudent = await studentsService.findPk(id);
     res.json(updatedStudent);
   } catch (error) {
     console.error("Erro ao atualizar aluno:", error);
@@ -67,7 +68,7 @@ exports.updateStudent = async (req, res) => {
 exports.deleteStudent = async (req, res) => {
   try {
     const { id } = req.params;
-    const deleted = await Student.destroy({ where: { id } });
+    const deleted = await studentsService.destroy({ id });
     
     if (deleted) {
       res.status(204).end();
@@ -81,35 +82,32 @@ exports.deleteStudent = async (req, res) => {
 
 exports.getStudentById = async (req, res) => {
   try {
-    const student = await Student.findByPk(
-      req.params.id,
-      {
-        include: [
-          {
-            model: Subject,
-            as: 'subjects',
-            attributes: ['id'],
-            through: { attributes: [] },
-            required: false
-          },
-          {
-            model: Parent,
-            as: 'parent',
-            required: false
-          },
-          {
-            model: Parent,
-            as: 'second_parent',
-            required: false
-          },
-          {
-            model: Parent,
-            as: 'responsible_parent',
-            required: false
-          }
-        ]
-      }
-    );
+    const student = await studentsService.findPk(req.params.id, {
+      include: [
+        {
+          model: Subject,
+          as: 'subjects',
+          attributes: ['id'],
+          through: { attributes: [] },
+          required: false
+        },
+        {
+          model: Parent,
+          as: 'parent',
+          required: false
+        },
+        {
+          model: Parent,
+          as: 'second_parent',
+          required: false
+        },
+        {
+          model: Parent,
+          as: 'responsible_parent',
+          required: false
+        }
+      ]
+    });
     
     if (student) {
       res.json(student);

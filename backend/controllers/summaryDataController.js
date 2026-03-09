@@ -3,10 +3,14 @@ const Students = require("../models/Students");
 const Subject = require("../models/Subject");
 const SubjectStudent = require("../models/SubjectStudent");
 const { Op } = require('sequelize');
+const summaryDataService = require("../services/summaryDataService");
+const studentsService = require("../services/studentsService");
+const subjectService = require("../services/subjectService");
+const subjectStudentService = require("../services/subjectStudentService");
 
 exports.getAll = async (req, res) => {
   try {
-    const list = await SummaryData.findAll();
+    const list = await summaryDataService.getAll();
     res.json(list);
   } catch (error) {
     res.status(500).json({ error: "Erro ao buscar dados resumidos" });
@@ -22,7 +26,7 @@ exports.getBirthdayStudents = async (req, res) => {
       return res.status(400).json({ error: "Mês inválido. Deve ser entre 1 e 12." });
     }
 
-    const students = await Students.findAll({
+    const students = await studentsService.getAll({
       where: {
         active: true,
         birth_date: {
@@ -52,7 +56,7 @@ exports.getBirthdayStudents = async (req, res) => {
 // Contar alunos por disciplina
 exports.getStudentsBySubject = async (req, res) => {
   try {
-    const subjectCounts = await SubjectStudent.findAll({
+    const subjectCounts = await subjectStudentService.getAll({
       attributes: [
         'subject_id',
         [SubjectStudent.sequelize.fn('COUNT', SubjectStudent.sequelize.col('students_id')), 'student_count']
@@ -62,7 +66,7 @@ exports.getStudentsBySubject = async (req, res) => {
     });
 
     // Buscar nomes das disciplinas
-    const subjects = await Subject.findAll({
+    const subjects = await subjectService.getAll({
       attributes: ['id', 'name']
     });
 
@@ -106,7 +110,7 @@ exports.getMonthlySubjectEnrollments = async (req, res) => {
 
     console.log({ startDate, endDate });
 
-    const enrollments = await SubjectStudent.findAll({
+    const enrollments = await subjectStudentService.getAll({
       where: {
         createdAt: {
           [Op.between]: [startDate, endDate]
@@ -130,7 +134,7 @@ exports.getMonthlySubjectEnrollments = async (req, res) => {
 // Estatísticas adicionais
 exports.getAdditionalStats = async (req, res) => {
   try {
-    const students = await Students.findAll({
+    const students = await studentsService.getAll({
       where: { active: true },
       attributes: ['birth_date', 'neighborhood', 'school_year', 'createdAt']
     });
@@ -176,11 +180,11 @@ exports.getAdditionalStats = async (req, res) => {
 exports.updateSummaryData = async (req, res) => {
   console.log("updateSummaryData");
   try {
-    const [summaryData] = await SummaryData.findAll();
+    const [summaryData] = await summaryDataService.getAll();
     if (!summaryData) {
       return res.status(404).json({ error: "Dados resumidos não encontrados" });
     }
-    await summaryData.update(req.body);
+    await summaryDataService.update(summaryData, req.body);
     res.status(200).json(summaryData);
   } catch (error) {
     console.error("Error updating summary data:", error);
@@ -191,7 +195,7 @@ exports.updateSummaryData = async (req, res) => {
 exports.createSummaryData = async (req, res) => {
   console.log("createSummaryData");
   try {
-    const summaryData = await SummaryData.create(req.body);
+    const summaryData = await summaryDataService.create(req.body);
     res.status(201).json(summaryData);
   } catch (error) {
     console.error("Error creating summary data:", error);

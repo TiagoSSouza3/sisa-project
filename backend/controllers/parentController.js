@@ -1,10 +1,11 @@
 const Parent = require("../models/Parent");
 const { Op } = require('sequelize');
+const parentService = require("../services/parentService");
 
 // Buscar todos os parents
 exports.getAllParents = async (req, res) => {
   try {
-    const list = await Parent.findAll({
+    const list = await parentService.getAll({
       order: [['name', 'ASC']]
     });
     res.json(list);
@@ -18,7 +19,7 @@ exports.getAllParents = async (req, res) => {
 exports.getParentById = async (req, res) => {
   try {
     const { id } = req.params;
-    const parent = await Parent.findByPk(id);
+    const parent = await parentService.findPk(id);
     
     if (!parent) {
       return res.status(404).json({ error: "Parent não encontrado" });
@@ -40,7 +41,7 @@ exports.searchParentsByName = async (req, res) => {
       return res.json([]);
     }
     
-    const parents = await Parent.findAll({
+    const parents = await parentService.getAll({
       where: {
         name: {
           [Op.like]: `%${name}%`
@@ -60,7 +61,7 @@ exports.searchParentsByName = async (req, res) => {
 // Criar novo parent
 exports.createParent = async (req, res) => {
   try {
-    const parent = await Parent.create(req.body);
+    const parent = await parentService.create(req.body);
     res.status(201).json(parent);
   } catch (error) {
     console.error("Erro ao criar parent:", error);
@@ -72,14 +73,14 @@ exports.createParent = async (req, res) => {
 exports.updateParent = async (req, res) => {
   try {
     const { id } = req.params;
-    const parent = await Parent.findByPk(id);
+    const parent = await parentService.findPk(id);
     
     if (!parent) {
       return res.status(404).json({ error: "Parent não encontrado" });
     }
     
-    await parent.update(req.body);
-    const updatedParent = await Parent.findByPk(id);
+    await parentService.update(parent, req.body);
+    const updatedParent = await parentService.findPk(id);
     res.json(updatedParent);
   } catch (error) {
     console.error("Erro ao atualizar parent:", error);
@@ -91,7 +92,7 @@ exports.updateParent = async (req, res) => {
 exports.deleteParent = async (req, res) => {
   try {
     const { id } = req.params;
-    const deleted = await Parent.destroy({ where: { id } });
+    const deleted = await parentService.destroy({ id });
     
     if (deleted) {
       res.status(204).end();

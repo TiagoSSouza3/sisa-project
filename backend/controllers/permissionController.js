@@ -1,11 +1,11 @@
-const Permission = require("../models/Permission");
-const GlobalPermission = require("../models/GlobalPermission");
-const User = require("../models/User");
+const permissionService = require("../services/permissionService");
+const globalPermissionService = require("../services/globalPermissionService");
+const userService = require("../services/userService");
 const sequelize = require("../config");
 
 exports.getAll = async (req, res) => {
   try {
-    const perms = await Permission.findAll();
+    const perms = await permissionService.getAll();
     res.json(perms);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -17,12 +17,12 @@ exports.getByUserId = async (req, res) => {
     const { userId } = req.params;
     console.log(`[PERMISSIONS] Buscando permissões para usuário ID: ${userId}`);
     
-    const permission = await Permission.findOne({ where: { user_id: userId } });
+    const permission = await permissionService.findOne({ where: { user_id: userId } });
     
     if (!permission) {
       console.log(`[PERMISSIONS] Permissão não encontrada para usuário ${userId}, criando padrão por role`);
       // Buscar usuário para identificar a role
-      const user = await User.findOne({ where: { id: userId }, attributes: ['id', 'occupation_id'] });
+      const user = await userService.findOne({ where: { id: userId }, attributes: ['id', 'occupation_id'] });
       const occ = user?.occupation_id;
 
       // Defaults por role
@@ -126,7 +126,7 @@ exports.getByUserId = async (req, res) => {
         };
       }
 
-      const defaultPermission = await Permission.create(defaultData);
+      const defaultPermission = await permissionService.create(defaultData);
       console.log(`[PERMISSIONS] Permissão padrão criada por role:`, defaultPermission.toJSON());
       return res.json(defaultPermission);
     }
@@ -160,11 +160,11 @@ exports.setPermission = async (req, res) => {
     const { user_id, permissions } = req.body;
     console.log(`[PERMISSIONS] Salvando permissões para usuário ${user_id}:`, permissions);
 
-    const existing = await Permission.findOne({ where: { user_id } });
+    const existing = await permissionService.findOne({ where: { user_id } });
     if (existing) {
       console.log(`[PERMISSIONS] Atualizando permissões existentes para usuário ${user_id}`);
-      await Permission.update(permissions, { where: { user_id } });
-      const updated = await Permission.findOne({ where: { user_id } });
+      await permissionService.updateWhere(permissions, { where: { user_id } });
+      const updated = await permissionService.findOne({ where: { user_id } });
       console.log(`[PERMISSIONS] Permissões atualizadas:`, {
         can_access_documents: updated.can_access_documents,
         layout_view_roles: updated.layout_view_roles,
@@ -173,7 +173,7 @@ exports.setPermission = async (req, res) => {
       res.json(updated);
     } else {
       console.log(`[PERMISSIONS] Criando novas permissões para usuário ${user_id}`);
-      const newPermission = await Permission.create({
+      const newPermission = await permissionService.create({
         user_id,
         ...permissions
       });
@@ -192,12 +192,12 @@ exports.getEffectivePermissions = async (req, res) => {
     const { userId } = req.params;
     console.log(`[PERMISSIONS] (SIMPLIFICADO) Carregando permissões efetivas diretas para usuário ${userId}`);
 
-    let permission = await Permission.findOne({ where: { user_id: userId } });
+    let permission = await permissionService.findOne({ where: { user_id: userId } });
 
     // Se não existir, criar uma linha padrão (mesma lógica do GET /permissions/:userId)
     if (!permission) {
       console.log(`[PERMISSIONS] (SIMPLIFICADO) Nenhuma permissão encontrada, criando padrão por role`);
-      const user = await User.findOne({ where: { id: userId }, attributes: ['id', 'occupation_id'] });
+      const user = await userService.findOne({ where: { id: userId }, attributes: ['id', 'occupation_id'] });
       const occ = user?.occupation_id;
 
       let defaultData = {
@@ -294,7 +294,7 @@ exports.getEffectivePermissions = async (req, res) => {
         };
       }
 
-      permission = await Permission.create(defaultData);
+      permission = await permissionService.create(defaultData);
     }
 
     const normalized = {
@@ -328,7 +328,7 @@ exports.resetIndividualPermissions = async (req, res) => {
     const occupationId = role === 'professor' ? 3 : 2;
 
     // Buscar todos usuários da role
-    const users = await User.findAll({
+    const users = await userService.getAll({
       where: { occupation_id: occupationId },
       attributes: ['id', 'name', 'email']
     });
@@ -348,7 +348,7 @@ exports.resetIndividualPermissions = async (req, res) => {
       'can_access_summary_data',
     ];
 
-    const globalPagePerms = await GlobalPermission.findAll({
+    const globalPagePerms = await globalPermissionService.getAll({
       where: { role, permission_name: PAGE_PERMISSIONS }
     });
 
@@ -399,11 +399,11 @@ exports.resetIndividualPermissions = async (req, res) => {
         layout_upload_roles: buildRoleArray(!!docPerms.can_upload_layouts, role),
       };
 
-      const existing = await Permission.findOne({ where: { user_id: u.id } });
+      const existing = await permissionService.findOne({ where: { user_id: u.id } });
       if (existing) {
-        await Permission.update(data, { where: { user_id: u.id } });
+        await permissionService.updateWhere(data, { where: { user_id: u.id } });
       } else {
-        await Permission.create({ user_id: u.id, ...data });
+        await permissionService.create({ user_id: u.id, ...data });
       }
       updated += 1;
     }
@@ -425,7 +425,7 @@ exports.resetToGlobal = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const user = await User.findOne({ where: { id: userId }, attributes: ['id', 'occupation_id', 'name', 'email'] });
+    const user = await userService.findOne({ where: { id: userId }, attributes: ['id', 'occupation_id', 'name', 'email'] });
     if (!user) {
       return res.status(404).json({ error: 'Usuário não encontrado' });
     }
@@ -457,10 +457,10 @@ exports.resetToGlobal = async (req, res) => {
         layout_upload_roles: ['professor', 'colaborador'],
       };
 
-      const existing = await Permission.findOne({ where: { user_id: user.id } });
+      const existing = await permissionService.findOne({ where: { user_id: user.id } });
       const saved = existing
-        ? await (await Permission.update(adminData, { where: { user_id: user.id } }), Permission.findOne({ where: { user_id: user.id } }))
-        : await Permission.create({ user_id: user.id, ...adminData });
+        ? await (await permissionService.updateWhere(adminData, { where: { user_id: user.id } }), permissionService.findOne({ where: { user_id: user.id } }))
+        : await permissionService.create({ user_id: user.id, ...adminData });
 
       return res.json({ message: 'Permissões resetadas para padrão de administrador', permission: saved });
     }
@@ -476,7 +476,7 @@ exports.resetToGlobal = async (req, res) => {
       'can_access_summary_data',
     ];
 
-    const globalPagePerms = await GlobalPermission.findAll({ where: { role, permission_name: PAGE_PERMISSIONS } });
+    const globalPagePerms = await globalPermissionService.getAll({ where: { role, permission_name: PAGE_PERMISSIONS } });
     const pagePermObj = PAGE_PERMISSIONS.reduce((acc, name) => {
       const found = globalPagePerms.find(p => p.permission_name === name);
       acc[name] = found ? !!found.is_allowed : false;
@@ -519,13 +519,13 @@ exports.resetToGlobal = async (req, res) => {
       layout_upload_roles: buildRoleArray(!!docPerms.can_upload_layouts, role),
     };
 
-    const existing = await Permission.findOne({ where: { user_id: user.id } });
+    const existing = await permissionService.findOne({ where: { user_id: user.id } });
     let saved;
     if (existing) {
-      await Permission.update(data, { where: { user_id: user.id } });
-      saved = await Permission.findOne({ where: { user_id: user.id } });
+      await permissionService.updateWhere(data, { where: { user_id: user.id } });
+      saved = await permissionService.findOne({ where: { user_id: user.id } });
     } else {
-      saved = await Permission.create({ user_id: user.id, ...data });
+      saved = await permissionService.create({ user_id: user.id, ...data });
     }
 
     return res.json({ message: 'Permissões do usuário resetadas para o padrão global da função', permission: saved });

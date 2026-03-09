@@ -1,17 +1,17 @@
-const User = require("../models/User");
+const userService = require("../services/userService");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const { sendPasswordResetEmail, sendFirstAccessEmail, testConnection } = require("../utils/emailService");
 
 exports.getUserById = async (req, res) => {
   const { id } = req.params;
-  let user = await User.findByPk(id);
+  const user = await userService.findPk(id);
   user.password = "";
   res.json(user);
 };
 
 exports.getAllUsers = async (req, res) => {
-  const users = await User.findAll();
+  const users = await userService.getAll();
   
   // Converter occupation_id numérico para string
   const occupationMap = {
@@ -30,7 +30,7 @@ exports.getAllUsers = async (req, res) => {
 
 exports.editUser = async (req, res) => {
   let { id, name, email, password, occupation_id } = req.body;
-  const user = await User.findByPk(id);
+  const user = await userService.findPk(id);
 
   if (!user) {
     return res.status(404).json({ error: "User não encontrado" });
@@ -51,7 +51,7 @@ exports.editUser = async (req, res) => {
   }
 
   await user.update(updateData);
-  const updatedUser = await User.findByPk(id);
+  const updatedUser = await userService.findPk(id);
   res.json(updatedUser);
 }
 
@@ -67,7 +67,7 @@ exports.createUser = async (req, res) => {
     const resetToken = crypto.randomBytes(32).toString('hex');
     const resetTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 horas
 
-    const user = await User.create({
+    const user = await userService.create({
       name,
       email,
       password: hashedPassword,
@@ -103,7 +103,7 @@ exports.createUser = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
   const { id } = req.params;
-  await User.destroy({ where: { id } });
+  await userService.destroy(id);
   res.status(204).end();
 };
 
@@ -112,7 +112,7 @@ exports.requestPasswordReset = async (req, res) => {
   try {
     const { email } = req.body;
     
-    const user = await User.findOne({ where: { email } });
+    const user = await userService.findOneByEmail(email);
     if (!user) {
       return res.status(404).json({ error: 'Email não encontrado' });
     }
@@ -151,7 +151,7 @@ exports.resetPassword = async (req, res) => {
       timestamp: new Date().toISOString()
     });
     
-    const user = await User.findOne({ 
+    const user = await userService.findOne({ 
       where: { 
         reset_token: token,
         reset_token_expires: { [require('sequelize').Op.gt]: new Date() }
@@ -176,7 +176,7 @@ exports.resetPassword = async (req, res) => {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     // Atualizar senha e limpar token
-    await user.update({
+    await userService.update(user, {
       password: hashedPassword,
       first_login: false,
       reset_token: null,
@@ -203,7 +203,7 @@ exports.checkFirstLogin = async (req, res) => {
   try {
     const { token } = req.params;
     
-    const user = await User.findOne({ 
+    const user = await userService.findOne({ 
       where: { 
         reset_token: token,
         reset_token_expires: { [require('sequelize').Op.gt]: new Date() }
@@ -233,7 +233,7 @@ exports.checkUserFirstAccess = async (req, res) => {
   try {
     const { id } = req.params;
     
-    const user = await User.findByPk(id);
+    const user = await userService.findPk(id);
     if (!user) {
       return res.status(404).json({ error: 'Usuário não encontrado' });
     }
