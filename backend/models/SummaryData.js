@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config');
+const sequelize = require('../config/config');
 
 const SummaryData = sequelize.define('summary_data', {
   students_active: DataTypes.INTEGER,

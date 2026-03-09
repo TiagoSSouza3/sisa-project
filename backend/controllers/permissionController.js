@@ -1,7 +1,7 @@
 const permissionService = require("../services/permissionService");
 const globalPermissionService = require("../services/globalPermissionService");
 const userService = require("../services/userService");
-const sequelize = require("../config");
+const sequelize = require("../config/config");
 
 exports.getAll = async (req, res) => {
   try {
@@ -329,8 +329,7 @@ exports.resetIndividualPermissions = async (req, res) => {
 
     // Buscar todos usuários da role
     const users = await userService.getAll({
-      where: { occupation_id: occupationId },
-      attributes: ['id', 'name', 'email']
+      where: { occupation_id: occupationId }
     });
 
     if (!users || users.length === 0) {

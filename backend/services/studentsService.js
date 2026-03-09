@@ -1,18 +1,26 @@
-const Students = require("../models/Students");
+const db = require("../config/firebase");
+const { firebaseCollections } = require("../enums/firebaseCollections");
 
-exports.getAll = async (options = {}) => {
-  const list = await Students.findAll(options);
-  return list;
+const Students = require("../models/Students"); //temp
+
+const studentsRef = db.collection(firebaseCollections.STUDENTS);
+
+exports.getAll = async (_options = {}) => {
+  const snapshot = await studentsRef.get()
+
+  if(snapshot.empty) return []
+
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+};
+
+exports.create = async (data) => {
+  const user = await studentsRef.add(data);
+  return (await user.get()).data()
 };
 
 exports.findPk = async (id, options = {}) => {
   const item = await Students.findByPk(id, options);
   return item;
-};
-
-exports.create = async (data) => {
-  const created = await Students.create(data);
-  return created;
 };
 
 exports.destroy = async (idOrWhere) => {

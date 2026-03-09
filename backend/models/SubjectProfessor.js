@@ -1,4 +1,4 @@
-const sequelize = require("../config");
+const sequelize = require("../config/config");
 
 const SubjectProfessor = sequelize.define("SubjectProfessor", {}, {
     tableName: 'subject_professor',

@@ -1,5 +1,5 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../config");
+const sequelize = require("../config/config");
 
 const Permission = sequelize.define("permission", {
   user_id: { type: DataTypes.INTEGER, unique: true },

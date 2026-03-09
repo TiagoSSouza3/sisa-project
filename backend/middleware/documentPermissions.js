@@ -1,4 +1,4 @@
-const db = require('../config');
+const db = require('../config/config');
 
 /**
  * Middleware para verificar permissões globais de documentos

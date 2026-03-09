@@ -125,7 +125,7 @@ export default function Students() {
     try {
       const res = await API.get("/students");
       setStudents(res.data);
-      setFilteredStudents(res.data);
+      setFilteredStudents(!!res.data ? res.data : {});
     } catch (err) {
       setError("Erro ao carregar alunos");
     }
@@ -521,7 +521,7 @@ export default function Students() {
       {success && <div className="success">{success}</div>}
 
       <div className="students-list">
-        {filteredStudents.map((student, index) => (
+        {filteredStudents && filteredStudents.map((student, index) => (
           <div key={student.id} className="student-item">
             <div className="student-info">
               <div className="student-name">{student.name}</div>

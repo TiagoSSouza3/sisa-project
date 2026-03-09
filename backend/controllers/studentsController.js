@@ -1,4 +1,3 @@
-const Student = require("../models/Students");
 const Subject = require("../models/Subject");
 const Parent = require("../models/Parent");
 const studentsService = require("../services/studentsService");

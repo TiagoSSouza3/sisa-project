@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const sequelize = require('../config');
+const sequelize = require('../config/config');
 const authenticateToken = require("../middleware/authMiddleware");
 
 // Função para criar tabela se não existir
