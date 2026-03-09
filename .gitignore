@@ -3,9 +3,10 @@ frontend/.env
 backend/.env
 
 node_modules
-backend/node_modules
-frontend/node_modules
+backend/node_modules/
+frontend/node_modules/
 
 backend/cert/cert.pem
 backend/cert/key.pem
 
+backend/config/firebase-adminsdk.json
