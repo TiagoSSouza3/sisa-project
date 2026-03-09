@@ -1,17 +1,35 @@
 const Student = require("../models/Students");
 const Subject = require("../models/Subject");
+const Parent = require("../models/Parent");
 
 exports.getAllStudents = async (req, res) => {
 
     const list = await Student.findAll(
       {
-        include: [{
-          model: Subject,
-          as: 'subjects',
-          attributes: ['id'],
-          through: { attributes: [] },
-          required: false
-        }]
+        include: [
+          {
+            model: Subject,
+            as: 'subjects',
+            attributes: ['id'],
+            through: { attributes: [] },
+            required: false
+          },
+          {
+            model: Parent,
+            as: 'parent',
+            required: false
+          },
+          {
+            model: Parent,
+            as: 'second_parent',
+            required: false
+          },
+          {
+            model: Parent,
+            as: 'responsible_parent',
+            required: false
+          }
+        ]
       }
     );
 
@@ -66,13 +84,30 @@ exports.getStudentById = async (req, res) => {
     const student = await Student.findByPk(
       req.params.id,
       {
-        include: [{
-          model: Subject,
-          as: 'subjects',
-          attributes: ['id'],
-          through: { attributes: [] },
-          required: false
-        }]
+        include: [
+          {
+            model: Subject,
+            as: 'subjects',
+            attributes: ['id'],
+            through: { attributes: [] },
+            required: false
+          },
+          {
+            model: Parent,
+            as: 'parent',
+            required: false
+          },
+          {
+            model: Parent,
+            as: 'second_parent',
+            required: false
+          },
+          {
+            model: Parent,
+            as: 'responsible_parent',
+            required: false
+          }
+        ]
       }
     );
     

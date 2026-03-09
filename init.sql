@@ -33,7 +33,9 @@ CREATE TABLE IF NOT EXISTS parent (
     birth_date DATE,
     RG CHAR(12),
     CPF CHAR(15),
-    occupation VARCHAR(255)
+    occupation VARCHAR(255),
+    phone VARCHAR(255),
+    degree_of_kinship VARCHAR(255)
 );
 
 -- Estudantes
@@ -62,6 +64,7 @@ CREATE TABLE IF NOT EXISTS students (
     notes TEXT,
     parent_id INT,
     second_parent_id INT,
+    responsible_parent_id INT,
     active BOOLEAN DEFAULT TRUE,
     FOREIGN KEY (parent_id) REFERENCES parent(id),
     FOREIGN KEY (second_parent_id) REFERENCES parent(id),

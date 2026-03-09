@@ -232,7 +232,7 @@ exports.getEffectivePermissions = async (req, res) => {
           can_access_subjects: true,
           can_access_documents: true,
           can_access_storage: false,
-          can_access_summary_data: true,
+          can_access_summary_data: false,
           can_view_documents: true,
           can_edit_documents: false,
           can_upload_documents: false,

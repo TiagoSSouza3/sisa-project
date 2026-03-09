@@ -14,6 +14,7 @@ const Students = sequelize.define('students', {
   registration: DataTypes.INTEGER,
   parent_id: DataTypes.INTEGER,
   second_parent_id: DataTypes.INTEGER,
+  responsible_parent_id: DataTypes.INTEGER,
   CPF: DataTypes.CHAR(15),
   gender: DataTypes.STRING,
   skin_color: DataTypes.STRING,

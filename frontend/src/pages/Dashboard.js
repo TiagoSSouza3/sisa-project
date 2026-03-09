@@ -152,12 +152,12 @@ export default function Dashboard() {
             linkToPage="/documents"
           />
         )}
-        {hasPermission('can_access_storage') && (
+        {/* {hasPermission('can_access_storage') && (
           <LinkShortCut 
             name={language === "english" ? "Storage" : "Estoque"}
             linkToPage="/storage"
           />
-        )}
+        )} */}
         {hasPermission('can_access_summary_data') && (
           <LinkShortCut 
             name={language === "english" ? "Summary Data" : "Dados Resumidos"}

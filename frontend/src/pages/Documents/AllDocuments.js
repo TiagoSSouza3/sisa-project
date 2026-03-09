@@ -49,8 +49,7 @@ export default function AllDocuments({ canEdit = false, canUpload = false, canDe
     // Remover javascript: e handlers inline
     t = t.replace(/javascript:[^"'\s]*/gi, '');
     t = t.replace(/on\w+\s*=\s*(["']).*?\1/gi, '');
-    // Normalizar espaços
-    t = t.replace(/\s+/g, ' ').trim();
+    // NÃO colapsar espaços aqui para permitir espaços normais na digitação
     return t;
   };
 
@@ -360,6 +359,7 @@ export default function AllDocuments({ canEdit = false, canUpload = false, canDe
     try {
       // Sanitização e validações finais antes do envio
       const sanitizedName = sanitizeInput(name).slice(0, NAME_MAX).trim();
+      // No envio, apenas trim nas pontas para evitar espaços no início/fim; manter espaços internos
       const sanitizedDescription = sanitizeInput(description).slice(0, DESCRIPTION_MAX).trim();
 
       if (!sanitizedName) {
@@ -645,7 +645,12 @@ export default function AllDocuments({ canEdit = false, canUpload = false, canDe
                   maxLength={DESCRIPTION_MAX}
                   onChange={(e) => {
                     let value = e.target.value;
-                    setDescriptionError(hasMaliciousPattern(value) ? (language === 'english' ? 'Remove HTML/JS code from the description' : 'Remova código HTML/JS da descrição') : '');
+                    setDescriptionError(
+                      hasMaliciousPattern(value)
+                        ? (language === 'english' ? 'Remove HTML/JS code from the description' : 'Remova código HTML/JS da descrição')
+                        : ''
+                    );
+                    // Apenas remover tags/scripts, sem colapsar espaços; preservar o que o usuário digita
                     value = sanitizeInput(value).slice(0, DESCRIPTION_MAX);
                     setDescription(value);
                   }}

@@ -511,6 +511,7 @@
   border-radius: 6px;
   background: var(--surface-color);
   transition: all 0.2s ease;
+  overflow: hidden;
 }
 
 .granular-item:hover {
@@ -539,6 +540,10 @@
   color: var(--text-color);
   font-size: 16px;
   font-weight: 600;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
 }
 
 .granular-item-info p {

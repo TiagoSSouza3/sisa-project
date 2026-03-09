@@ -3,30 +3,33 @@ require('dotenv').config();
 const { getPasswordResetTemplate, getWelcomeTemplate, getRegistrationNotificationTemplate } = require('./emailTemplates');
 
 const FRONTEND_BASE = (process.env.FRONTEND_URL || '').replace(/\/$/, '');
-const SENDGRID_API_URL = 'https://api.sendgrid.com/v3/mail/send';
+const MAILERSEND_API_URL = 'https://api.mailersend.com/v1/email';
 
 const isConfigured = () => {
-  return !!(process.env.SENDGRID_API_KEY && process.env.SENDGRID_FROM_EMAIL);
+  return !!(process.env.MAILERSEND_API_KEY && process.env.MAILERSEND_FROM_EMAIL);
 };
 
 const sendEmail = async ({ to, subject, html }) => {
   if (!isConfigured()) {
-    throw new Error('Configuração do SendGrid ausente. Defina SENDGRID_API_KEY e SENDGRID_FROM_EMAIL no .env');
+    throw new Error('Configuração do MailerSend ausente. Defina MAILERSEND_API_KEY e MAILERSEND_FROM_EMAIL no .env');
   }
 
   const payload = {
-    personalizations: [{ to: [{ email: to }] }],
-    from: { email: process.env.SENDGRID_FROM_EMAIL, name: 'Sistema SISA' },
+    from: {
+      email: process.env.MAILERSEND_FROM_EMAIL,
+      name: process.env.MAILERSEND_FROM_NAME || 'Sistema SISA'
+    },
+    to: [
+      { email: to }
+    ],
     subject,
-    content: [
-      { type: 'text/html', value: html }
-    ]
+    html
   };
 
   try {
-    await axios.post(SENDGRID_API_URL, payload, {
+    await axios.post(MAILERSEND_API_URL, payload, {
       headers: {
-        Authorization: `Bearer ${process.env.SENDGRID_API_KEY}`,
+        Authorization: `Bearer ${process.env.MAILERSEND_API_KEY}`,
         'Content-Type': 'application/json'
       },
       timeout: 10000
@@ -35,7 +38,7 @@ const sendEmail = async ({ to, subject, html }) => {
   } catch (error) {
     const status = error.response?.status;
     const data = error.response?.data;
-    console.error('Erro ao enviar email via SendGrid Web API:', status, data || error.message);
+    console.error('Erro ao enviar email via MailerSend:', status, data || error.message);
     return { success: false, error: data || error.message };
   }
 };
@@ -44,7 +47,7 @@ const sendEmail = async ({ to, subject, html }) => {
 const testConnection = async () => {
   const ok = isConfigured();
   if (!ok) {
-    console.error('SendGrid não configurado corretamente (verifique SENDGRID_API_KEY e SENDGRID_FROM_EMAIL)');
+    console.error('MailerSend não configurado corretamente (verifique MAILERSEND_API_KEY e MAILERSEND_FROM_EMAIL)');
   }
   return ok;
 };

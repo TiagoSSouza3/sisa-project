@@ -6,6 +6,7 @@ import ConfirmationModal from '../../components/ConfirmationModal';
 import useConfirmation from '../../hooks/useConfirmation';
 import '../../styles/global.css';
 import '../../styles/subject-creation.css';
+import { occupationEnum } from "../../enums/occupationEnum";
 
 export default function SubjectForm() {
     const navigate = useNavigate();
@@ -40,16 +41,31 @@ export default function SubjectForm() {
         }
     }, [id]);
 
+    const mergeProfessorLists = (current = [], incoming = []) => {
+        const listMap = new Map(
+            current.map((prof) => [String(prof.id), { ...prof, id: String(prof.id) }])
+        );
+
+        incoming.forEach((prof) => {
+            if (!prof) return;
+            const normalized = { ...prof, id: String(prof.id) };
+            if (!listMap.has(normalized.id)) {
+                listMap.set(normalized.id, normalized);
+            }
+        });
+
+        return Array.from(listMap.values());
+    };
+
     const loadSubject = async () => {
         try {
-            const response = await API.get(`/subjects/professor/${id}`);
+            const response = await API.get(`/subjects/withProfessor/${id}`);
             await setSubject(response.data);
-            console.log(response.data)
 
             if (response.data.professores && response.data.professores.length > 0) {
                 const ids = response.data.professores.map(p => String(p.id));
                 setSelectedProfessor(ids);
-                console.log(ids)
+                setProfessor(prev => mergeProfessorLists(prev, response.data.professores));
             } else {
                 setSelectedProfessor(['']);
             }
@@ -106,14 +122,15 @@ export default function SubjectForm() {
     const loadProfessor = async () => {
         try {
             const response = await API.get(`/users/`);
-            // Filtrar apenas usuários com occupation_id = "3" (professores) ou "PROFESSOR"
             const professores = response.data.filter(user => 
                 user.occupation_id === "3" || 
                 user.occupation_id === 3 || 
-                user.occupation_id === "PROFESSOR"
+                user.occupation_id === occupationEnum.professor ||
+                user.occupation_id === "1" ||
+                user.occupation_id === 1 ||
+                user.occupation_id === occupationEnum.administrador
             );
-            setProfessor(professores);
-            console.log("Professores encontrados:", professores); // Debug
+            setProfessor(prev => mergeProfessorLists(prev, professores));
         } catch (err) {
             console.error("Erro ao carregar professores:", err);
             navigate(`/subject_infos/${id}`);

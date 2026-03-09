@@ -56,8 +56,10 @@ DocumentTemplate.hasMany(Document, { foreignKey: 'template_id', as: 'documents' 
 // Student and Parent relationships
 Student.belongsTo(Parent, { foreignKey: 'parent_id', as: 'parent' });
 Student.belongsTo(Parent, { foreignKey: 'second_parent_id', as: 'second_parent' });
+Student.belongsTo(Parent, { foreignKey: 'responsible_parent_id', as: 'responsible_parent' });
 Parent.hasMany(Student, { foreignKey: 'parent_id', as: 'children' });
 Parent.hasMany(Student, { foreignKey: 'second_parent_id', as: 'second_parent_children' });
+Parent.hasMany(Student, { foreignKey: 'responsible_parent_id', as: 'responsible_children' });
 
 module.exports = {
   User,

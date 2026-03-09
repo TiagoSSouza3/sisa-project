@@ -79,6 +79,9 @@ export default function SubjectInfos() {
                         description: subject.description,
                         students: updatedStudentIds
                     });
+
+                    const updateStudent = await API.delete(`/subjects/students/${student_id}`);
+                    console.log(updateStudent)
         
                     setSubject({
                         ...updated.data,
@@ -107,6 +110,7 @@ export default function SubjectInfos() {
     const handleViewStudentInfo = async (studentId) => {
         try {
             const res = await API.get(`/students/${studentId}`);
+            console.log(res.data)
             setSelectedStudent(res.data);
             setIsStudentInfoModalOpen(true);
         } catch (err) {
@@ -234,23 +238,25 @@ export default function SubjectInfos() {
                         </div>
 
                         {/* Endereço - Sempre visível */}
-                        <div className="detail-section">
-                            <h4>{language === "english" ? "Address" : "Endereço"}</h4>
-                            <div className="detail-grid">
-                                <div className="detail-item">
-                                    <label>{language === "english" ? "Address" : "Endereço"}:</label>
-                                    <span>{selectedStudent.address || 'N/A'}</span>
-                                </div>
-                                <div className="detail-item">
-                                    <label>{language === "english" ? "Neighborhood" : "Bairro"}:</label>
-                                    <span>{selectedStudent.neighborhood || 'N/A'}</span>
-                                </div>
-                                <div className="detail-item">
-                                    <label>CEP:</label>
-                                    <span>{selectedStudent.cep || 'N/A'}</span>
+                        {!isProfessor && (
+                            <div className="detail-section">
+                                <h4>{language === "english" ? "Address" : "Endereço"}</h4>
+                                <div className="detail-grid">
+                                    <div className="detail-item">
+                                        <label>{language === "english" ? "Address" : "Endereço"}:</label>
+                                        <span>{selectedStudent.address || 'N/A'}</span>
+                                    </div>
+                                    <div className="detail-item">
+                                        <label>{language === "english" ? "Neighborhood" : "Bairro"}:</label>
+                                        <span>{selectedStudent.neighborhood || 'N/A'}</span>
+                                    </div>
+                                    <div className="detail-item">
+                                        <label>CEP:</label>
+                                        <span>{selectedStudent.cep || 'N/A'}</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        )}
 
                         {/* Informações do Responsável - Sempre visível */}
                         <div className="detail-section">
@@ -258,15 +264,15 @@ export default function SubjectInfos() {
                             <div className="detail-grid">
                                 <div className="detail-item">
                                     <label>{language === "english" ? "Responsible" : "Responsável"}:</label>
-                                    <span>{selectedStudent.responsable || 'N/A'}</span>
+                                    <span>{selectedStudent.responsible_parent.name || 'N/A'}</span>
                                 </div>
                                 <div className="detail-item">
                                     <label>{language === "english" ? "Degree of Kinship" : "Grau de Parentesco"}:</label>
-                                    <span>{selectedStudent.degree_of_kinship || 'N/A'}</span>
+                                    <span>{selectedStudent.responsible_parent.degree_of_kinship || 'N/A'}</span>
                                 </div>
                                 <div className="detail-item">
-                                    <label>UBS:</label>
-                                    <span>{selectedStudent.UBS || 'N/A'}</span>
+                                    <label>Telefone:</label>
+                                    <span>{selectedStudent.responsible_parent.phone || 'N/A'}</span>
                                 </div>
                             </div>
                         </div>

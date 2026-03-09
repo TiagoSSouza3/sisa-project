@@ -76,7 +76,7 @@
 .info-message p {
   margin: 0;
   color: #1976d2;
-  font-size: 0.9rem;
+  font-size: 1rem;
   line-height: 1.4;
 }
 
@@ -344,8 +344,9 @@
 .info-message p {
   margin: 0.5rem 0;
   color: #1565c0;
-  font-size: 0.85rem;
+  font-size: 1.2rem;
   line-height: 1.5;
+  margin-left: 10%;
 }
 
 .info-message p:first-child {

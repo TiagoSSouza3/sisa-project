@@ -183,7 +183,7 @@ export default function Storage() {
 
     const handlePriceEdit = (e, index) => {
         const value = e.target.value;
-        const numValue = value === '' ? 0 : parseFloat(value);
+        const numValue = value === '' ? '' : parseFloat(value);
         
         if (!isNaN(numValue) && numValue >= 0) {
             const updatedStorage = [...storage];
@@ -408,7 +408,6 @@ export default function Storage() {
                                     <input
                                         type="number"
                                         step="0.01"
-                                        min="0"
                                         className="edit-price-input"
                                         value={item.editingPrice || item.last_price}
                                         onChange={(e) => handlePriceEdit(e, index)}

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import { useLanguage } from './LanguageContext';
 import { useTheme } from './ThemeContext';
+import logoInstituto from "../assets/login-images/logoInstituto2.png";
 
 export default function Navbar() {
   const [menuAberto, setMenuAberto] = useState(false);
@@ -11,6 +12,7 @@ export default function Navbar() {
   const { changeLanguage } = useLanguage();
   const { changeTheme, theme } = useTheme();
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Páginas onde não deve mostrar o menu, apenas o seletor de idioma
   const isPasswordResetPage = location.pathname === '/reset-password' || location.pathname === '/first-access';
@@ -49,7 +51,7 @@ export default function Navbar() {
 
   return (
     <nav className="navbar">
-      <div>
+      <div className="navbar-left">
         {/* Menu completo - APENAS quando logado E NÃO nas páginas de redefinição */}
         {isLoggedIn && !isPasswordResetPage && (
           <div className="slider-div navbar-controls">
@@ -57,24 +59,6 @@ export default function Navbar() {
               ☰ Menu
             </button>
             <Sidebar isOpen={menuAberto} onClose={() => setMenuAberto(false)} />
-            {/* Language Toggle (sem wrapper adicional) */}
-            <div className="toggle-group">
-              <img
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/960px-Flag_of_Brazil.svg.png"
-              />
-              <label className="switch">
-                <input 
-                  type="checkbox" 
-                  onChange={handleLanguageChange}
-                  checked={isLanguageChecked} 
-                />
-                <span className="slider round"></span>
-              </label>
-              <img
-                src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg"
-                alt="English"
-              />
-            </div>
           </div>
         )}
         {/* Seletor de idioma APENAS para páginas de redefinição de senha */}
@@ -82,6 +66,7 @@ export default function Navbar() {
           <div className="slider-div">
             <img
               src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/960px-Flag_of_Brazil.svg.png"
+              alt="Português"
             />
             <label className="switch">
               <input 
@@ -93,12 +78,25 @@ export default function Navbar() {
             </label>
             <img
               src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg"
+              alt="English"
             />
           </div>
         )}
       </div>
-    {/* Botão único de tema no canto superior direito */}
-    {isLoggedIn && (
+      
+      <div className="navbar-center">
+        <button
+          type="button"
+          className="logo-nav-btn"
+          onClick={() => navigate("/dashboard")}
+          aria-label="Ir para o dashboard"
+        >
+          <img src={logoInstituto} alt="Logo Instituto" />
+        </button>
+      </div>
+
+      {/* Botão único de tema no canto superior direito */}
+      {isLoggedIn && (
         <button
           className="theme-toggle-btn"
           aria-label="Alternar tema"

@@ -336,21 +336,122 @@ export default function Students() {
                 </div>
 
                 <div className="detail-section">
-                  <h4>{language === "english" ? "Responsible Information" : "Informações do Responsável"}</h4>
-                  <div className="detail-grid">
-                    <div className="detail-item">
-                      <label>{language === "english" ? "Responsible" : "Responsável"}:</label>
-                      <span>{selectedStudent.responsable || 'N/A'}</span>
+                  <h4>{language === "english" ? "Parents/Guardians Information" : "Informações dos Pais/Responsáveis"}</h4>
+                  
+                  {/* Responsável */}
+                  {selectedStudent.responsible_parent && (
+                    <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#f5f5f5', borderRadius: '5px' }}>
+                      <h5 style={{ marginTop: 0, color: '#d32f2f' }}>{language === "english" ? "Responsible Parent" : "Responsável"}</h5>
+                      <div className="detail-grid">
+                        <div className="detail-item">
+                          <label>{language === "english" ? "Name" : "Nome"}:</label>
+                          <span>{selectedStudent.responsible_parent.name || 'N/A'}</span>
+                        </div>
+                        <div className="detail-item">
+                          <label>CPF:</label>
+                          <span>{selectedStudent.responsible_parent.CPF || 'N/A'}</span>
+                        </div>
+                        <div className="detail-item">
+                          <label>RG:</label>
+                          <span>{selectedStudent.responsible_parent.RG || 'N/A'}</span>
+                        </div>
+                        <div className="detail-item">
+                          <label>{language === "english" ? "Birth Date" : "Data de Nascimento"}:</label>
+                          <span>{selectedStudent.responsible_parent.birth_date ? new Date(selectedStudent.responsible_parent.birth_date).toLocaleDateString('pt-BR') : 'N/A'}</span>
+                        </div>
+                        <div className="detail-item">
+                          <label>{language === "english" ? "Degree of Kinship" : "Grau de Parentesco"}:</label>
+                          <span>{selectedStudent.responsible_parent.degree_of_kinship || 'N/A'}</span>
+                        </div>
+                        <div className="detail-item">
+                          <label>{language === "english" ? "Occupation" : "Ocupação"}:</label>
+                          <span>{selectedStudent.responsible_parent.occupation || 'N/A'}</span>
+                        </div>
+                        <div className="detail-item">
+                          <label>{language === "english" ? "Phone" : "Telefone"}:</label>
+                          <span>{selectedStudent.responsible_parent.phone || 'N/A'}</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="detail-item">
-                      <label>{language === "english" ? "Degree of Kinship" : "Grau de Parentesco"}:</label>
-                      <span>{selectedStudent.degree_of_kinship || 'N/A'}</span>
+                  )}
+                  
+                  {/* Primeiro Pai */}
+                  {selectedStudent.parent && (
+                    <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#f5f5f5', borderRadius: '5px' }}>
+                      <h5 style={{ marginTop: 0 }}>{language === "english" ? "Parent 1" : "Pai/Mãe 1"}</h5>
+                      <div className="detail-grid">
+                        <div className="detail-item">
+                          <label>{language === "english" ? "Name" : "Nome"}:</label>
+                          <span>{selectedStudent.parent.name || 'N/A'}</span>
+                        </div>
+                        <div className="detail-item">
+                          <label>CPF:</label>
+                          <span>{selectedStudent.parent.CPF || 'N/A'}</span>
+                        </div>
+                        <div className="detail-item">
+                          <label>RG:</label>
+                          <span>{selectedStudent.parent.RG || 'N/A'}</span>
+                        </div>
+                        <div className="detail-item">
+                          <label>{language === "english" ? "Birth Date" : "Data de Nascimento"}:</label>
+                          <span>{selectedStudent.parent.birth_date ? new Date(selectedStudent.parent.birth_date).toLocaleDateString('pt-BR') : 'N/A'}</span>
+                        </div>
+                        <div className="detail-item">
+                          <label>{language === "english" ? "Degree of Kinship" : "Grau de Parentesco"}:</label>
+                          <span>{selectedStudent.parent.degree_of_kinship || 'N/A'}</span>
+                        </div>
+                        <div className="detail-item">
+                          <label>{language === "english" ? "Occupation" : "Ocupação"}:</label>
+                          <span>{selectedStudent.parent.occupation || 'N/A'}</span>
+                        </div>
+                        <div className="detail-item">
+                          <label>{language === "english" ? "Phone" : "Telefone"}:</label>
+                          <span>{selectedStudent.parent.phone || 'N/A'}</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="detail-item">
-                      <label>UBS:</label>
-                      <span>{selectedStudent.UBS || 'N/A'}</span>
+                  )}
+                  
+                  {/* Segundo Pai */}
+                  {selectedStudent.second_parent && (
+                    <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#f5f5f5', borderRadius: '5px' }}>
+                      <h5 style={{ marginTop: 0 }}>{language === "english" ? "Parent 2" : "Pai/Mãe 2"}</h5>
+                      <div className="detail-grid">
+                        <div className="detail-item">
+                          <label>{language === "english" ? "Name" : "Nome"}:</label>
+                          <span>{selectedStudent.second_parent.name || 'N/A'}</span>
+                        </div>
+                        <div className="detail-item">
+                          <label>CPF:</label>
+                          <span>{selectedStudent.second_parent.CPF || 'N/A'}</span>
+                        </div>
+                        <div className="detail-item">
+                          <label>RG:</label>
+                          <span>{selectedStudent.second_parent.RG || 'N/A'}</span>
+                        </div>
+                        <div className="detail-item">
+                          <label>{language === "english" ? "Birth Date" : "Data de Nascimento"}:</label>
+                          <span>{selectedStudent.second_parent.birth_date ? new Date(selectedStudent.second_parent.birth_date).toLocaleDateString('pt-BR') : 'N/A'}</span>
+                        </div>
+                        <div className="detail-item">
+                          <label>{language === "english" ? "Degree of Kinship" : "Grau de Parentesco"}:</label>
+                          <span>{selectedStudent.second_parent.degree_of_kinship || 'N/A'}</span>
+                        </div>
+                        <div className="detail-item">
+                          <label>{language === "english" ? "Occupation" : "Ocupação"}:</label>
+                          <span>{selectedStudent.second_parent.occupation || 'N/A'}</span>
+                        </div>
+                        <div className="detail-item">
+                          <label>{language === "english" ? "Phone" : "Telefone"}:</label>
+                          <span>{selectedStudent.second_parent.phone || 'N/A'}</span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  )}
+                  
+                  {!selectedStudent.responsible_parent && !selectedStudent.parent && !selectedStudent.second_parent && (
+                    <p>{language === "english" ? "No parent information available" : "Nenhuma informação de parente disponível"}</p>
+                  )}
                 </div>
               </>
             )}
@@ -436,7 +537,7 @@ export default function Students() {
                           : language === "english" ? "Inactive" : "Inativo"
                         }
                   className={`status-badge ${student.active ? 'active' : 'inactive'}`}
-                  onClick={() => changeStudentStatus(index)}
+                  //onClick={() => changeStudentStatus(index)}
                 />
               </div>
             </div>

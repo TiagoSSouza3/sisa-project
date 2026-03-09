@@ -259,7 +259,11 @@ export default function UsersForm() {
     if(isLoggedIn && localStorage.getItem("occupation_id") === occupationEnum.professor){
         return (
             <div className="users-container">
-                access denied
+                <div className="access-denied">
+                    <div className="access-denied-icon">🚫</div>
+                    <h2>{language === "english" ? "Access Denied" : "Acesso Negado"}</h2>
+                    <p>{language === "english" ? "You don't have permission to access this page." : "Você não tem permissão para acessar esta página."}</p>
+                </div>
             </div>
         );
     }
@@ -377,14 +381,14 @@ export default function UsersForm() {
                     />
                 </div>
 
-                <div className="permission-item">
+                {/* <div className="permission-item">
                     <span className="permission-label">{language === "english" ? "Storage" : "Estoque"}</span>
                     <ToggleSwitch
                         checked={permissions.can_access_storage}
                         onChange={(val) => handlePermissionChange('can_access_storage', val)}
                         label={language === "english" ? "Storage access" : "Acesso ao Estoque"}
                     />
-                </div>
+                </div> */}
 
                 <div className="permission-item">
                     <span className="permission-label">{language === "english" ? "Summary Data" : "Dados Resumidos"}</span>

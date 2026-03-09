@@ -14,9 +14,9 @@ exports.getSubjectById = async (req, res) => {
     const { type } = req.params;
 
     const subject = 
-    type === "professor"
+    type === "withProfessor"
       ? await Subject.findByPk(
-        req.params.id, 
+        id, 
         {
           include: [{
             model: User,
@@ -27,7 +27,7 @@ exports.getSubjectById = async (req, res) => {
           }]
         })
       : await Subject.findByPk(
-        req.params.id, 
+        id, 
         {
           include: [{
             model: Students,
@@ -168,6 +168,8 @@ exports.addStudentToSubject = async (req, res) => {
       students_id: studentId,
       createdAt: new Date()
     });
+
+    await verifyActivity(studentId);
     
     res.status(201).json({ message: "Aluno adicionado à disciplina com sucesso" });
   } catch (error) {
@@ -176,22 +178,27 @@ exports.addStudentToSubject = async (req, res) => {
   }
 };
 
+const verifyActivity = async (studentId) => {
+  const existingRelation = await SubjectStudent.findOne({
+    where: {
+      students_id: studentId
+    }
+  });
+
+  const student = await Students.findByPk(studentId);
+
+  existingRelation 
+  ? await student.update({ active: true })
+  : await student.update({ active: false })
+}
+
 exports.removeStudentFromSubject = async (req, res) => {
   try {
-    const { subjectId, studentId } = req.params;
-    
-    const deleted = await SubjectStudent.destroy({
-      where: {
-        subject_id: subjectId,
-        students_id: studentId
-      }
-    });
-    
-    if (deleted) {
-      res.status(200).json({ message: "Aluno removido da disciplina com sucesso" });
-    } else {
-      res.status(404).json({ error: "Relação não encontrada" });
-    }
+    const { studentId } = req.params;
+
+    await verifyActivity(studentId);
+
+    res.status(200).json({ message: "Aluno removido da disciplina com sucesso" });
   } catch (error) {
     console.error("Erro ao remover aluno da disciplina:", error);
     res.status(400).json({ error: error.message });

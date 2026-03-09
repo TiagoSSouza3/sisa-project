@@ -1,16 +1,17 @@
 import axios from "axios";
 
-const base_url = process.env.REACT_APP_API_DEVELOPMENT || (
-  process.env.NODE_ENV === "development" 
-    ? "http://localhost:5000/api" // Local backend URL
-    : "https://sisa-project.up.railway.app" // Correct backend URL without port
-);
+const base_url = process.env.REACT_APP_API_BASE_URL
+  || process.env.REACT_APP_API_DEVELOPMENT
+  || (typeof window !== 'undefined' && window.location.hostname === 'localhost'
+      ? "http://localhost:5000/api"
+      : "https://sisa.up.railway.app/api");
 const API = axios.create({
   baseURL: base_url,
   headers: {
     'Content-Type': 'application/json'
   }
 });
+
 
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");

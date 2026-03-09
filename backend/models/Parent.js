@@ -12,16 +12,28 @@ const Parent = sequelize.define("parent", {
     allowNull: false
   },
   birth_date: {
-    type: DataTypes.DATE
+    type: DataTypes.DATE,
+    allowNull: true
   },
   RG: {
-    type: DataTypes.CHAR(12)
+    type: DataTypes.CHAR(12),
+    allowNull: true
   },
   CPF: {
-    type: DataTypes.CHAR(15)
+    type: DataTypes.CHAR(15),
+    allowNull: true
   },
   occupation: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  phone: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  degree_of_kinship: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 }, {
   tableName: 'parent',

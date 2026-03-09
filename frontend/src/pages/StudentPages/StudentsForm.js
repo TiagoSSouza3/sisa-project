@@ -17,13 +17,45 @@ export default function StudentsForm() {
     const [phoneError, setPhoneError] = useState("");
     const [secondPhoneError, setSecondPhoneError] = useState("");
     const [cpfError, setCpfError] = useState("");
-    const [rgError, setRgError] = useState("");
     const [emailError, setEmailError] = useState("");
     const [childAge, setChildAge] = useState("");
     const [ageError, setAgeError] = useState("");
     const [cepError, setCepError] = useState("");
     const [loadingCep, setLoadingCep] = useState(false);
     const { confirmationState, showConfirmation, hideConfirmation, handleConfirm } = useConfirmation();
+    
+    // Estados para parentes
+    const [parents, setParents] = useState({
+        parent1: null, // Primeiro pai
+        parent2: null, // Segundo pai
+        responsible: null // Responsável (obrigatório)
+    });
+    const [parentErrors, setParentErrors] = useState({
+        parent1: {},
+        parent2: {},
+        responsible: {}
+    });
+    const [parentSearchResults, setParentSearchResults] = useState({
+        parent1: [],
+        parent2: [],
+        responsible: []
+    });
+    const [parentSearchLoading, setParentSearchLoading] = useState({
+        parent1: false,
+        parent2: false,
+        responsible: false
+    });
+    const [parentSearchTerms, setParentSearchTerms] = useState({
+        parent1: "",
+        parent2: "",
+        responsible: ""
+    });
+    const [parentModified, setParentModified] = useState({
+        parent1: false,
+        parent2: false,
+        responsible: false
+    });
+    const [showParent2, setShowParent2] = useState(false);
 
     const [student, setStudent] = useState({
         name: "",
@@ -44,10 +76,11 @@ export default function StudentsForm() {
         school_period: "",
         birth_date: "",
         address: "",
+        address_number: "",
         neighborhood: "",
         cep: "",
         notes: "",
-        active: true,
+        active: false,
         createdAt: Date.now(),
         updatedAt: Date.now()
     });
@@ -61,8 +94,56 @@ export default function StudentsForm() {
     const getStudentById = async () => {
         try {
             const response = await API.get(`/students/${id}`);
-            setStudent(response.data);
-            setChildAge(validadeAge(response.data.birth_date))
+            const studentData = response.data;
+            
+            // Separar endereço e número se o endereço contiver vírgula e número
+            let address = studentData.address || "";
+            let address_number = "";
+            
+            if (address) {
+                // Tenta separar endereço e número (formato: "Rua Exemplo, 123")
+                const addressMatch = address.match(/^(.+?),\s*(\d+.*)$/);
+                if (addressMatch) {
+                    address = addressMatch[1].trim();
+                    address_number = addressMatch[2].trim();
+                }
+            }
+            
+            setStudent({
+                ...studentData,
+                address: address,
+                address_number: address_number
+            });
+            setChildAge(validadeAge(studentData.birth_date));
+            
+            // Carregar parentes se existirem
+            if (studentData.parent) {
+                setParents(prev => ({ ...prev, parent1: studentData.parent }));
+                setParentSearchTerms(prev => ({ ...prev, parent1: studentData.parent.name || "" }));
+            } else {
+                // Inicializar parent1 vazio para sempre mostrar campos
+                setParents(prev => ({ 
+                    ...prev, 
+                    parent1: {
+                        name: "",
+                        birth_date: "",
+                        RG: "",
+                        CPF: "",
+                        occupation: "",
+                        phone: "",
+                        degree_of_kinship: ""
+                    }
+                }));
+            }
+            if (studentData.second_parent) {
+                setParents(prev => ({ ...prev, parent2: studentData.second_parent }));
+                setParentSearchTerms(prev => ({ ...prev, parent2: studentData.second_parent.name || "" }));
+                setShowParent2(true);
+            }
+            if (studentData.responsible_parent) {
+                setParents(prev => ({ ...prev, responsible: studentData.responsible_parent }));
+                setParentSearchTerms(prev => ({ ...prev, responsible: studentData.responsible_parent.name || "" }));
+            }
         } catch (err) {
             console.error("Erro ao buscar aluno:", err);
         }
@@ -119,24 +200,24 @@ export default function StudentsForm() {
     };
 
     const validateCPF = (cpfNumber) => {
+        if (!cpfNumber) return true;
+        
         const cleanCPF = cpfNumber.replace(/\D/g, '');
         
-        if (!cleanCPF) return true;
+        // Se não tiver 11 dígitos, ainda está digitando (não é inválido ainda)
+        if (cleanCPF.length < 11) {
+            return true;
+        }
         
-        return cpf.isValid(cleanCPF);
-    };
-
-    const validateRG = (rg) => {
-        const cleanRG = rg.replace(/[^\dX]/gi, '');
-        
-        if (!cleanRG) return true;
-        
-        if (cleanRG.length < 6 || cleanRG.length > 11) {
+        // Se tiver mais de 11 dígitos, é inválido
+        if (cleanCPF.length > 11) {
             return false;
         }
         
-        return true;
+        // Valida apenas quando tiver 11 dígitos completos
+        return cpf.isValid(cleanCPF);
     };
+
 
     const validateName = (name) => {
         if (!name) return true;
@@ -261,7 +342,8 @@ export default function StudentsForm() {
                         cep: formattedCEP,
                         address: data.logradouro || prev.address,
                         neighborhood: data.bairro || prev.neighborhood,
-                        // Você pode adicionar cidade/estado se tiver esses campos
+                        // Mantém o número se já existir
+                        address_number: prev.address_number || "",
                     }));
                     setCepError("");
                 }
@@ -296,24 +378,15 @@ export default function StudentsForm() {
         }
     };
 
-    const formatRG = (rg) => {
-        const cleanRG = rg.replace(/\D/g, '');
-        if (cleanRG.length > 11) {
-            return rg.substring(0, 14); // Limita a 11 dígitos com formatação
-        }
-        if (cleanRG.length >= 8) {
-            return cleanRG.replace(/^(\d{2})(\d{3})(\d{3})(\d{1,3}).*/, '$1.$2.$3-$4');
-        }
-        return cleanRG;
-    };
-
     const handleCPFChange = (e) => {
         const cpfValue = e.target.value;
         const formattedCPF = formatCPF(cpfValue);
         
         setStudent({ ...student, CPF: formattedCPF });
         
-        if (cpfValue && !validateCPF(cpfValue)) {
+        // Valida apenas quando o CPF estiver completo (11 dígitos)
+        const cleanCPF = cpfValue.replace(/\D/g, '');
+        if (cleanCPF.length === 11 && !validateCPF(cpfValue)) {
             setCpfError("CPF inválido");
         } else {
             setCpfError("");
@@ -322,15 +395,8 @@ export default function StudentsForm() {
 
     const handleRGChange = (e) => {
         const rgValue = e.target.value;
-        const formattedRG = formatRG(rgValue);
         
-        setStudent({ ...student, RG: formattedRG });
-        
-        if (rgValue && !validateRG(rgValue)) {
-            setRgError("RG inválido.");
-        } else {
-            setRgError("");
-        }
+        setStudent({ ...student, RG: rgValue });
     };
 
     const handleEmailChange = (e) => {
@@ -366,58 +432,404 @@ export default function StudentsForm() {
         }
     }
 
+    // Funções para gerenciar parentes
+    const searchParentsDebounce = (() => {
+        let timeout;
+        return (searchTerm, parentType) => {
+            clearTimeout(timeout);
+            timeout = setTimeout(async () => {
+                if (searchTerm && searchTerm.trim().length >= 2) {
+                    setParentSearchLoading(prev => ({ ...prev, [parentType]: true }));
+                    try {
+                        const response = await API.get(`/parents/search?name=${encodeURIComponent(searchTerm)}`);
+                        setParentSearchResults(prev => ({ ...prev, [parentType]: response.data }));
+                    } catch (err) {
+                        console.error("Erro ao buscar parentes:", err);
+                        setParentSearchResults(prev => ({ ...prev, [parentType]: [] }));
+                    } finally {
+                        setParentSearchLoading(prev => ({ ...prev, [parentType]: false }));
+                    }
+                } else {
+                    setParentSearchResults(prev => ({ ...prev, [parentType]: [] }));
+                }
+            }, 300);
+        };
+    })();
+
+    const handleParentNameChange = (e, parentType) => {
+        const value = e.target.value;
+        setParentSearchTerms(prev => ({ ...prev, [parentType]: value }));
+        
+        // Atualiza o nome no parent também (se o parent existe)
+        if (parents[parentType]) {
+            const updatedParent = { ...parents[parentType], name: value };
+            setParents(prev => ({ ...prev, [parentType]: updatedParent }));
+            setParentModified(prev => ({ ...prev, [parentType]: true }));
+        } else {
+            // Se não existe, cria um novo parent vazio
+            const newParent = {
+                name: value,
+                birth_date: "",
+                RG: "",
+                CPF: "",
+                occupation: "",
+                phone: "",
+                degree_of_kinship: ""
+            };
+            setParents(prev => ({ ...prev, [parentType]: newParent }));
+        }
+        
+        // Busca quando o usuário digita
+        if (value && value.trim().length >= 2) {
+            searchParentsDebounce(value, parentType);
+        } else {
+            setParentSearchResults(prev => ({ ...prev, [parentType]: [] }));
+        }
+    };
+
+    const handleSelectParent = (parent, parentType) => {
+        setParents(prev => ({ ...prev, [parentType]: parent }));
+        setParentSearchTerms(prev => ({ ...prev, [parentType]: parent.name }));
+        setParentSearchResults(prev => ({ ...prev, [parentType]: [] }));
+        setParentModified(prev => ({ ...prev, [parentType]: false }));
+        setParentErrors(prev => ({ ...prev, [parentType]: {} }));
+    };
+
+    const handleParentFieldChange = (field, value, parentType) => {
+        const currentParent = parents[parentType];
+        if (!currentParent) return;
+        
+        const updatedParent = { ...currentParent, [field]: value };
+        setParents(prev => ({ ...prev, [parentType]: updatedParent }));
+        setParentModified(prev => ({ ...prev, [parentType]: true }));
+        
+        // Validações em tempo real
+        const currentErrors = parentErrors[parentType] || {};
+        const errors = { ...currentErrors };
+        
+        if (field === 'CPF') {
+            if (!value || !value.trim()) {
+                // Se o campo estiver vazio, remove o erro de CPF
+                delete errors.CPF;
+            } else {
+                const cleanCPF = value.replace(/\D/g, '');
+                // Valida apenas quando o CPF estiver completo (11 dígitos)
+                if (cleanCPF.length === 11) {
+                    if (!validateCPF(value)) {
+                        errors.CPF = "CPF inválido";
+                    } else {
+                        // Limpa o erro se o CPF for válido
+                        delete errors.CPF;
+                    }
+                } else if (cleanCPF.length > 11) {
+                    errors.CPF = "CPF inválido";
+                } else {
+                    // Limpa o erro enquanto está digitando (menos de 11 dígitos)
+                    delete errors.CPF;
+                }
+            }
+        }
+        
+        if (field === 'phone') {
+            if (!value || !value.trim()) {
+                delete errors.phone;
+            } else if (!validatePhoneNumber(value)) {
+                errors.phone = "Telefone inválido";
+            } else {
+                delete errors.phone;
+            }
+        }
+        
+        setParentErrors(prev => ({ 
+            ...prev, 
+            [parentType]: errors
+        }));
+    };
+
+    const validateParent = (parent, parentType) => {
+        const errors = {};
+        
+        if (!parent.name || !parent.name.trim()) {
+            errors.name = language === "english" ? "Name is required" : "Nome é obrigatório";
+        }
+        if (!parent.birth_date) {
+            errors.birth_date = language === "english" ? "Birth date is required" : "Data de nascimento é obrigatória";
+        }
+        if (!parent.CPF || !parent.CPF.trim()) {
+            errors.CPF = language === "english" ? "CPF is required" : "CPF é obrigatório";
+        } else {
+            const cleanCPF = parent.CPF.replace(/\D/g, '');
+            if (cleanCPF.length === 11 && !validateCPF(parent.CPF)) {
+                errors.CPF = "CPF inválido";
+            } else if (cleanCPF.length > 0 && cleanCPF.length < 11) {
+                errors.CPF = language === "english" ? "CPF must have 11 digits" : "CPF deve ter 11 dígitos";
+            }
+        }
+        if (!parent.degree_of_kinship || !parent.degree_of_kinship.trim()) {
+            errors.degree_of_kinship = language === "english" ? "Degree of kinship is required" : "Grau de parentesco é obrigatório";
+        }
+        if (parent.phone && !validatePhoneNumber(parent.phone)) {
+            errors.phone = "Telefone inválido";
+        }
+        
+        return errors;
+    };
+
+    const handleSaveParent = async (parentType) => {
+        const parent = parents[parentType];
+        if (!parent) return null;
+        
+        const errors = validateParent(parent, parentType);
+        if (Object.keys(errors).length > 0) {
+            setParentErrors(prev => ({ ...prev, [parentType]: errors }));
+            return null;
+        }
+        
+        try {
+            let savedParent;
+            if (parent.id) {
+                // Atualizar parent existente
+                const response = await API.put(`/parents/${parent.id}`, parent);
+                savedParent = response.data;
+            } else {
+                // Criar novo parent
+                const response = await API.post("/parents", parent);
+                savedParent = response.data;
+            }
+            
+            setParents(prev => ({ ...prev, [parentType]: savedParent }));
+            setParentModified(prev => ({ ...prev, [parentType]: false }));
+            setParentErrors(prev => ({ ...prev, [parentType]: {} }));
+            return savedParent;
+        } catch (err) {
+            console.error("Erro ao salvar parent:", err);
+            setParentErrors(prev => ({ 
+                ...prev, 
+                [parentType]: { 
+                    ...prev[parentType], 
+                    save: language === "english" ? "Error saving parent" : "Erro ao salvar parente" 
+                } 
+            }));
+            return null;
+        }
+    };
+
+    const handleAddNewParent = (parentType) => {
+        const newParent = {
+            name: "",
+            birth_date: "",
+            RG: "",
+            CPF: "",
+            occupation: "",
+            phone: "",
+            degree_of_kinship: ""
+        };
+        setParents(prev => ({ ...prev, [parentType]: newParent }));
+        setParentSearchTerms(prev => ({ ...prev, [parentType]: "" }));
+        setParentSearchResults(prev => ({ ...prev, [parentType]: [] }));
+        setParentModified(prev => ({ ...prev, [parentType]: false }));
+        setParentErrors(prev => ({ ...prev, [parentType]: {} }));
+        if (parentType === 'parent2') {
+            setShowParent2(true);
+        }
+    };
+    
+    // Inicializar parent1 quando componente carrega
+    useEffect(() => {
+        if (!parents.parent1) {
+            setParents(prev => ({ 
+                ...prev, 
+                parent1: {
+                    name: "",
+                    birth_date: "",
+                    RG: "",
+                    CPF: "",
+                    occupation: "",
+                    phone: "",
+                    degree_of_kinship: ""
+                }
+            }));
+        }
+    }, []);
+
+    const handleRemoveParent = (parentType) => {
+        setParents(prev => ({ ...prev, [parentType]: null }));
+        setParentSearchTerms(prev => ({ ...prev, [parentType]: "" }));
+        setParentSearchResults(prev => ({ ...prev, [parentType]: [] }));
+        setParentModified(prev => ({ ...prev, [parentType]: false }));
+        setParentErrors(prev => ({ ...prev, [parentType]: {} }));
+    };
+
     const handleCreate = async () => {
-        if (!validateCPF(student.CPF)) {
-            setCpfError("CPF inválido");
+        // Validar responsável (obrigatório)
+        if (!parents.responsible) {
+            setParentErrors(prev => ({ 
+                ...prev, 
+                responsible: { 
+                    ...prev.responsible, 
+                    required: language === "english" ? "Responsible parent is required" : "Responsável é obrigatório" 
+                } 
+            }));
             return;
         }
         
-        if (student.RG && !validateRG(student.RG)) {
-            setRgError("RG inválido");
-            return;
-        }
-
-        if (!validatePhoneNumber(student.phone)) {
-            setPhoneError("Telefone principal inválido");
+        // Validar todos os parentes
+        const responsibleErrors = validateParent(parents.responsible, 'responsible');
+        if (Object.keys(responsibleErrors).length > 0) {
+            setParentErrors(prev => ({ ...prev, responsible: responsibleErrors }));
             return;
         }
         
-        if (student.second_phone && !validatePhoneNumber(student.second_phone)) {
-            setSecondPhoneError("Telefone secundário inválido");
-            return;
-        }
-        
-        if (student.birth_date >= (new Date(Date.now()))) {
-            setAgeError("Erro da Data de nascimento");
-            return;
-        }
-
-        if (student.email) {
-            const emailValidation = validateEmail(student.email);
-            if (!emailValidation.isValid) {
-                setEmailError(emailValidation.message);
+        if (parents.parent1) {
+            const parent1Errors = validateParent(parents.parent1, 'parent1');
+            if (Object.keys(parent1Errors).length > 0) {
+                setParentErrors(prev => ({ ...prev, parent1: parent1Errors }));
                 return;
             }
         }
-
-        showConfirmation({
-            type: 'edit',
-            title: language === "english" ? "Edit Student" : "Editar Aluno",
-            message: language === "english" 
-              ? `Do you want to edit student "${student?.name}"?`
-              : `Deseja editar o aluno "${student?.name}"?`,
-            confirmText: language === "english" ? "Edit" : "Editar",
-            onConfirm: async () => {
-                if (id) {
-                    await API.put(`/students/${id}`, student);
-                } else {
-                    console.log(student)
-                    await API.post("/students", student);
+        
+        if (parents.parent2) {
+            const parent2Errors = validateParent(parents.parent2, 'parent2');
+            if (Object.keys(parent2Errors).length > 0) {
+                setParentErrors(prev => ({ ...prev, parent2: parent2Errors }));
+                return;
+            }
+        }
+        
+        // Salvar parentes modificados antes de salvar o aluno
+        try {
+            // Salvar responsável
+            let responsibleParentId = null;
+            if (parentModified.responsible || !parents.responsible.id) {
+                const response = parents.responsible.id 
+                    ? await API.put(`/parents/${parents.responsible.id}`, parents.responsible)
+                    : await API.post("/parents", parents.responsible);
+                responsibleParentId = response.data.id;
+            } else {
+                responsibleParentId = parents.responsible.id;
+            }
+            
+            // Salvar parent1 - verifica se existe pelo nome primeiro
+            let parent1Id = null;
+            if (parents.parent1 && parents.parent1.name && parents.parent1.name.trim()) {
+                // Busca se já existe um parent com esse nome
+                try {
+                    const searchResponse = await API.get(`/parents/search?name=${encodeURIComponent(parents.parent1.name.trim())}`);
+                    const existingParent = searchResponse.data.find(p => 
+                        p.name.trim().toLowerCase() === parents.parent1.name.trim().toLowerCase()
+                    );
+                    
+                    if (existingParent) {
+                        // Se existe, apenas associa o ID
+                        parent1Id = existingParent.id;
+                    } else {
+                        // Se não existe, cria novo
+                        const response = await API.post("/parents", parents.parent1);
+                        parent1Id = response.data.id;
+                    }
+                } catch (err) {
+                    // Se erro na busca, cria novo
+                    const response = await API.post("/parents", parents.parent1);
+                    parent1Id = response.data.id;
                 }
+            }
+            
+            // Salvar parent2 se existir
+            let parent2Id = null;
+            if (parents.parent2 && parents.parent2.name && parents.parent2.name.trim()) {
+                // Busca se já existe um parent com esse nome
+                try {
+                    const searchResponse = await API.get(`/parents/search?name=${encodeURIComponent(parents.parent2.name.trim())}`);
+                    const existingParent = searchResponse.data.find(p => 
+                        p.name.trim().toLowerCase() === parents.parent2.name.trim().toLowerCase()
+                    );
+                    
+                    if (existingParent) {
+                        // Se existe, apenas associa o ID
+                        parent2Id = existingParent.id;
+                    } else {
+                        // Se não existe, cria novo
+                        const response = parents.parent2.id 
+                            ? await API.put(`/parents/${parents.parent2.id}`, parents.parent2)
+                            : await API.post("/parents", parents.parent2);
+                        parent2Id = response.data.id;
+                    }
+                } catch (err) {
+                    // Se erro na busca, cria novo
+                    const response = parents.parent2.id 
+                        ? await API.put(`/parents/${parents.parent2.id}`, parents.parent2)
+                        : await API.post("/parents", parents.parent2);
+                    parent2Id = response.data.id;
+                }
+            }
+            
+            // Validar aluno
+            if (student.CPF) {
+                const cleanCPF = student.CPF.replace(/\D/g, '');
+                if (cleanCPF.length === 11 && !validateCPF(student.CPF)) {
+                    setCpfError("CPF inválido");
+                    return;
+                }
+            }
+
+            if (!validatePhoneNumber(student.phone)) {
+                setPhoneError("Telefone principal inválido");
+                return;
+            }
+            
+            if (student.second_phone && !validatePhoneNumber(student.second_phone)) {
+                setSecondPhoneError("Telefone secundário inválido");
+                return;
+            }
+            
+            if (student.birth_date >= (new Date(Date.now()))) {
+                setAgeError("Erro da Data de nascimento");
+                return;
+            }
+
+            if (student.email) {
+                const emailValidation = validateEmail(student.email);
+                if (!emailValidation.isValid) {
+                    setEmailError(emailValidation.message);
+                    return;
+                }
+            }
+
+            // Preparar dados do aluno com IDs dos parentes
+            // Concatena endereço com número se houver número
+            const fullAddress = student.address_number 
+                ? `${student.address}, ${student.address_number}`.trim()
+                : student.address;
+            
+            const studentData = {
+                ...student,
+                address: fullAddress,
+                parent_id: parent1Id,
+                second_parent_id: parent2Id,
+                responsible_parent_id: responsibleParentId
+            };
+
+            if(id){
+                showConfirmation({
+                    type: 'edit',
+                    title: language === "english" ? "Edit Student" : "Editar Aluno",
+                    message: language === "english" 
+                      ? `Do you want to edit student "${student?.name}"?`
+                      : `Deseja editar o aluno "${student?.name}"?`,
+                    confirmText: language === "english" ? "Edit" : "Editar",
+                    onConfirm: async () => {
+                        await API.put(`/students/${id}`, studentData);
+                        navigate("/students");
+                    }
+                });
+            } else {
+                await API.post("/students", studentData);
                 navigate("/students");
             }
-        });
-
+        } catch (err) {
+            console.error("Erro ao salvar parentes:", err);
+            alert(language === "english" ? "Error saving parents" : "Erro ao salvar parentes");
+        }
     };
 
     return (
@@ -485,7 +897,6 @@ export default function StudentsForm() {
                     value={student.RG}
                     onChange={handleRGChange}
                 />
-                {rgError && <span className="error-message">{rgError}</span>}
                 </div>
                 <div className="form-group">
                     <label htmlFor="gender">{language === "english" ? "Gender" : "Sexo"}</label>
@@ -542,23 +953,6 @@ export default function StudentsForm() {
                     {ageError && <span className="error-message">{ageError}</span>}
                 </div>
                 <div className="form-group">
-                    <label htmlFor="neighborhood">{language === "english" ? "Neighborhood" : "Bairro"}</label>
-                    <input 
-                        id="neighborhood"
-                        type="text"
-                        placeholder={language === "english" ? "Write the neighborhood" : "Digite o Bairro"}
-                        value={student.neighborhood}
-                        onChange={handleNeighborhoodChange}
-                    />
-                    {student.neighborhood && !validateFreeText(student.neighborhood) && (
-                        <span className="error-message">
-                            {language === "english" 
-                                ? "Invalid text (max 150 characters, no special code characters)" 
-                                : "Texto inválido (máx 150 caracteres, sem caracteres especiais de código)"}
-                        </span>
-                    )}
-                </div>
-                <div className="form-group">
                     <label htmlFor="skin_color">{language === "english" ? "Skin Color" : "Cor da Pele"}</label>
                     <select 
                         id="skin_color"
@@ -608,7 +1002,386 @@ export default function StudentsForm() {
                     />
                     {secondPhoneError && <span className="error-message">{secondPhoneError}</span>}
                 </div>
-                <div className="form-group">
+
+                {/* Seção de Parentes */}
+                <div className="parents-section" style={{ marginTop: '30px', paddingTop: '20px', borderTop: '2px solid #e0e0e0' }}>
+                    <h3 style={{ marginBottom: '20px' }}>{language === "english" ? "Parents/Guardians" : "Pais/Responsáveis"}</h3>
+                    
+                    {/* Responsável (Obrigatório) */}
+                    <div className="parent-form-card" style={{ marginBottom: '1.5rem', padding: '1.5rem', border: '2px solid #e0e0e0', borderRadius: 'var(--border-radius)', backgroundColor: 'var(--surface-color)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                            <h4 style={{ margin: 0, fontWeight: 600, color: '#d32f2f' }}>
+                                {language === "english" ? "Responsible Parent *" : "Responsável *"}
+                            </h4>
+                            {parents.responsible && (
+                                <button 
+                                    type="button"
+                                    onClick={() => handleRemoveParent('responsible')}
+                                    className="cancel-button"
+                                    style={{ width: 'auto', padding: '0.5rem 1rem', fontSize: '0.9rem' }}
+                                >
+                                    {language === "english" ? "Remove" : "Remover"}
+                                </button>
+                            )}
+                        </div>
+                        
+                        <div>
+                            <div className="form-group">
+                                <label>{language === "english" ? "Name *" : "Nome *"}</label>
+                                <input
+                                    type="text"
+                                    placeholder={language === "english" ? "Type name to search or add new..." : "Digite o nome para buscar ou adicionar novo..."}
+                                    value={parents.responsible?.name || parentSearchTerms.responsible || ''}
+                                    onChange={(e) => handleParentNameChange(e, 'responsible')}
+                                    required
+                                />
+                                {parentSearchLoading.responsible && <span className="info-message" style={{ fontSize: '0.9rem', color: '#666' }}>{language === "english" ? "Searching..." : "Buscando..."}</span>}
+                                {parentSearchResults.responsible.length > 0 && (
+                                    <div style={{ marginTop: '0.5rem', border: '2px solid #e0e0e0', borderRadius: 'var(--border-radius)', maxHeight: '200px', overflowY: 'auto', backgroundColor: 'white' }}>
+                                        {parentSearchResults.responsible.map((parent) => (
+                                            <div
+                                                key={parent.id}
+                                                onClick={() => handleSelectParent(parent, 'responsible')}
+                                                style={{ padding: '0.75rem', cursor: 'pointer', borderBottom: '1px solid #eee', transition: 'background-color 0.2s' }}
+                                                onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
+                                                onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
+                                            >
+                                                {parent.name} {parent.CPF && `- CPF: ${parent.CPF}`}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                                {parentErrors.responsible.name && <span className="error-message">{parentErrors.responsible.name}</span>}
+                            </div>
+                            
+                            
+                            {(parents.responsible || parentSearchTerms.responsible) && (
+                                <>
+                                    <div className="form-group">
+                                        <label>{language === "english" ? "Birth Date *" : "Data de Nascimento *"}</label>
+                                        <input
+                                            type="date"
+                                            max={new Date().toISOString().split('T')[0]}
+                                            value={parents.responsible?.birth_date ? dateToString(parents.responsible.birth_date) : ''}
+                                            onChange={(e) => handleParentFieldChange('birth_date', StringToDate(e.target.value), 'responsible')}
+                                            required
+                                        />
+                                        {parentErrors.responsible.birth_date && <span className="error-message">{parentErrors.responsible.birth_date}</span>}
+                                    </div>
+                                    <div className="form-group">
+                                        <label>CPF *</label>
+                                        <input
+                                            type="text"
+                                            value={parents.responsible?.CPF || ''}
+                                            onChange={(e) => handleParentFieldChange('CPF', formatCPF(e.target.value), 'responsible')}
+                                            required
+                                        />
+                                        {parentErrors.responsible.CPF && <span className="error-message">{parentErrors.responsible.CPF}</span>}
+                                    </div>
+                                    <div className="form-group">
+                                        <label>RG</label>
+                                        <input
+                                            type="text"
+                                            value={parents.responsible?.RG || ''}
+                                            onChange={(e) => handleParentFieldChange('RG', e.target.value, 'responsible')}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>{language === "english" ? "Degree of Kinship *" : "Grau de Parentesco *"}</label>
+                                        <select
+                                            value={parents.responsible?.degree_of_kinship || ''}
+                                            onChange={(e) => handleParentFieldChange('degree_of_kinship', e.target.value, 'responsible')}
+                                            required
+                                        >
+                                            <option value="">{language === "english" ? "Select degree of kinship" : "Selecione o grau de parentesco"}</option>
+                                            <option value="Pai">{language === "english" ? "Father" : "Pai"}</option>
+                                            <option value="Mãe">{language === "english" ? "Mother" : "Mãe"}</option>
+                                            <option value="Avô">{language === "english" ? "Grandfather" : "Avô"}</option>
+                                            <option value="Avó">{language === "english" ? "Grandmother" : "Avó"}</option>
+                                            <option value="Tio">{language === "english" ? "Uncle" : "Tio"}</option>
+                                            <option value="Tia">{language === "english" ? "Aunt" : "Tia"}</option>
+                                            <option value="Padrasto">{language === "english" ? "Stepfather" : "Padrasto"}</option>
+                                            <option value="Madrasta">{language === "english" ? "Stepmother" : "Madrasta"}</option>
+                                            <option value="Responsável Legal">{language === "english" ? "Legal Guardian" : "Responsável Legal"}</option>
+                                            <option value="Tutor">{language === "english" ? "Tutor" : "Tutor"}</option>
+                                            <option value="Outro">{language === "english" ? "Other" : "Outro"}</option>
+                                        </select>
+                                        {parentErrors.responsible.degree_of_kinship && <span className="error-message">{parentErrors.responsible.degree_of_kinship}</span>}
+                                    </div>
+                                    <div className="form-group">
+                                        <label>{language === "english" ? "Occupation" : "Ocupação"}</label>
+                                        <input
+                                            type="text"
+                                            value={parents.responsible?.occupation || ''}
+                                            onChange={(e) => handleParentFieldChange('occupation', e.target.value, 'responsible')}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>{language === "english" ? "Phone" : "Telefone"}</label>
+                                        <input
+                                            type="text"
+                                            value={parents.responsible?.phone || ''}
+                                            onChange={(e) => handleParentFieldChange('phone', formatPhoneNumber(e.target.value), 'responsible')}
+                                        />
+                                        {parentErrors.responsible.phone && <span className="error-message">{parentErrors.responsible.phone}</span>}
+                                    </div>
+                                    {parentModified.responsible && parents.responsible?.id && (
+                                        <button
+                                            type="button"
+                                            onClick={() => handleSaveParent('responsible')}
+                                            className="add-student-button"
+                                            style={{ width: 'auto', marginTop: '0.5rem', backgroundColor: 'var(--success-color)' }}
+                                        >
+                                            {language === "english" ? "Save Changes" : "Salvar Alterações"}
+                                        </button>
+                                    )}
+                                </>
+                            )}
+                        </div>
+                        {parentErrors.responsible.required && <span className="error-message">{parentErrors.responsible.required}</span>}
+                    </div>
+
+                    {/* Primeiro Pai - Sempre visível */}
+                    {parents.parent1 && (
+                        <div className="parent-form-card" style={{ marginBottom: '1.5rem', padding: '1.5rem', border: '2px solid #e0e0e0', borderRadius: 'var(--border-radius)', backgroundColor: 'var(--surface-color)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                <h4 style={{ margin: 0, fontWeight: 600 }}>{language === "english" ? "Parent 1" : "Pai/Mãe 1"}</h4>
+                            </div>
+                            
+                            <div>
+                                <div className="form-group">
+                                    <label>{language === "english" ? "Name *" : "Nome *"}</label>
+                                    <input
+                                        type="text"
+                                        placeholder={language === "english" ? "Type name to search or add new..." : "Digite o nome para buscar ou adicionar novo..."}
+                                        value={parents.parent1.name || ''}
+                                        onChange={(e) => handleParentNameChange(e, 'parent1')}
+                                        required
+                                    />
+                                    {parentSearchLoading.parent1 && <span className="info-message" style={{ fontSize: '0.9rem', color: '#666' }}>{language === "english" ? "Searching..." : "Buscando..."}</span>}
+                                    {parentSearchResults.parent1.length > 0 && (
+                                        <div style={{ marginTop: '0.5rem', border: '2px solid #e0e0e0', borderRadius: 'var(--border-radius)', maxHeight: '200px', overflowY: 'auto', backgroundColor: 'white' }}>
+                                            {parentSearchResults.parent1.map((parent) => (
+                                                <div
+                                                    key={parent.id}
+                                                    onClick={() => handleSelectParent(parent, 'parent1')}
+                                                    style={{ padding: '0.75rem', cursor: 'pointer', borderBottom: '1px solid #eee', transition: 'background-color 0.2s' }}
+                                                    onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
+                                                    onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
+                                                >
+                                                    {parent.name} {parent.CPF && `- CPF: ${parent.CPF}`}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                    {parentErrors.parent1.name && <span className="error-message">{parentErrors.parent1.name}</span>}
+                                </div>
+                                <div className="form-group">
+                                    <label>{language === "english" ? "Birth Date *" : "Data de Nascimento *"}</label>
+                                    <input
+                                        type="date"
+                                        max={new Date().toISOString().split('T')[0]}
+                                        value={parents.parent1.birth_date ? dateToString(parents.parent1.birth_date) : ''}
+                                        onChange={(e) => handleParentFieldChange('birth_date', StringToDate(e.target.value), 'parent1')}
+                                        required
+                                    />
+                                    {parentErrors.parent1.birth_date && <span className="error-message">{parentErrors.parent1.birth_date}</span>}
+                                </div>
+                                <div className="form-group">
+                                    <label>CPF *</label>
+                                    <input
+                                        type="text"
+                                        value={parents.parent1.CPF || ''}
+                                        onChange={(e) => handleParentFieldChange('CPF', formatCPF(e.target.value), 'parent1')}
+                                        required
+                                    />
+                                    {parentErrors.parent1.CPF && <span className="error-message">{parentErrors.parent1.CPF}</span>}
+                                </div>
+                                <div className="form-group">
+                                    <label>RG</label>
+                                    <input
+                                        type="text"
+                                        value={parents.parent1.RG || ''}
+                                        onChange={(e) => handleParentFieldChange('RG', e.target.value, 'parent1')}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>{language === "english" ? "Degree of Kinship *" : "Grau de Parentesco *"}</label>
+                                    <select
+                                        value={parents.parent1.degree_of_kinship || ''}
+                                        onChange={(e) => handleParentFieldChange('degree_of_kinship', e.target.value, 'parent1')}
+                                        required
+                                    >
+                                        <option value="">{language === "english" ? "Select degree of kinship" : "Selecione o grau de parentesco"}</option>
+                                        <option value="Pai">{language === "english" ? "Father" : "Pai"}</option>
+                                        <option value="Mãe">{language === "english" ? "Mother" : "Mãe"}</option>
+                                        <option value="Avô">{language === "english" ? "Grandfather" : "Avô"}</option>
+                                        <option value="Avó">{language === "english" ? "Grandmother" : "Avó"}</option>
+                                        <option value="Tio">{language === "english" ? "Uncle" : "Tio"}</option>
+                                        <option value="Tia">{language === "english" ? "Aunt" : "Tia"}</option>
+                                        <option value="Padrasto">{language === "english" ? "Stepfather" : "Padrasto"}</option>
+                                        <option value="Madrasta">{language === "english" ? "Stepmother" : "Madrasta"}</option>
+                                        <option value="Responsável Legal">{language === "english" ? "Legal Guardian" : "Responsável Legal"}</option>
+                                        <option value="Tutor">{language === "english" ? "Tutor" : "Tutor"}</option>
+                                        <option value="Outro">{language === "english" ? "Other" : "Outro"}</option>
+                                    </select>
+                                    {parentErrors.parent1.degree_of_kinship && <span className="error-message">{parentErrors.parent1.degree_of_kinship}</span>}
+                                </div>
+                                <div className="form-group">
+                                    <label>{language === "english" ? "Occupation" : "Ocupação"}</label>
+                                    <input
+                                        type="text"
+                                        value={parents.parent1.occupation || ''}
+                                        onChange={(e) => handleParentFieldChange('occupation', e.target.value, 'parent1')}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>{language === "english" ? "Phone" : "Telefone"}</label>
+                                    <input
+                                        type="text"
+                                        value={parents.parent1.phone || ''}
+                                        onChange={(e) => handleParentFieldChange('phone', formatPhoneNumber(e.target.value), 'parent1')}
+                                    />
+                                    {parentErrors.parent1.phone && <span className="error-message">{parentErrors.parent1.phone}</span>}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    
+                    {/* Botão para adicionar segundo parente */}
+                    {!showParent2 && (
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <button
+                                type="button"
+                                onClick={() => handleAddNewParent('parent2')}
+                                className="add-student-button"
+                                style={{ width: 'auto', padding: '0.8rem 1.5rem' }}
+                            >
+                                {language === "english" ? "+ Add Second Parent" : "+ Adicionar Segundo Pai/Mãe"}
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Segundo Pai - Aparece apenas quando showParent2 é true */}
+                    {showParent2 && parents.parent2 && (
+                        <div className="parent-form-card" style={{ marginBottom: '1.5rem', padding: '1.5rem', border: '2px solid #e0e0e0', borderRadius: 'var(--border-radius)', backgroundColor: 'var(--surface-color)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                <h4 style={{ margin: 0, fontWeight: 600 }}>{language === "english" ? "Parent 2" : "Pai/Mãe 2"}</h4>
+                                <button 
+                                    type="button"
+                                    onClick={() => {
+                                        handleRemoveParent('parent2');
+                                        setShowParent2(false);
+                                    }}
+                                    className="cancel-button"
+                                    style={{ width: 'auto', padding: '0.5rem 1rem', fontSize: '0.9rem' }}
+                                >
+                                    {language === "english" ? "Remove" : "Remover"}
+                                </button>
+                            </div>
+                            
+                            <div>
+                                <div className="form-group">
+                                    <label>{language === "english" ? "Name *" : "Nome *"}</label>
+                                    <input
+                                        type="text"
+                                        placeholder={language === "english" ? "Type name to search or add new..." : "Digite o nome para buscar ou adicionar novo..."}
+                                        value={parents.parent2.name || ''}
+                                        onChange={(e) => handleParentNameChange(e, 'parent2')}
+                                        required
+                                    />
+                                    {parentSearchLoading.parent2 && <span className="info-message" style={{ fontSize: '0.9rem', color: '#666' }}>{language === "english" ? "Searching..." : "Buscando..."}</span>}
+                                    {parentSearchResults.parent2.length > 0 && (
+                                        <div style={{ marginTop: '0.5rem', border: '2px solid #e0e0e0', borderRadius: 'var(--border-radius)', maxHeight: '200px', overflowY: 'auto', backgroundColor: 'white' }}>
+                                            {parentSearchResults.parent2.map((parent) => (
+                                                <div
+                                                    key={parent.id}
+                                                    onClick={() => handleSelectParent(parent, 'parent2')}
+                                                    style={{ padding: '0.75rem', cursor: 'pointer', borderBottom: '1px solid #eee', transition: 'background-color 0.2s' }}
+                                                    onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
+                                                    onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
+                                                >
+                                                    {parent.name} {parent.CPF && `- CPF: ${parent.CPF}`}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                    {parentErrors.parent2.name && <span className="error-message">{parentErrors.parent2.name}</span>}
+                                </div>
+                                <div className="form-group">
+                                    <label>{language === "english" ? "Birth Date *" : "Data de Nascimento *"}</label>
+                                    <input
+                                        type="date"
+                                        max={new Date().toISOString().split('T')[0]}
+                                        value={parents.parent2.birth_date ? dateToString(parents.parent2.birth_date) : ''}
+                                        onChange={(e) => handleParentFieldChange('birth_date', StringToDate(e.target.value), 'parent2')}
+                                        required
+                                    />
+                                    {parentErrors.parent2.birth_date && <span className="error-message">{parentErrors.parent2.birth_date}</span>}
+                                </div>
+                                <div className="form-group">
+                                    <label>CPF *</label>
+                                    <input
+                                        type="text"
+                                        value={parents.parent2.CPF || ''}
+                                        onChange={(e) => handleParentFieldChange('CPF', formatCPF(e.target.value), 'parent2')}
+                                        required
+                                    />
+                                    {parentErrors.parent2.CPF && <span className="error-message">{parentErrors.parent2.CPF}</span>}
+                                </div>
+                                <div className="form-group">
+                                    <label>RG</label>
+                                    <input
+                                        type="text"
+                                        value={parents.parent2.RG || ''}
+                                        onChange={(e) => handleParentFieldChange('RG', e.target.value, 'parent2')}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>{language === "english" ? "Degree of Kinship *" : "Grau de Parentesco *"}</label>
+                                    <select
+                                        value={parents.parent2.degree_of_kinship || ''}
+                                        onChange={(e) => handleParentFieldChange('degree_of_kinship', e.target.value, 'parent2')}
+                                        required
+                                    >
+                                        <option value="">{language === "english" ? "Select degree of kinship" : "Selecione o grau de parentesco"}</option>
+                                        <option value="Pai">{language === "english" ? "Father" : "Pai"}</option>
+                                        <option value="Mãe">{language === "english" ? "Mother" : "Mãe"}</option>
+                                        <option value="Avô">{language === "english" ? "Grandfather" : "Avô"}</option>
+                                        <option value="Avó">{language === "english" ? "Grandmother" : "Avó"}</option>
+                                        <option value="Tio">{language === "english" ? "Uncle" : "Tio"}</option>
+                                        <option value="Tia">{language === "english" ? "Aunt" : "Tia"}</option>
+                                        <option value="Padrasto">{language === "english" ? "Stepfather" : "Padrasto"}</option>
+                                        <option value="Madrasta">{language === "english" ? "Stepmother" : "Madrasta"}</option>
+                                        <option value="Responsável Legal">{language === "english" ? "Legal Guardian" : "Responsável Legal"}</option>
+                                        <option value="Tutor">{language === "english" ? "Tutor" : "Tutor"}</option>
+                                        <option value="Outro">{language === "english" ? "Other" : "Outro"}</option>
+                                    </select>
+                                    {parentErrors.parent2.degree_of_kinship && <span className="error-message">{parentErrors.parent2.degree_of_kinship}</span>}
+                                </div>
+                                <div className="form-group">
+                                    <label>{language === "english" ? "Occupation" : "Ocupação"}</label>
+                                    <input
+                                        type="text"
+                                        value={parents.parent2.occupation || ''}
+                                        onChange={(e) => handleParentFieldChange('occupation', e.target.value, 'parent2')}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>{language === "english" ? "Phone" : "Telefone"}</label>
+                                    <input
+                                        type="text"
+                                        value={parents.parent2.phone || ''}
+                                        onChange={(e) => handleParentFieldChange('phone', formatPhoneNumber(e.target.value), 'parent2')}
+                                    />
+                                    {parentErrors.parent2.phone && <span className="error-message">{parentErrors.parent2.phone}</span>}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                <div className="form-group" style={{ marginTop: '30px', paddingTop: '20px', borderTop: '2px solid #e0e0e0' }}>
                     <label htmlFor="is_on_school">{language === "english" ? "Is on School Actually?" : "Esta na Escola Atualmente?"}</label>
                     <div className="radio-group">
                         <input 
@@ -631,55 +1404,60 @@ export default function StudentsForm() {
                         <label htmlFor="isnt-school">{language === "english" ? "Yes" : "Sim"}</label>
                     </div>
                 </div>
-                <div className="form-group">
-                    <label htmlFor="school_year">{language === "english" ? "School Year" : "Ano Escolar"}</label>
-                    <input 
-                        id="school_year"
-                        type="text"
-                        placeholder={language === "english" ? "Write the school year" : "Digite o ano escolar"}
-                        value={student.school_year}
-                        onChange={(e) => {
-                            const value = sanitizeText(e.target.value);
-                            // Limita a 80 caracteres
-                            if (value.length <= 80) {
-                                setStudent({ ...student, school_year: value });
-                            }
-                        }}
-                    />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="school_name">{language === "english" ? "School Name" : "Nome da Escola"}</label>
-                    <input 
-                        id="school_name"
-                        type="text"
-                        placeholder={language === "english" ? "Write the School's Name" : "Digite o Nome da Escola"}
-                        value={student.school_name}
-                        onChange={(e) => {
-                            const value = sanitizeText(e.target.value);
-                            // Limita a 80 caracteres
-                            if (value.length <= 80) {
-                                setStudent({ ...student, school_name: value });
-                            }
-                        }}
-                    />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="school_period">{language === "english" ? "School Period" : "Período Escolar"}</label>
-                    <input 
-                        id="school_period"
-                        type="text"
-                        placeholder={language === "english" ? "Write the School's period" : "Digite o Período escolar"}
-                        value={student.school_period}
-                        onChange={(e) => {
-                            const value = sanitizeText(e.target.value);
-                            // Limita a 80 caracteres
-                            if (value.length <= 80) {
-                                setStudent({ ...student, school_period: value });
-                            }
-                        }}
-                    />
-                </div>
-                <div className="form-group">
+                
+                {(student.is_on_school === true || student.is_on_school === "true") && (
+                    <>
+                        <div className="form-group">
+                            <label htmlFor="school_year">{language === "english" ? "School Year" : "Ano Escolar"}</label>
+                            <input 
+                                id="school_year"
+                                type="text"
+                                placeholder={language === "english" ? "Write the school year" : "Digite o ano escolar"}
+                                value={student.school_year}
+                                onChange={(e) => {
+                                    const value = sanitizeText(e.target.value);
+                                    // Limita a 80 caracteres
+                                    if (value.length <= 80) {
+                                        setStudent({ ...student, school_year: value });
+                                    }
+                                }}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="school_name">{language === "english" ? "School Name" : "Nome da Escola"}</label>
+                            <input 
+                                id="school_name"
+                                type="text"
+                                placeholder={language === "english" ? "Write the School's Name" : "Digite o Nome da Escola"}
+                                value={student.school_name}
+                                onChange={(e) => {
+                                    const value = sanitizeText(e.target.value);
+                                    // Limita a 80 caracteres
+                                    if (value.length <= 80) {
+                                        setStudent({ ...student, school_name: value });
+                                    }
+                                }}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="school_period">{language === "english" ? "School Period" : "Período Escolar"}</label>
+                            <input 
+                                id="school_period"
+                                type="text"
+                                placeholder={language === "english" ? "Write the School's period" : "Digite o Período escolar"}
+                                value={student.school_period}
+                                onChange={(e) => {
+                                    const value = sanitizeText(e.target.value);
+                                    // Limita a 80 caracteres
+                                    if (value.length <= 80) {
+                                        setStudent({ ...student, school_period: value });
+                                    }
+                                }}
+                            />
+                        </div>
+                    </>
+                )}
+                <div className="form-group" style={{ marginTop: '30px', paddingTop: '20px', borderTop: '2px solid #e0e0e0' }}>
                     <label htmlFor="cep">CEP</label>
                     <input 
                         id="cep"
@@ -692,15 +1470,15 @@ export default function StudentsForm() {
                     {cepError && <span className="error-message">{cepError}</span>}
                 </div>
                 <div className="form-group">
-                    <label htmlFor="address">{language === "english" ? "Address" : "Endereço"}</label>
+                    <label htmlFor="neighborhood">{language === "english" ? "Neighborhood" : "Bairro"}</label>
                     <input 
-                        id="address"
+                        id="neighborhood"
                         type="text"
-                        placeholder={language === "english" ? "Write the address" : "Digite o endereço"}
-                        value={student.address}
-                        onChange={handleAddressChange}
+                        placeholder={language === "english" ? "Write the neighborhood" : "Digite o Bairro"}
+                        value={student.neighborhood}
+                        onChange={handleNeighborhoodChange}
                     />
-                    {student.address && !validateFreeText(student.address) && (
+                    {student.neighborhood && !validateFreeText(student.neighborhood) && (
                         <span className="error-message">
                             {language === "english" 
                                 ? "Invalid text (max 150 characters, no special code characters)" 
@@ -709,6 +1487,42 @@ export default function StudentsForm() {
                     )}
                 </div>
                 <div className="form-group">
+                    <label htmlFor="address">{language === "english" ? "Address" : "Endereço"}</label>
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                        <div style={{ flex: 1 }}>
+                            <input 
+                                id="address"
+                                type="text"
+                                placeholder={language === "english" ? "Street/Logradouro" : "Rua/Logradouro"}
+                                value={student.address}
+                                onChange={handleAddressChange}
+                            />
+                        </div>
+                        <div style={{ width: '150px' }}>
+                            <input 
+                                id="address_number"
+                                type="text"
+                                placeholder={language === "english" ? "Number" : "Número"}
+                                value={student.address_number || ''}
+                                onChange={(e) => {
+                                    const value = sanitizeText(e.target.value);
+                                    // Limita a 20 caracteres para número
+                                    if (value.length <= 20) {
+                                        setStudent({ ...student, address_number: value });
+                                    }
+                                }}
+                            />
+                        </div>
+                    </div>
+                    {student.address && !validateFreeText(student.address) && (
+                        <span className="error-message">
+                            {language === "english" 
+                                ? "Invalid text (max 150 characters, no special code characters)" 
+                                : "Texto inválido (máx 150 caracteres, sem caracteres especiais de código)"}
+                        </span>
+                    )}
+                </div>
+                <div className="form-group" style={{ marginTop: '30px', paddingTop: '20px', borderTop: '2px solid #e0e0e0' }}>
                     <label htmlFor="notes">{language === "english" ? "Additional Notes" : "Informações Adicionais"}</label>
                     <textarea 
                         id="notes"

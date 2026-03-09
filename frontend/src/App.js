@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 
 import Login from "./pages/Login";
@@ -26,6 +26,10 @@ import PermissionProtectedRoute from "./components/PermissionProtectedRoute";
 import './styles/global.css';
 
 function App() {
+  useEffect(() => {
+    const url = `https://sisa.up.railway.app/api/health/frontend?frontendHost=${window.location.host}`;
+    fetch(url, { method: 'GET', credentials: 'include' }).catch(() => {});
+  }, []);
   return (
     <Router future={{ v7_startTransition: true }}>
       <AppContent />
@@ -59,10 +63,10 @@ function AppContent() {
         <Route path="/subject_inscription/:id" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_subjects"><SubjectInscription /></PermissionProtectedRoute></ProtectedRoute>} />
         <Route path="/summary_data" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_summary_data"><Summary_data /></PermissionProtectedRoute></ProtectedRoute>} />
         <Route path="/documents" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_documents"><Documents /></PermissionProtectedRoute></ProtectedRoute>} />
-        <Route path="/storage" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_storage"><Storage /></PermissionProtectedRoute></ProtectedRoute>} />
+        {/* <Route path="/storage" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_storage"><Storage /></PermissionProtectedRoute></ProtectedRoute>} />
         <Route path="/storage_log/:id" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_storage"><StorageLog /></PermissionProtectedRoute></ProtectedRoute>} />
         <Route path="/storage_log/" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_storage"><StorageLog /></PermissionProtectedRoute></ProtectedRoute>} />
-        <Route path="/cash_flow" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_storage"><CashFlow /></PermissionProtectedRoute></ProtectedRoute>} />
+        <Route path="/cash_flow" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_storage"><CashFlow /></PermissionProtectedRoute></ProtectedRoute>} /> */}
       </Routes>
     </>
   );

@@ -129,7 +129,6 @@ export default function Summary_data() {
         try {
             const res = await API.get(`/summary_data/birthday-students/${month}`);
             setBirthdayStudents(res.data);
-            console.log(res.data)
         } catch (err) {
             console.error("Error fetching birthday students:", err);
         }

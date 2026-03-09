@@ -12,6 +12,6 @@ router.delete("/:id", authenticateToken, subjectController.deleteSubject);
 
 // Novas rotas para gerenciar alunos em disciplinas
 router.post("/:subjectId/students/:studentId", authenticateToken, subjectController.addStudentToSubject);
-router.delete("/:subjectId/students/:studentId", authenticateToken, subjectController.removeStudentFromSubject);
+router.delete("/students/:studentId", authenticateToken, subjectController.removeStudentFromSubject);
 
 module.exports = router; 

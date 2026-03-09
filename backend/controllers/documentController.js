@@ -97,8 +97,8 @@ exports.updateDocument = async (req, res) => {
         const newVersion = document.version + 1;
 
         // Atualizar documento
+        content: content || document.content,
         await document.update({
-            content: content || document.content,
             status: status || document.status,
             version: newVersion,
             last_modified_by: req.user.id
