@@ -1,8 +1,8 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const User = require("../models/User");
 require("dotenv").config();
+const userService = require("../services/userService");
 
 const router = express.Router();
 
@@ -20,7 +20,7 @@ router.post("/login", async (req, res) => {
       return res.status(500).json({ error: "Erro de configuração do servidor" });
     }
 
-    const user = await User.findOne({ where: { email } });
+    const user = await userService.findOne({ where: { email: email } });
     if (!user) {
       console.log('❌ Usuário não encontrado:', email);
       return res.status(401).json({ error: "Usuário não encontrado" });

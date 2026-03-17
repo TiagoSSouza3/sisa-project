@@ -13,8 +13,9 @@ exports.getAll = async (req, res) => {
 };
 
 exports.getByUserId = async (req, res) => {
+  const { userId } = req.params;
+
   try {
-    const { userId } = req.params;
     console.log(`[PERMISSIONS] Buscando permissões para usuário ID: ${userId}`);
     
     const permission = await permissionService.findOne({ where: { user_id: userId } });
@@ -133,7 +134,7 @@ exports.getByUserId = async (req, res) => {
     
     // Normalizar campos JSON que podem ser null
     const normalizedPermission = {
-      ...permission.toJSON(),
+      ...permission,
       document_view_roles: permission.document_view_roles || [],
       document_edit_roles: permission.document_edit_roles || [],
       document_upload_roles: permission.document_upload_roles || [],

@@ -20,8 +20,8 @@ exports.getAllUsers = async (req, res) => {
     3: 'PROFESSOR'
   };
   
-  const usersWithStringOccupation = users.map(user => ({
-    ...user.toJSON(),
+  const usersWithStringOccupation = users.map((user) => ({
+    ...user,
     occupation_id: occupationMap[user.occupation_id] || user.occupation_id
   }));
   

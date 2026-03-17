@@ -15,9 +15,9 @@ import Summary_data from "./pages/StudentPages/SummaryData";
 import Documents from "./pages/Documents/Documents";
 import ResetPassword from "./pages/ResetPassword";
 import FirstAccess from "./pages/FirstAccess";
-import Storage from "./pages/Storage/Storage";
-import StorageLog from "./pages/Storage/StorageLog";
-import CashFlow from "./pages/Storage/CashFlow";
+// import Storage from "./pages/Storage/Storage";
+// import StorageLog from "./pages/Storage/StorageLog";
+// import CashFlow from "./pages/Storage/CashFlow";
 
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -26,10 +26,6 @@ import PermissionProtectedRoute from "./components/PermissionProtectedRoute";
 import './styles/global.css';
 
 function App() {
-  useEffect(() => {
-    const url = `https://sisa.up.railway.app/api/health/frontend?frontendHost=${window.location.host}`;
-    fetch(url, { method: 'GET', credentials: 'include' }).catch(() => {});
-  }, []);
   return (
     <Router future={{ v7_startTransition: true }}>
       <AppContent />

@@ -3,7 +3,7 @@ import axios from "axios";
 const base_url = process.env.REACT_APP_API_DEVELOPMENT
   || (typeof window !== 'undefined' && window.location.hostname === 'localhost'
       ? "http://localhost:5000/api"
-      : "https://sisa.up.railway.app/api");
+      : "");
 const API = axios.create({
   baseURL: base_url,
   headers: {

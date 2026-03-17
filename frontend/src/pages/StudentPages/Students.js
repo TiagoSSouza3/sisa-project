@@ -165,7 +165,7 @@ export default function Students() {
   };
 
   const getAge = (birth_date) => {
-    const date = StringToDate(birth_date);
+    const date = new Date((birth_date._seconds)*1000);
     const res = validadeAge(date);
     return res;
   }
@@ -526,7 +526,7 @@ export default function Students() {
             <div className="student-info">
               <div className="student-name">{student.name}</div>
               <div className="student-details">
-                <p>{language === "english" ? "Registration" : "Matrícula"}: {student.id}</p>
+                <p>{language === "english" ? "Registration" : "Matrícula"}: {student.registration}</p>
                 {student.email && <p>Idade: {getAge(student.birth_date)}</p>}
               </div>
               <div className="student-status">

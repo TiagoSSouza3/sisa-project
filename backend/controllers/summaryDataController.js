@@ -34,9 +34,7 @@ exports.getBirthdayStudents = async (req, res) => {
         }
       },
       attributes: ['id', 'name', 'birth_date', 'registration'],
-      order: [
-        [Students.sequelize.literal(`DAY(birth_date)`), 'ASC']
-      ]
+      order: ['birth_date']
     });
 
     // Filtrar aniversariantes do mês específico

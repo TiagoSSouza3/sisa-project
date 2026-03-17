@@ -226,7 +226,7 @@ const PORT = process.env.PORT || 5000;
 const startServer = async (port) => {
   try {
     // Inicializar conexão com banco de dados
-    await connectWithRetry();
+    //await connectWithRetry();
     
     app.listen(port, () => {
       console.log(`Server running on port ${port}`);
