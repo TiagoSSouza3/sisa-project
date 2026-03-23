@@ -1,26 +1,7 @@
 const db = require("../config/firebase");
 const { firebaseCollections } = require("../enums/firebaseCollections");
-
+const { applyWhere } = require("./utilsService.js");
 const storageLogsRef = db.collection(firebaseCollections.STORAGE_LOGS);
-
-const applyWhere = (items, where = {}) => {
-  const entries = Object.entries(where);
-  if (!entries.length) return items;
-
-  return items.filter((item) => {
-    return entries.every(([key, value]) => {
-      if (value === null || value === undefined) {
-        return item[key] == null;
-      }
-
-      if (Array.isArray(value)) {
-        return value.includes(item[key]);
-      }
-
-      return item[key] === value;
-    });
-  });
-};
 
 exports.getAll = async (options = {}) => {
   const snapshot = await storageLogsRef.get();
