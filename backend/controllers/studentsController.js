@@ -77,6 +77,21 @@ exports.createStudent = async (req, res) => {
       }
     }
 
+    if (payload.registration === 0){
+      var nextRegistration = (await studentsService.countStudents()) + 1;
+
+      while(payload.registration === 0){
+        const sameRegistration = await studentsService.getAll({ where: { registration: nextRegistration } })
+        
+        if(sameRegistration.length === 0){
+          payload.registration = nextRegistration;
+          break;
+        }
+        
+        nextRegistration += 1;
+      }
+    }
+
     const student = await studentsService.create(payload);
     res.status(201).json(student);
   } catch (error) {
@@ -163,5 +178,15 @@ exports.getStudentById = async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ error: "Erro ao buscar aluno" });
+  }
+};
+
+exports.verifyStudentByCPF = async (req, res) => {
+  try {
+    const students = await studentsService.getAll({ where: {CPF : req.params.cpf}});
+
+    res.json({cpfExists: students.length === 0 ? true : false });
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao buscar cpf" });
   }
 };

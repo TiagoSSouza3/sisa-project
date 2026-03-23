@@ -1,7 +1,7 @@
 const db = require("../config/firebase");
 const { firebaseCollections } = require("../enums/firebaseCollections");
-const studentsRef = db.collection(firebaseCollections.STUDENTS);
 const { applyWhere, applyAttributes } = require("./utilsService.js");
+const studentsRef = db.collection(firebaseCollections.STUDENTS);
 
 exports.getAll = async (options = {}) => {
   const snapshot = await studentsRef.get();
@@ -61,3 +61,12 @@ exports.update = async (id, data) => {
   const snapshot = await studentsRef.doc(id).get();
   return { id: snapshot.id, ...snapshot.data() };
 };
+
+exports.countStudents = async () => {
+  const countQuery = await studentsRef.count().get();
+  const number = countQuery.data().count;
+
+  console.log('total count: ', number);
+
+  return number;
+}

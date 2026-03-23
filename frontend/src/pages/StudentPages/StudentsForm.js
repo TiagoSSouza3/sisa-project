@@ -199,7 +199,7 @@ export default function StudentsForm() {
         }
     };
 
-    const validateCPF = (cpfNumber) => {
+    const validateCPF = async (cpfNumber) => {
         if (!cpfNumber) return true;
         
         const cleanCPF = cpfNumber.replace(/\D/g, '');
@@ -215,7 +215,12 @@ export default function StudentsForm() {
         }
         
         // Valida apenas quando tiver 11 dígitos completos
-        return cpf.isValid(cleanCPF);
+        if(cpf.isValid(cleanCPF)){
+            // validar se o cpf ja existe no sistema
+            return await API.get(`/cpf/${cleanCPF}`);
+        }
+
+        return false;
     };
 
 
