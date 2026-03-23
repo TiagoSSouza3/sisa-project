@@ -50,7 +50,7 @@ exports.editUser = async (req, res) => {
     updateData.password = hashedPassword;
   }
 
-  await user.update(updateData);
+  await userService.update(user, updateData);
   const updatedUser = await userService.findPk(id);
   res.json(updatedUser);
 }

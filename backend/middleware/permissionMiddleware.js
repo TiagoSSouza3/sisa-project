@@ -152,9 +152,8 @@ const getUserEffectivePermissions = async (userId, userOccupationId) => {
       };
     }
 
-    const data = permission.toJSON ? permission.toJSON() : permission;
     return {
-      ...data,
+      ...permission,
       document_view_roles: data.document_view_roles || [],
       document_edit_roles: data.document_edit_roles || [],
       document_upload_roles: data.document_upload_roles || [],

@@ -567,6 +567,9 @@ export default function UsersForm() {
 
             {id && (
                 <div className="permissions-actions" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                    <button className="cancel-button" onClick={handleCancel} disabled={isSaving} aria-disabled={isSaving}>
+                        {language === "english" ? "Cancel" : "Cancelar"}
+                    </button>
                     <button className="submit-button" onClick={handleSavePermissions}>
                         {language === "english" ? "Save" : "Salvar"}
                     </button>

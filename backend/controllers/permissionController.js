@@ -128,7 +128,7 @@ exports.getByUserId = async (req, res) => {
       }
 
       const defaultPermission = await permissionService.create(defaultData);
-      console.log(`[PERMISSIONS] Permissão padrão criada por role:`, defaultPermission.toJSON());
+      console.log(`[PERMISSIONS] Permissão padrão criada por role:`, defaultPermission);
       return res.json(defaultPermission);
     }
     
@@ -178,7 +178,7 @@ exports.setPermission = async (req, res) => {
         user_id,
         ...permissions
       });
-      console.log(`[PERMISSIONS] Novas permissões criadas:`, newPermission.toJSON());
+      console.log(`[PERMISSIONS] Novas permissões criadas:`, newPermission);
       res.status(201).json(newPermission);
     }
   } catch (error) {
@@ -299,7 +299,7 @@ exports.getEffectivePermissions = async (req, res) => {
     }
 
     const normalized = {
-      ...permission.toJSON(),
+      ...permission,
       document_view_roles: permission.document_view_roles || [],
       document_edit_roles: permission.document_edit_roles || [],
       document_upload_roles: permission.document_upload_roles || [],

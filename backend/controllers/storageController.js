@@ -10,9 +10,8 @@ exports.getStorage = async (req, res) => {
     
     // Abordagem mais simples: adicionar priceChange diretamente
     const storageWithPriceChange = storage.filter((item) => !!item).map((item) => {
-      // Usar toJSON() e depois adicionar priceChange
-      const itemData = item.toJSON();
-      itemData.priceChange = {
+      // Adicionar priceChange
+      item.priceChange = {
         percentage: 25.5,
         isPositive: true,
         isNegative: false,
@@ -21,12 +20,12 @@ exports.getStorage = async (req, res) => {
       
       console.log("=== SIMPLE APPROACH ===");
       console.log("Item ID:", item.id);
-      console.log("Item data:", itemData);
-      console.log("priceChange:", itemData.priceChange);
-      console.log("priceChange type:", typeof itemData.priceChange);
-      console.log("priceChange keys:", Object.keys(itemData.priceChange));
+      console.log("Item data:", item);
+      console.log("priceChange:", item.priceChange);
+      console.log("priceChange type:", typeof item.priceChange);
+      console.log("priceChange keys:", Object.keys(item.priceChange));
       
-      return itemData;
+      return item;
     });
     
     console.log("=== FINAL RESPONSE ===");
@@ -84,9 +83,8 @@ exports.getStorageLogById = async (req, res) => {
 
     // Abordagem simples: adicionar priceChange para cada log
     const logsWithPriceChange = storage_Logs.map((log, index) => {
-      // Usar toJSON() e depois adicionar priceChange
-      const logData = log.toJSON();
-      logData.priceChange = {
+      // Adicionar priceChange
+      log.priceChange = {
         percentage: 12.3,
         isPositive: true,
         isNegative: false,
@@ -95,12 +93,12 @@ exports.getStorageLogById = async (req, res) => {
       
       console.log("=== SIMPLE LOG APPROACH ===");
       console.log("Log ID:", log.id, "Index:", index);
-      console.log("Log data:", logData);
-      console.log("priceChange:", logData.priceChange);
-      console.log("priceChange type:", typeof logData.priceChange);
-      console.log("priceChange keys:", Object.keys(logData.priceChange));
+      console.log("Log data:", log);
+      console.log("priceChange:", log.priceChange);
+      console.log("priceChange type:", typeof log.priceChange);
+      console.log("priceChange keys:", Object.keys(log.priceChange));
       
-      return logData;
+      return log;
     });
 
     res.json(logsWithPriceChange);

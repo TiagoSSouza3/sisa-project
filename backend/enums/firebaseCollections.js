@@ -10,7 +10,7 @@ exports.firebaseCollections = Object.freeze({
     STORAGES: "storages",
     SUMMARY_DATA: "summary_data",
     GRANULAR_PERMISSIONS: "granular_permissions",
-    PERMISSIONS: "permissions",
+    PERMISSIONS: "users_permissions",
     GLOBAL_PERMISSIONS: "global_permissions",
     OCCUPATIONS_ENUM: "occupations_enum",
     STORAGE_LOGS: "storage_logs",

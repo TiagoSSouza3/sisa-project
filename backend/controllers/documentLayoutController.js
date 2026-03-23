@@ -69,16 +69,14 @@ const getAllLayouts = async (req, res) => {
     
     // Garantir que placeholders seja sempre um array
     const layoutsWithParsedPlaceholders = layouts.map(layout => {
-      const layoutData = layout.toJSON();
-      
       // Se placeholders já é um array (devido ao getter do modelo), usar diretamente
       // Senão, tentar fazer parse
       let placeholders = [];
-      if (Array.isArray(layoutData.placeholders)) {
-        placeholders = layoutData.placeholders;
-      } else if (typeof layoutData.placeholders === 'string') {
+      if (Array.isArray(layout.placeholders)) {
+        placeholders = layout.placeholders;
+      } else if (typeof layout.placeholders === 'string') {
         try {
-          placeholders = JSON.parse(layoutData.placeholders);
+          placeholders = JSON.parse(layout.placeholders);
         } catch (e) {
           console.error('Erro ao fazer parse dos placeholders:', e);
           placeholders = [];
@@ -86,7 +84,7 @@ const getAllLayouts = async (req, res) => {
       }
       
       return {
-        ...layoutData,
+        ...layout,
         placeholders: placeholders
       };
     });
@@ -111,15 +109,13 @@ const getLayout = async (req, res) => {
       return res.status(404).json({ message: 'Layout não encontrado' });
     }
     
-    const layoutData = layout.toJSON();
-    
     // Garantir que placeholders seja sempre um array
     let placeholders = [];
-    if (Array.isArray(layoutData.placeholders)) {
-      placeholders = layoutData.placeholders;
-    } else if (typeof layoutData.placeholders === 'string') {
+    if (Array.isArray(layout.placeholders)) {
+      placeholders = layout.placeholders;
+    } else if (typeof layout.placeholders === 'string') {
       try {
-        placeholders = JSON.parse(layoutData.placeholders);
+        placeholders = JSON.parse(layout.placeholders);
       } catch (e) {
         console.error('Erro ao fazer parse dos placeholders:', e);
         placeholders = [];
@@ -127,7 +123,7 @@ const getLayout = async (req, res) => {
     }
     
     const responseLayout = {
-      ...layoutData,
+      ...layout,
       placeholders: placeholders
     };
     
@@ -803,7 +799,7 @@ const getPartialTemplates = async (req, res) => {
     
     // Formatar resposta
     const formattedTemplates = templates.map(template => {
-      const templateData = template.toJSON();
+      const templateData = template;
       
       // Garantir que placeholders seja sempre um array
       let placeholders = [];
@@ -856,7 +852,7 @@ const getPartialTemplate = async (req, res) => {
       return res.status(404).json({ message: 'Template parcial não encontrado' });
     }
     
-    const templateData = template.toJSON();
+    const templateData = template;
     
     // Garantir que placeholders seja sempre um array
     let placeholders = [];

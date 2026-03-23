@@ -172,17 +172,23 @@ export default function Users() {
             <div className="user-email">{user.email}</div>
             <span className="user-role">{user.occupation_id}</span>
           </div>
-          { isLoggedIn && localStorage.getItem("occupation_id") === occupationEnum.administrador
-            ? <div className="user-actions">
-              <button className="delete-button" onClick={() => handleDelete(user.id)}>
-                {language === "english" ? "Delete" : "Excluir"}
-              </button>
-              <button className="edit-button" onClick={() => handleEdit(user.id)}>
-                {language === "english" ? "Edit" : "Editar"}
-              </button>
-            </div>
-            : ""
-          }
+          <div className="user-actions">
+            {isLoggedIn && localStorage.getItem("occupation_id") === occupationEnum.administrador
+              ? <> { user.id !== localStorage.getItem("id")
+                ? <button className="delete-button" onClick={() => handleDelete(user.id)}>
+                    {language === "english" ? "Delete" : "Excluir"}
+                  </button>
+                : ""
+                }
+                { user.occupation_id !== occupationEnum.administrador
+                ? <button className="edit-button" onClick={() => handleEdit(user.id)}>
+                    {language === "english" ? "Edit" : "Editar"}
+                  </button>
+                : ""
+              } </>
+              : ""
+            }
+          </div>
         </div>
       ))}
     </div>

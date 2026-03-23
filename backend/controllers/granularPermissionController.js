@@ -82,7 +82,7 @@ exports.saveRestrictions = async (req, res) => {
         restricted_documents: restrictedDocuments
       });
       
-      console.log(`[GRANULAR] Novas restrições criadas:`, newRestriction.toJSON());
+      console.log(`[GRANULAR] Novas restrições criadas:`, newRestriction);
       
       res.status(201).json({
         message: "Restrições criadas com sucesso",
