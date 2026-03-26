@@ -16,7 +16,7 @@ exports.getAll = async (options = {}) => {
   return data;
 };
 
-exports.findPk = async (id, _options = {}) => {
+exports.findPk = async (id) => {
   const snapshot = await subjectsRef.doc(id).get();
   if (!snapshot.exists) return null;
   return { id: snapshot.id, ...snapshot.data() };
@@ -63,3 +63,21 @@ exports.update = async (instanceOrId, data) => {
   const snapshot = await subjectsRef.doc(id).get();
   return { id: snapshot.id, ...snapshot.data() };
 };
+
+exports.setProfessores = async (subjectId, professors) => {
+  if(!subjectId){
+    throw new Error(
+      "setProfessores requires an subjectId"
+    );
+  }
+
+  if(!professors){
+    throw new Error(
+      "setProfessores requires an professors array object"
+    );
+  }
+
+  await subjectsRef.doc(subjectId).set({ id: subjectId, ...{professorsIds: professors} }, { merge: true });
+  const snapshot = await subjectsRef.doc(subjectId).get();
+  return { id: snapshot.id, ...snapshot.data() };
+}

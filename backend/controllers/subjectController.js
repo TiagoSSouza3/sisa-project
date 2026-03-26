@@ -24,7 +24,7 @@ exports.getSubjectById = async (req, res) => {
         {
           include: [{
             model: User,
-            as: 'professores',
+            as: 'professors',
             attributes: ['id', 'name'],
             through: { attributes: [] },
             required: false
@@ -58,7 +58,7 @@ exports.createSubject = async (req, res) => {
     const subject = await subjectService.create({ name, description });
 
     if (Array.isArray(professors)) {
-      await subject.setProfessores(professors);
+      await subjectService.setProfessores(subject.id, professors);
     }
 
     if (Array.isArray(students)) {
@@ -92,7 +92,8 @@ exports.updateSubject = async (req, res) => {
     if (Array.isArray(professores)) {
       const validUsers = await userService.getAll({ where: { id: professores } });
       const validProfIds = validUsers.map(u => u.id);
-      await subject.setProfessores(validProfIds);
+
+      await subjectService.setProfessores(id, validProfIds);
     }
 
     if (Array.isArray(students)) {

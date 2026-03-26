@@ -62,10 +62,10 @@ export default function SubjectForm() {
             const response = await API.get(`/subjects/withProfessor/${id}`);
             await setSubject(response.data);
 
-            if (response.data.professores && response.data.professores.length > 0) {
+            if (response.data.professors && response.data.professores.length > 0) {
                 const ids = response.data.professores.map(p => String(p.id));
                 setSelectedProfessor(ids);
-                setProfessor(prev => mergeProfessorLists(prev, response.data.professores));
+                setProfessor(prev => mergeProfessorLists(prev, response.data.professors));
             } else {
                 setSelectedProfessor(['']);
             }
