@@ -17,59 +17,41 @@ exports.getSubjectById = async (req, res) => {
     const { id } = req.params;
     const { type } = req.params;
 
-    const subject = 
-    type === "withProfessor"
-      ? await subjectService.findPk(
-        id, 
-        {
-          include: [{
-            model: User,
-            as: 'professors',
-            attributes: ['id', 'name'],
-            through: { attributes: [] },
-            required: false
-          }]
-        })
-      : await subjectService.findPk(
-        id, 
-        {
-          include: [{
-            model: Students,
-            as: 'students',
-            attributes: ['id', 'name', 'registration', 'responsable', 'notes'],
-            through: { attributes: [] },
-            required: false
-          }]
-        })
+    const subject = await subjectService.findPk(id);
 
     if (!subject) {
       return res.status(404).json({ error: "Disciplina não encontrada: " + id });
     }
 
-    res.json(subject);
+    const subjectUpdated = {
+      ...subject,
+      professors: [],
+      students: []
+    };
+
+    if(type === "withProfessor"){
+      for(professorId in subject.professorsIds){
+        subjectUpdated.professors.push(await userService.findPk(professorId))
+      }
+    } else {
+      for(studentId in subject.studentsIds){
+        subjectUpdated.students.push(await studentsService.findPk(studentId))
+      }
+    }
+
+    res.json(subjectUpdated);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
 exports.createSubject = async (req, res) => {
-  const { name, description, professors, students } = req.body;
+  const { name, description, professors } = req.body;
   try {
     const subject = await subjectService.create({ name, description });
 
     if (Array.isArray(professors)) {
-      await subjectService.setProfessores(subject.id, professors);
-    }
-
-    if (Array.isArray(students)) {
-      // Criar relações com createdAt explícito
-      for (const studentId of students) {
-        await subjectStudentService.create({
-          subject_id: subject.id,
-          students_id: studentId,
-          createdAt: new Date()
-        });
-      }
+      await subjectService.setProfessors(subject.id, professors);
     }
 
     res.status(201).json(subject);
@@ -100,38 +82,12 @@ exports.updateSubject = async (req, res) => {
       const validStudents = await studentsService.getAll({ where: { id: students } });
       const validStudentIds = validStudents.map(s => s.id);
       
-      // Primeiro, remover todas as relações existentes
-      await subject.setStudents([]);
-      
-      // Depois, criar novas relações com createdAt explícito
-      for (const studentId of validStudentIds) {
-        await subjectStudentService.create({
-          subject_id: subject.id,
-          students_id: studentId,
-          createdAt: new Date()
-        });
+      for(validId in validStudentIds){
+        updateSubjectAndStudent(subject, validId)
       }
     }
 
-    const updated = await subjectService.findPk(id, {
-      include: [
-        {
-          model: User,
-          as: 'professores',
-          attributes: ['id', 'name'],
-          through: { attributes: [] },
-          required: false
-        },
-        {
-          model: Students,
-          as: 'students',
-          attributes: ['id', 'name'],
-          through: { attributes: [] },
-          required: false
-        }
-      ]
-    });
-
+    const updated = await subjectService.findPk(id);
     res.json(updated);
   } catch (error) {
     console.error("Erro ao atualizar disciplina:", error);
@@ -156,23 +112,13 @@ exports.addStudentToSubject = async (req, res) => {
     }
     
     // Verificar se a relação já existe
-    const existingRelation = await subjectStudentService.findOne({
-      where: {
-        subject_id: subjectId,
-        students_id: studentId
-      }
-    });
+    const existingRelation = subject.students.includes(student.id);
     
     if (existingRelation) {
       return res.status(400).json({ error: "Aluno já está inscrito nesta disciplina" });
     }
-    
-    // Criar a relação com createdAt explícito
-    await subjectStudentService.create({
-      subject_id: subjectId,
-      students_id: studentId,
-      createdAt: new Date()
-    });
+
+    updateSubjectAndStudent(subject, student)
 
     await verifyActivity(studentId);
     
@@ -184,31 +130,60 @@ exports.addStudentToSubject = async (req, res) => {
 };
 
 const verifyActivity = async (studentId) => {
-  const existingRelation = await subjectStudentService.findOne({
-    where: {
-      students_id: studentId
-    }
-  });
-
   const student = await studentsService.findPk(studentId);
 
-  existingRelation 
+  student.subjects.length > 0
   ? await studentsService.update(student, { active: true })
   : await studentsService.update(student, { active: false })
 }
 
 exports.removeStudentFromSubject = async (req, res) => {
   try {
-    const { studentId } = req.params;
+    const { subjectId, studentId } = req.params;
+    
+    // Verificar se a disciplina existe
+    const subject = await subjectService.findPk(subjectId);
+    if (!subject) {
+      return res.status(404).json({ error: "Disciplina não encontrada" });
+    }
+    
+    // Verificar se o aluno existe
+    const student = await studentsService.findPk(studentId);
+    if (!student) {
+      return res.status(404).json({ error: "Aluno não encontrado" });
+    }
+    
+    // Verificar se a relação já existe
+    const existingRelation = subject.students.includes(student.id);
+    
+    if (!existingRelation) {
+      return res.status(400).json({ error: "Aluno não está inscrito nesta disciplina" });
+    }
+
+    updateSubjectAndStudent(subject, student, true);
 
     await verifyActivity(studentId);
-
-    res.status(200).json({ message: "Aluno removido da disciplina com sucesso" });
   } catch (error) {
     console.error("Erro ao remover aluno da disciplina:", error);
     res.status(400).json({ error: error.message });
   }
 };
+
+const updateSubjectAndStudent = async (subject, student, remove = false) => {
+  if(remove){
+    await subjectService.update(subject.id, {students: [...subject.students.filter((id) => id != student.id )]})
+  
+    await studentsService.update(student.id, {subjects: [...student.subjects.filter((id) => id != subject.id )]})
+  } else {
+    if(!subject.students.include({id: student.id, name: student.name})){
+      await subjectService.update(subject.id, {students: [...subject.students, {id: student.id, name: student.name}]})
+    }
+
+    if(!student.subjects.include({id: subject.id, name: subject.name})){
+      await studentsService.update(student.id, {subjects: [...student.subjects, {id: subject.id, name: subject.name}]})
+    }
+  }
+}
 
 exports.deleteSubject = async (req, res) => {
   try {
@@ -217,8 +192,16 @@ exports.deleteSubject = async (req, res) => {
     if (!subject) {
       return res.status(404).json({ error: "Disciplina não encontrada" });
     }
+
     // Remover relações com alunos antes de excluir a disciplina
-    await subjectStudentService.destroy({ subject_id: subjectId });
+    for(studentId in subject.students){
+      const student = await studentsService.findPk(studentId);
+
+      if(student){
+        updateSubjectAndStudent(subject, student)
+      }
+    }
+
     // Excluir a disciplina
     await subjectService.destroy(subjectId);
     res.status(204).send();
@@ -234,16 +217,7 @@ exports.getSubjectsByProfessor = async (req, res) => {
     
     console.log("🔍 Buscando matérias para professor ID:", professorId);
     
-    const subjects = await subjectService.getAll({
-      include: [{
-        model: User,
-        as: 'professores',
-        where: { id: professorId },
-        attributes: ['id', 'name'],
-        through: { attributes: [] },
-        required: true // INNER JOIN - só matérias que têm esse professor
-      }]
-    });
+    const subjects = await subjectService.findWhere("professors", "array-contains", professorId);
     
     console.log("📦 Matérias encontradas:", subjects.length);
     console.log("📋 Lista de matérias:", subjects.map(s => ({ id: s.id, name: s.name })));

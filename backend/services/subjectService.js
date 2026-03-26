@@ -23,7 +23,7 @@ exports.findPk = async (id) => {
 };
 
 exports.create = async (data) => {
-  const docRef = await subjectsRef.add(data);
+  const docRef = await subjectsRef.add({...data, students: []});
   const snapshot = await docRef.get();
   return { id: snapshot.id, ...snapshot.data() };
 };
@@ -64,20 +64,25 @@ exports.update = async (instanceOrId, data) => {
   return { id: snapshot.id, ...snapshot.data() };
 };
 
-exports.setProfessores = async (subjectId, professors) => {
+exports.setProfessors = async (subjectId, professors) => {
   if(!subjectId){
     throw new Error(
-      "setProfessores requires an subjectId"
+      "setProfessors requires an subjectId"
     );
   }
 
   if(!professors){
     throw new Error(
-      "setProfessores requires an professors array object"
+      "setProfessors requires an professors array object"
     );
   }
 
-  await subjectsRef.doc(subjectId).set({ id: subjectId, ...{professorsIds: professors} }, { merge: true });
+  await subjectsRef.doc(subjectId).set({ id: subjectId, ...{professors: professors} }, { merge: true });
   const snapshot = await subjectsRef.doc(subjectId).get();
   return { id: snapshot.id, ...snapshot.data() };
+}
+
+exports.findWhere = async (where) => {
+  const subjects = await subjectsRef.where(where.attribute, where.queryType, where.values).get();
+  return subjects.docs.map((sub) => ({id: sub.id, ...sub.data()}));
 }
