@@ -1,9 +1,4 @@
-const Subject = require('../models/Subject');
-const Students = require('../models/Students');
-const User = require('../models/User');
-const SubjectStudent = require('../models/SubjectStudent');
 const subjectService = require("../services/subjectService");
-const subjectStudentService = require("../services/subjectStudentService");
 const studentsService = require("../services/studentsService");
 const userService = require("../services/userService");
 
@@ -29,14 +24,18 @@ exports.getSubjectById = async (req, res) => {
       students: []
     };
 
-    if(type === "withProfessor"){
-      for(professorId in subject.professorsIds){
-        subjectUpdated.professors.push(await userService.findPk(professorId))
-      }
+    if (type === "withProfessor") {
+      subjectUpdated.professors = await Promise.all(
+        subject.professors.map(async (professorId) => {
+          return await userService.findPk(professorId);
+        })
+      );
     } else {
-      for(studentId in subject.studentsIds){
-        subjectUpdated.students.push(await studentsService.findPk(studentId))
-      }
+      subjectUpdated.students = await Promise.all(
+        subject.students.map(async (studentId) => {
+          return await studentsService.findPk(studentId);
+        })
+      );
     }
 
     res.json(subjectUpdated);
@@ -75,14 +74,14 @@ exports.updateSubject = async (req, res) => {
       const validUsers = await userService.getAll({ where: { id: professores } });
       const validProfIds = validUsers.map(u => u.id);
 
-      await subjectService.setProfessores(id, validProfIds);
+      await subjectService.setProfessors(id, validProfIds);
     }
 
     if (Array.isArray(students)) {
       const validStudents = await studentsService.getAll({ where: { id: students } });
       const validStudentIds = validStudents.map(s => s.id);
       
-      for(validId in validStudentIds){
+      for(const validId of validStudentIds){
         updateSubjectAndStudent(subject, validId)
       }
     }
@@ -119,8 +118,6 @@ exports.addStudentToSubject = async (req, res) => {
     }
 
     updateSubjectAndStudent(subject, student)
-
-    await verifyActivity(studentId);
     
     res.status(201).json({ message: "Aluno adicionado à disciplina com sucesso" });
   } catch (error) {
@@ -161,8 +158,6 @@ exports.removeStudentFromSubject = async (req, res) => {
     }
 
     updateSubjectAndStudent(subject, student, true);
-
-    await verifyActivity(studentId);
   } catch (error) {
     console.error("Erro ao remover aluno da disciplina:", error);
     res.status(400).json({ error: error.message });
@@ -183,6 +178,8 @@ const updateSubjectAndStudent = async (subject, student, remove = false) => {
       await studentsService.update(student.id, {subjects: [...student.subjects, {id: subject.id, name: subject.name}]})
     }
   }
+
+  await verifyActivity(student.id);
 }
 
 exports.deleteSubject = async (req, res) => {
@@ -194,7 +191,7 @@ exports.deleteSubject = async (req, res) => {
     }
 
     // Remover relações com alunos antes de excluir a disciplina
-    for(studentId in subject.students){
+    for(const studentId of subject.students){
       const student = await studentsService.findPk(studentId);
 
       if(student){

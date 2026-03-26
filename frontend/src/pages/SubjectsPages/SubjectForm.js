@@ -13,7 +13,6 @@ export default function SubjectForm() {
     const { id } = useParams();
     const { language } = useLanguage();
     const { confirmationState, showConfirmation, hideConfirmation, handleConfirm } = useConfirmation();
-
     const [subject, setSubject] = useState({
         name: "",
         description: "",
@@ -61,11 +60,11 @@ export default function SubjectForm() {
         try {
             const response = await API.get(`/subjects/withProfessor/${id}`);
             await setSubject(response.data);
-
-            if (response.data.professors && response.data.professores.length > 0) {
-                const ids = response.data.professores.map(p => String(p.id));
+            
+            if (response.data.professors && response.data.professors.length > 0) {
+                const ids = response.data.professors.map((prof) => prof.id);
                 setSelectedProfessor(ids);
-                setProfessor(prev => mergeProfessorLists(prev, response.data.professors));
+                setProfessor(prev => mergeProfessorLists(prev, ids));
             } else {
                 setSelectedProfessor(['']);
             }
