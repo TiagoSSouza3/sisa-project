@@ -49,14 +49,9 @@ exports.findOne = async (options = {}) => {
   return list[0] || null;
 };
 
-exports.update = async (instanceOrId, data) => {
-  const id =
-    typeof instanceOrId === "string"
-      ? instanceOrId
-      : instanceOrId && instanceOrId.id;
-
+exports.update = async (id, data) => {
   if (!id) {
-    throw new Error("subjectService.update requires an id or instance with id");
+    throw new Error("subjectService.update requires an id");
   }
 
   await subjectsRef.doc(id).set({ id, ...data }, { merge: true });

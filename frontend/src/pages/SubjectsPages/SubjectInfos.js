@@ -70,23 +70,11 @@ export default function SubjectInfos() {
                 : `Tem certeza que deseja desinscrever o aluno "${student[0]?.name}"?`,
             onConfirm: async () => {
                 try {
-                    const currentStudentIds = subject.students?.map(s => s.id) || [];
-                
-                    const updatedStudentIds = currentStudentIds.filter(i => i !== student_id);
-                
-                    const updated = await API.put(`/subjects/${id}`, {
-                        name: subject.name,
-                        description: subject.description,
-                        students: updatedStudentIds
-                    });
-
-                    const updateStudent = await API.delete(`/subjects/students/${student_id}`);
-                    console.log(updateStudent)
+                    await API.delete(`/subjects/students/${id}/${student_id}`);
         
-                    setSubject({
-                        ...updated.data,
-                        students: subject.students.filter(s => s.id !== student_id)
-                    });
+                    const updated = await API.get(`/subjects/all/${id}`)
+
+                    setSubject({...updated.data});
         
                     if (subject.students) {
                         setStudents(subject.students.filter(s => s.id !== student_id));
@@ -264,15 +252,15 @@ export default function SubjectInfos() {
                             <div className="detail-grid">
                                 <div className="detail-item">
                                     <label>{language === "english" ? "Responsible" : "Responsável"}:</label>
-                                    <span>{selectedStudent.responsible_parent.name || 'N/A'}</span>
+                                    <span>{selectedStudent.responsible_parent?.name ? selectedStudent.responsible_parent.name : 'N/A'}</span>
                                 </div>
                                 <div className="detail-item">
                                     <label>{language === "english" ? "Degree of Kinship" : "Grau de Parentesco"}:</label>
-                                    <span>{selectedStudent.responsible_parent.degree_of_kinship || 'N/A'}</span>
+                                    <span>{selectedStudent.responsible_parent?.degree_of_kinship ? selectedStudent.responsible_parent.degree_of_kinship : 'N/A'}</span>
                                 </div>
                                 <div className="detail-item">
                                     <label>Telefone:</label>
-                                    <span>{selectedStudent.responsible_parent.phone || 'N/A'}</span>
+                                    <span>{selectedStudent.responsible_parent?.phone ? selectedStudent.responsible_parent.phone : 'N/A'}</span>
                                 </div>
                             </div>
                         </div>

@@ -32,8 +32,8 @@ exports.getSubjectById = async (req, res) => {
       );
     } else {
       subjectUpdated.students = await Promise.all(
-        subject.students.map(async (studentId) => {
-          return await studentsService.findPk(studentId);
+        subject.students.map(async (student) => {
+          return await studentsService.findPk(student.id);
         })
       );
     }
@@ -67,7 +67,7 @@ exports.updateSubject = async (req, res) => {
     const subject = await subjectService.findPk(id);
     if (!subject) return res.status(404).json({ error: "Disciplina não encontrada" });
 
-    await subjectService.update(subject, { name, description });
+    await subjectService.update(subject.id, { name, description });
 
     // Atualizar professores (validação incluída)
     if (Array.isArray(professores)) {
@@ -111,13 +111,13 @@ exports.addStudentToSubject = async (req, res) => {
     }
     
     // Verificar se a relação já existe
-    const existingRelation = subject.students.includes(student.id);
+    const existingRelation = subject.students.filter(stu => stu.id === student.id) > 0;
     
     if (existingRelation) {
       return res.status(400).json({ error: "Aluno já está inscrito nesta disciplina" });
     }
 
-    updateSubjectAndStudent(subject, student)
+    await updateSubjectAndStudent(subject, student)
     
     res.status(201).json({ message: "Aluno adicionado à disciplina com sucesso" });
   } catch (error) {
@@ -130,8 +130,8 @@ const verifyActivity = async (studentId) => {
   const student = await studentsService.findPk(studentId);
 
   student.subjects.length > 0
-  ? await studentsService.update(student, { active: true })
-  : await studentsService.update(student, { active: false })
+  ? await studentsService.update(studentId, { active: true })
+  : await studentsService.update(studentId, { active: false })
 }
 
 exports.removeStudentFromSubject = async (req, res) => {
@@ -151,13 +151,16 @@ exports.removeStudentFromSubject = async (req, res) => {
     }
     
     // Verificar se a relação já existe
-    const existingRelation = subject.students.includes(student.id);
+    console.log((subject.students.filter((stu) => stu.id === student.id)).length)
+    const existingRelation = (subject.students.filter((stu) => stu.id === student.id)).length > 0;
     
     if (!existingRelation) {
       return res.status(400).json({ error: "Aluno não está inscrito nesta disciplina" });
     }
 
-    updateSubjectAndStudent(subject, student, true);
+    await updateSubjectAndStudent(subject, student, true);
+
+    res.status(201).json({menssage: "success"});
   } catch (error) {
     console.error("Erro ao remover aluno da disciplina:", error);
     res.status(400).json({ error: error.message });
@@ -166,15 +169,15 @@ exports.removeStudentFromSubject = async (req, res) => {
 
 const updateSubjectAndStudent = async (subject, student, remove = false) => {
   if(remove){
-    await subjectService.update(subject.id, {students: [...subject.students.filter((id) => id != student.id )]})
+    await subjectService.update(subject.id, {students: [...subject.students.filter((stu) => stu.id != student.id )]})
   
-    await studentsService.update(student.id, {subjects: [...student.subjects.filter((id) => id != subject.id )]})
+    await studentsService.update(student.id, {subjects: [...student.subjects.filter((sub) => sub.id != subject.id )]})
   } else {
-    if(!subject.students.include({id: student.id, name: student.name})){
+    if(subject.students && (subject.students.filter(stu => stu.id === student.id)).length === 0){
       await subjectService.update(subject.id, {students: [...subject.students, {id: student.id, name: student.name}]})
     }
 
-    if(!student.subjects.include({id: subject.id, name: subject.name})){
+    if(student.subjects && (student.subjects.filter(sub => sub.id === subject.id)).length === 0){
       await studentsService.update(student.id, {subjects: [...student.subjects, {id: subject.id, name: subject.name}]})
     }
   }
