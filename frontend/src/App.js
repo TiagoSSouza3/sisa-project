@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import Users from "./pages/UserPages/Users";
 import Students from "./pages/StudentPages/Students";
 import StudentsForm from "./pages/StudentPages/StudentsForm";
+import ImportPlan from "./pages/StudentPages/ImportPlan";
 import Subjects from "./pages/SubjectsPages/Subjects";
 import SubjectForm from "./pages/SubjectsPages/SubjectForm";
 import SubjectInfos from "./pages/SubjectsPages/SubjectInfos";
@@ -52,6 +53,7 @@ function AppContent() {
         <Route path="/students" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_students"><Students /></PermissionProtectedRoute></ProtectedRoute>} />
         <Route path="/student_form" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_students"><StudentsForm /></PermissionProtectedRoute></ProtectedRoute>} />
         <Route path="/student_form/:id" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_students"><StudentsForm /></PermissionProtectedRoute></ProtectedRoute>} />
+        <Route path="/students/import-plan" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_students"><ImportPlan /></PermissionProtectedRoute></ProtectedRoute>} />
         <Route path="/subjects" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_subjects"><Subjects /></PermissionProtectedRoute></ProtectedRoute>} />
         <Route path="/subject_form" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_subjects"><SubjectForm /></PermissionProtectedRoute></ProtectedRoute>} />
         <Route path="/subject_form/:id" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_subjects"><SubjectForm /></PermissionProtectedRoute></ProtectedRoute>} />

@@ -10,7 +10,6 @@ import { useLanguage } from '../../components/LanguageContext';
 import '../../styles/global.css';
 import '../../styles/students.css';
 import { validadeAge } from "../../utils/validation";
-import { StringToDate } from "../../utils/utils";
 import '../../styles/document-permissions.css';
 
 export default function Students() {
@@ -481,6 +480,9 @@ export default function Students() {
           <div className="header-actions">
             <button className="add-student-button" onClick={() => navigate('/student_form')}>
               {language === "english" ? "Add New Student" : "Adicionar Novo Aluno"}
+            </button>
+            <button className="summary-data-button" onClick={() => navigate('/students/import-plan')}>
+              {language === "english" ? "Import Subscriptions" : "Importar Inscrições"}
             </button>
             <button className="summary-data-button" onClick={() => navigate('/summary_data')}>
               {language === "english" ? "Sumary Data" : "Dados Resumidos"}
