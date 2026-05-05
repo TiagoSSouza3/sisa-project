@@ -25,7 +25,7 @@ exports.getParentById = async (req, res) => {
       return res.status(404).json({ error: "Parent não encontrado" });
     }
     
-    res.json(parent);
+    res.json({id: id, ...parent});
   } catch (error) {
     console.error("Erro ao buscar parent:", error);
     res.status(500).json({ error: "Erro ao buscar parent" });
@@ -35,21 +35,18 @@ exports.getParentById = async (req, res) => {
 // Buscar parents por nome (para autocomplete)
 exports.searchParentsByName = async (req, res) => {
   try {
-    const { name } = req.query;
+    const { name } = req.params;
     
     if (!name || name.trim().length < 2) {
       return res.json([]);
     }
     
-    const parents = await parentService.getAll({
-      where: {
-        name: {
-          [Op.like]: `%${name}%`
-        }
-      },
+    const parents = await parentService.getSearch(name, {
       limit: 10,
       order: [['name', 'ASC']]
     });
+
+    console.log(parents)
     
     res.json(parents);
   } catch (error) {
@@ -61,8 +58,17 @@ exports.searchParentsByName = async (req, res) => {
 // Criar novo parent
 exports.createParent = async (req, res) => {
   try {
-    const parent = await parentService.create(req.body);
-    res.status(201).json(parent);
+    const payload = req.body;
+    const parentAlreadyExists = await parentService.findOne({ where: { CPF: payload.CPF } });
+    
+    if(parentAlreadyExists){
+      return res.status(201).json({id: parentAlreadyExists.id, ...parentAlreadyExists});
+    }
+    
+    if(payload.degree_of_kinship) delete payload.degree_of_kinship;
+    
+    const parent = await parentService.create(payload);
+    res.status(201).json({id: parent.id, ...parent});
   } catch (error) {
     console.error("Erro ao criar parent:", error);
     res.status(400).json({ error: "Erro ao criar parent. Verifique se todos os campos obrigatórios foram preenchidos." });
@@ -79,7 +85,11 @@ exports.updateParent = async (req, res) => {
       return res.status(404).json({ error: "Parent não encontrado" });
     }
     
-    await parentService.update(parent, req.body);
+    const payload = req.body;
+
+    if(payload.degree_of_kinship) delete payload.degree_of_kinship;
+    
+    await parentService.update({id: id, ...parent}, payload);
     const updatedParent = await parentService.findPk(id);
     res.json(updatedParent);
   } catch (error) {

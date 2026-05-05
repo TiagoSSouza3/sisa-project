@@ -78,7 +78,7 @@ export const validatePasswordConfirmation = (password, confirmPassword) => {
 };
 
 export const validadeAge = (birthDate) => {
-  if(typeof birthDate === "string") birthDate = StringToDate(birthDate)
+  if(typeof birthDate === "string" || typeof birthDate === "object") birthDate = StringToDate(birthDate)
     
   const today = new Date();
 

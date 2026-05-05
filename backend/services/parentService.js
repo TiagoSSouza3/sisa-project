@@ -37,6 +37,46 @@ exports.getAll = async (options = {}) => {
   return data;
 };
 
+exports.getSearch = async (name, options = {}) => {
+
+  const query = parentsRef
+    .where("name", ">=", name)
+    .where("name", "<=", name + "\uf8ff");
+
+  const snapshot = await query.get();
+  
+  if (snapshot.empty) return [];
+
+  let data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+  if (options.where) {
+    data = applyWhere(data, options.where);
+  }
+
+  if (options.attributes) {
+    data = applyAttributes(data, options.attributes);
+  }
+
+  if (options.limit && Number.isInteger(options.limit)) {
+    data = data.slice(0, options.limit);
+  }
+
+  if (options.order && Array.isArray(options.order) && options.order.length) {
+    const [field, direction] = options.order[0];
+    data.sort((a, b) => {
+      const av = a[field];
+      const bv = b[field];
+      if (av === bv) return 0;
+      if (direction === "DESC") {
+        return av < bv ? 1 : -1;
+      }
+      return av > bv ? 1 : -1;
+    });
+  }
+
+  return data;
+};
+
 exports.findPk = async (id, _options = {}) => {
   const snapshot = await parentsRef.doc(id).get();
   if (!snapshot.exists) return null;

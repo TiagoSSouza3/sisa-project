@@ -115,11 +115,12 @@ export default function StudentsForm() {
                 address_number: address_number
             });
             setChildAge(validadeAge(studentData.birth_date));
+
+            console.log(studentData)
             
             // Carregar parentes se existirem
             if (studentData.parent) {
-                setParents(prev => ({ ...prev, parent1: studentData.parent }));
-                setParentSearchTerms(prev => ({ ...prev, parent1: studentData.parent.name || "" }));
+                await getInicialParent(studentData.parent, "parent1");
             } else {
                 // Inicializar parent1 vazio para sempre mostrar campos
                 setParents(prev => ({ 
@@ -136,18 +137,33 @@ export default function StudentsForm() {
                 }));
             }
             if (studentData.second_parent) {
-                setParents(prev => ({ ...prev, parent2: studentData.second_parent }));
-                setParentSearchTerms(prev => ({ ...prev, parent2: studentData.second_parent.name || "" }));
+                await getInicialParent(studentData.second_parent, "parent2");
                 setShowParent2(true);
             }
             if (studentData.responsible_parent) {
-                setParents(prev => ({ ...prev, responsible: studentData.responsible_parent }));
-                setParentSearchTerms(prev => ({ ...prev, responsible: studentData.responsible_parent.name || "" }));
+                await getInicialParent(studentData.responsible_parent, "responsible");
             }
         } catch (err) {
             console.error("Erro ao buscar aluno:", err);
         }
     };
+
+    const getInicialParent = async (parentData, parentType) => {
+        const parent = await API.get(`/parents/${parentData.id}`);
+
+        setParents(prev => ({ ...prev,
+            [parentType]: {
+                ...parent.data,
+                degree_of_kinship: parentData.degree_of_kinship 
+            }
+        }));
+
+        console.log(parents)
+
+        setParentSearchTerms(prev => ({ ...prev, 
+            parent1: parent.name || "" 
+        }));
+    }
 
     const validatePhoneNumber = (phone) => {
         const cleanPhone = phone.replace(/\D/g, '');
@@ -217,7 +233,7 @@ export default function StudentsForm() {
         // Valida apenas quando tiver 11 dígitos completos
         if(cpf.isValid(cleanCPF)){
             // validar se o cpf ja existe no sistema
-            return await API.get(`/cpf/${cleanCPF}`);
+            //return await API.get(`/cpf/${cleanCPF}`);
         }
 
         return false;
@@ -437,7 +453,6 @@ export default function StudentsForm() {
         }
     }
 
-    // Funções para gerenciar parentes
     const searchParentsDebounce = (() => {
         let timeout;
         return (searchTerm, parentType) => {
@@ -446,7 +461,7 @@ export default function StudentsForm() {
                 if (searchTerm && searchTerm.trim().length >= 2) {
                     setParentSearchLoading(prev => ({ ...prev, [parentType]: true }));
                     try {
-                        const response = await API.get(`/parents/search?name=${encodeURIComponent(searchTerm)}`);
+                        const response = await API.get(`/parents/search/${encodeURIComponent(searchTerm)}`);
                         setParentSearchResults(prev => ({ ...prev, [parentType]: response.data }));
                     } catch (err) {
                         console.error("Erro ao buscar parentes:", err);
@@ -493,6 +508,8 @@ export default function StudentsForm() {
     };
 
     const handleSelectParent = (parent, parentType) => {
+        if(parent.degree_of_kinship && parent.degree_of_kinship != "") parent.degree_of_kinship = "";
+
         setParents(prev => ({ ...prev, [parentType]: parent }));
         setParentSearchTerms(prev => ({ ...prev, [parentType]: parent.name }));
         setParentSearchResults(prev => ({ ...prev, [parentType]: [] }));
@@ -570,9 +587,11 @@ export default function StudentsForm() {
                 errors.CPF = language === "english" ? "CPF must have 11 digits" : "CPF deve ter 11 dígitos";
             }
         }
+
         if (!parent.degree_of_kinship || !parent.degree_of_kinship.trim()) {
             errors.degree_of_kinship = language === "english" ? "Degree of kinship is required" : "Grau de parentesco é obrigatório";
         }
+
         if (parent.phone && !validatePhoneNumber(parent.phone)) {
             errors.phone = "Telefone inválido";
         }
@@ -583,7 +602,6 @@ export default function StudentsForm() {
     const handleSaveParent = async (parentType) => {
         const parent = parents[parentType];
         if (!parent) return null;
-        
         const errors = validateParent(parent, parentType);
         if (Object.keys(errors).length > 0) {
             setParentErrors(prev => ({ ...prev, [parentType]: errors }));
@@ -595,11 +613,11 @@ export default function StudentsForm() {
             if (parent.id) {
                 // Atualizar parent existente
                 const response = await API.put(`/parents/${parent.id}`, parent);
-                savedParent = response.data;
+                savedParent = {degree_of_kinship: parent.degree_of_kinship , ...response.data};
             } else {
                 // Criar novo parent
                 const response = await API.post("/parents", parent);
-                savedParent = response.data;
+                savedParent = {degree_of_kinship: parent.degree_of_kinship , ...response.data};
             }
             
             setParents(prev => ({ ...prev, [parentType]: savedParent }));
@@ -704,67 +722,67 @@ export default function StudentsForm() {
         // Salvar parentes modificados antes de salvar o aluno
         try {
             // Salvar responsável
-            let responsibleParentId = null;
+            let responsibleParent = null;
             if (parentModified.responsible || !parents.responsible.id) {
-                const response = parents.responsible.id 
+                const response = parents.responsible.id
                     ? await API.put(`/parents/${parents.responsible.id}`, parents.responsible)
                     : await API.post("/parents", parents.responsible);
-                responsibleParentId = response.data.id;
+                responsibleParent = {id: response.data.id, degree_of_kinship: parents.responsible.degree_of_kinship};
             } else {
-                responsibleParentId = parents.responsible.id;
+                responsibleParent = {id: parents.responsible.id, degree_of_kinship: parents.responsible.degree_of_kinship};
             }
             
             // Salvar parent1 - verifica se existe pelo nome primeiro
-            let parent1Id = null;
+            let parent1 = null;
             if (parents.parent1 && parents.parent1.name && parents.parent1.name.trim()) {
                 // Busca se já existe um parent com esse nome
                 try {
-                    const searchResponse = await API.get(`/parents/search?name=${encodeURIComponent(parents.parent1.name.trim())}`);
+                    const searchResponse = await API.get(`/parents/search/${encodeURIComponent(parents.parent1.name.trim())}`);
                     const existingParent = searchResponse.data.find(p => 
                         p.name.trim().toLowerCase() === parents.parent1.name.trim().toLowerCase()
                     );
                     
                     if (existingParent) {
                         // Se existe, apenas associa o ID
-                        parent1Id = existingParent.id;
+                        parent1 = {id: existingParent.id, degree_of_kinship: parents.parent1.degree_of_kinship};
                     } else {
                         // Se não existe, cria novo
                         const response = await API.post("/parents", parents.parent1);
-                        parent1Id = response.data.id;
+                        parent1 = {id: response.data.id, degree_of_kinship: parents.parent1.degree_of_kinship};
                     }
                 } catch (err) {
                     // Se erro na busca, cria novo
                     const response = await API.post("/parents", parents.parent1);
-                    parent1Id = response.data.id;
+                    parent1 = {id: response.data.id, degree_of_kinship: parents.parent1.degree_of_kinship};
                 }
             }
             
             // Salvar parent2 se existir
-            let parent2Id = null;
+            let parent2 = null;
             if (parents.parent2 && parents.parent2.name && parents.parent2.name.trim()) {
                 // Busca se já existe um parent com esse nome
                 try {
-                    const searchResponse = await API.get(`/parents/search?name=${encodeURIComponent(parents.parent2.name.trim())}`);
+                    const searchResponse = await API.get(`/parents/search/${encodeURIComponent(parents.parent2.name.trim())}`);
                     const existingParent = searchResponse.data.find(p => 
                         p.name.trim().toLowerCase() === parents.parent2.name.trim().toLowerCase()
                     );
                     
                     if (existingParent) {
                         // Se existe, apenas associa o ID
-                        parent2Id = existingParent.id;
+                        parent2 = {id: existingParent.id, degree_of_kinship: parents.parent2.degree_of_kinship};
                     } else {
                         // Se não existe, cria novo
                         const response = parents.parent2.id 
                             ? await API.put(`/parents/${parents.parent2.id}`, parents.parent2)
                             : await API.post("/parents", parents.parent2);
-                        parent2Id = response.data.id;
+                        parent2 = {id: response.data.id, degree_of_kinship: parents.parent2.degree_of_kinship};
                     }
                 } catch (err) {
                     // Se erro na busca, cria novo
                     const response = parents.parent2.id 
                         ? await API.put(`/parents/${parents.parent2.id}`, parents.parent2)
                         : await API.post("/parents", parents.parent2);
-                    parent2Id = response.data.id;
+                        parent2 = {id: response.data.id, degree_of_kinship: parents.parent2.degree_of_kinship};
                 }
             }
             
@@ -809,9 +827,9 @@ export default function StudentsForm() {
             const studentData = {
                 ...student,
                 address: fullAddress,
-                parent_id: parent1Id,
-                second_parent_id: parent2Id,
-                responsible_parent_id: responsibleParentId
+                parent: parent1,
+                second_parent: parent2,
+                responsible_parent: responsibleParent
             };
 
             if(id){

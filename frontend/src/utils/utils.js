@@ -1,4 +1,5 @@
 export const dateToString = (date) => {
+    console.log(date, typeof date)
     if (date === "" || date === null || date === undefined) return "";
 
     // Firestore Timestamp (server side) or similar objects
@@ -36,8 +37,8 @@ export const StringToDate = (value) => {
     if (value instanceof Date) return value;
 
     // Firestore Timestamp ou objeto semelhante
-    if (value && typeof value === "object" && typeof value.toDate === "function") {
-        return value.toDate();
+    if (value && typeof value === "object") {
+        return new Date(value._seconds * 1000);
     }
 
     if (typeof value === "string") {
