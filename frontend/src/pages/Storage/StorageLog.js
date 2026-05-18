@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import API from "../../api";
 import { useNavigate, useParams } from "react-router-dom";
 import { useLanguage } from '../../components/LanguageContext';
+import { getAuthToken } from "../../utils/auth";
 
 import '../../styles/global.css';
 import '../../styles/storage.css';
@@ -116,7 +117,7 @@ export default function StorageLog() {
     };
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
+        const token = getAuthToken();
         setIsLoggedIn(token !== null);
         loadStorage();
     }, []);

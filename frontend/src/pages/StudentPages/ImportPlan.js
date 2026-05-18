@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import API from "../../api";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
+import { getAuthToken } from "../../utils/auth";
 
 import "../../styles/global.css";
 import "../../styles/importPlan.css";
@@ -62,7 +63,7 @@ export default function ImportPlan() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = getAuthToken();
     setIsLoggedIn(token !== null);
   }, []);
 

@@ -6,6 +6,7 @@ import { useLanguage } from '../../components/LanguageContext';
 import ConfirmationModal from '../../components/ConfirmationModal';
 import useConfirmation from '../../hooks/useConfirmation';
 import Modal from "../../components/Modal";
+import { getAuthToken } from "../../utils/auth";
 
 import '../../styles/global.css';
 import '../../styles/subject-infos.css';
@@ -26,7 +27,7 @@ export default function SubjectInfos() {
     const [isStudentInfoModalOpen, setIsStudentInfoModalOpen] = useState(false);
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
+        const token = getAuthToken();
         setIsLoggedIn(token !== null);
         if (id) {
             loadSubject();

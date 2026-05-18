@@ -9,6 +9,7 @@ import { occupationEnum } from "../../enums/occupationEnum";
 import { useLanguage } from '../../components/LanguageContext';
 import ConfirmationModal from '../../components/ConfirmationModal';
 import useConfirmation from '../../hooks/useConfirmation';
+import { getAuthToken } from "../../utils/auth";
 
 export default function Users() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -42,7 +43,7 @@ export default function Users() {
   const { confirmationState, showConfirmation, hideConfirmation, handleConfirm } = useConfirmation();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = getAuthToken();
     setIsLoggedIn(token !== null);
     loadUsers();
     loadGlobalPermissions();

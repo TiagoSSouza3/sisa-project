@@ -4,6 +4,7 @@ import { useLanguage } from '../../components/LanguageContext';
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../../api";
+import { getAuthToken } from "../../utils/auth";
 
 export default function CashFlow() {
     const { language } = useLanguage(); 
@@ -119,7 +120,7 @@ export default function CashFlow() {
     };
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
+        const token = getAuthToken();
         setIsLoggedIn(token !== null);
     }, []);
 

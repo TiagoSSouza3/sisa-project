@@ -5,6 +5,7 @@ import { occupationEnum } from "../../enums/occupationEnum";
 import { useLanguage } from '../../components/LanguageContext';
 import ConfirmationModal from '../../components/ConfirmationModal';
 import useConfirmation from '../../hooks/useConfirmation';
+import { getAuthToken } from "../../utils/auth";
 
 import '../../styles/global.css';
 import '../../styles/storage.css';
@@ -71,7 +72,7 @@ export default function Storage() {
     };
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
+        const token = getAuthToken();
         setIsLoggedIn(token !== null);
         loadStorage();
     }, []);

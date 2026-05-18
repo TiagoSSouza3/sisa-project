@@ -67,7 +67,7 @@ export default function Subjects() {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = getAuthToken();
     setIsLoggedIn(token !== null);
     loadSubjects();
   }, []);

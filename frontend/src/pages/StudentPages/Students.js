@@ -6,6 +6,7 @@ import Modal from "../../components/Modal";
 import { useNavigate } from "react-router-dom";
 import { occupationEnum } from "../../enums/occupationEnum"
 import { useLanguage } from '../../components/LanguageContext';
+import { getAuthToken } from "../../utils/auth";
 
 import '../../styles/global.css';
 import '../../styles/students.css';
@@ -38,7 +39,7 @@ export default function Students() {
 
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = getAuthToken();
     setIsLoggedIn(token !== null);
     loadStudents();
   }, []);

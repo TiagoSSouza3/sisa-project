@@ -8,6 +8,7 @@ import ConfirmationModal from '../../components/ConfirmationModal';
 import useConfirmation from '../../hooks/useConfirmation';
 import GranularPermissions from '../../components/GranularPermissions';
 import ToggleSwitch from '../../components/ToggleSwitch';
+import { getAuthToken } from "../../utils/auth";
 
 import '../../styles/global.css';
 import '../../styles/users-creation.css';
@@ -67,7 +68,7 @@ export default function UsersForm() {
     // const [initialOccupationId, setInitialOccupationId] = useState(null); // ATIVAR para bloquear rebaixar admin
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
+        const token = getAuthToken();
         setIsLoggedIn(token !== null);
         if (id) {
             getUserById();

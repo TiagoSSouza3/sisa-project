@@ -73,15 +73,14 @@ export default function Login() {
     
     try {
       const res = await API.post("/auth/login", { email, password });
+      const token = res.data.token;
       
       // Verificar se temos token
-      if (!res.data.token) {
+      if (!token) {
         setNotification({ message: "Erro: Token de autenticação não recebido", type: 'error' });
         setLoading(false);
         return;
       }
-
-      const token = res.data.token;
 
       setAuthToken(token, remember);
       defineLocalStorageUser(res.data.user.id, res.data.user.name, res.data.user.occupation_id);
