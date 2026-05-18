@@ -3,6 +3,7 @@ import API from "../api";
 import { useNavigate } from "react-router-dom";
 import InlineNotification from "../components/InlineNotification";
 import { validateEmail } from "../utils/validation";
+import { getAuthToken, setAuthToken } from "../utils/auth";
 
 import '../styles/global.css';
 import '../styles/login.css';
@@ -19,6 +20,7 @@ export default function Login() {
   const [notification, setNotification] = useState(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [remember, setRemember] = useState(false);
   const navigate = useNavigate();
   
   // Desabilitar rolagem apenas nesta página
@@ -29,10 +31,29 @@ export default function Login() {
     };
   }, []);
 
+  useEffect(() => {
+    const token = getAuthToken();
 
-  // Limpar localStorage apenas uma vez quando o componente monta
-  React.useEffect(() => {
-    localStorage.clear();
+    if (token) {
+      const id = localStorage.getItem("id");
+      const name = localStorage.getItem("name");
+      const occupation_id = localStorage.getItem("occupation_id");
+
+      if (id && name && occupation_id) {
+        navigateDashboard();
+        return;
+      }
+
+      localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
+    }
+
+    setRemember(!!localStorage.getItem("token"));
+
+    if (process.env.NODE_ENV === "development") {
+      setEmail(process.env.REACT_APP_DEFAULT_EMAIL || "");
+      setPassword(process.env.REACT_APP_DEFAULT_PASSWORD || "");
+    }
   }, []);
 
   const handleLogin = async (e) => {
@@ -59,22 +80,32 @@ export default function Login() {
         setLoading(false);
         return;
       }
-      
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("occupation_id", res.data.user.occupation_id);
-      localStorage.setItem("name", res.data.user.name);
-      localStorage.setItem("id", res.data.user.id);
+
+      const token = res.data.token;
+
+      setAuthToken(token, remember);
+      defineLocalStorageUser(res.data.user.id, res.data.user.name, res.data.user.occupation_id);
       
       // Usar setTimeout para garantir que o localStorage foi salvo
-      setTimeout(() => {
-        navigate("/dashboard", { replace: true });
-      }, 100);
+      navigateDashboard()
       
     } catch (error) {
       setNotification({ message: error.response?.data?.error || "Erro ao fazer login", type: 'error' });
     } finally {
       setLoading(false);
     }
+  };
+
+  const navigateDashboard = () => {
+    setTimeout(() => {
+      navigate("/dashboard", { replace: true });
+    }, 100);
+  }
+
+  const defineLocalStorageUser = (id, name, occupation_id) => {
+    localStorage.setItem("occupation_id", occupation_id);
+    localStorage.setItem("name", name);
+    localStorage.setItem("id", id);
   };
 
   const handleForgotPassword = async (e) => {
@@ -230,6 +261,16 @@ export default function Login() {
                   )}
                 </svg>
               </button>
+            </div>
+            <div className="form-group">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                />
+                Lembrar-me
+              </label>
             </div>
             <button className="login-button" type="submit" disabled={loading}>
               {loading ? "Entrando..." : "Entrar"}

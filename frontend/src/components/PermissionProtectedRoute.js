@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import API from "../api";
+import { getAuthToken } from "../utils/auth";
 
 export default function PermissionProtectedRoute({ children, requiredPermission }) {
   const [hasPermission, setHasPermission] = useState(null);
@@ -12,7 +13,7 @@ export default function PermissionProtectedRoute({ children, requiredPermission 
 
   const checkPermission = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = getAuthToken();
       const userId = localStorage.getItem("id");
       const occupationId = localStorage.getItem("occupation_id");
       

@@ -4,6 +4,7 @@ import Sidebar from "./Sidebar";
 import { useLanguage } from './LanguageContext';
 import { useTheme } from './ThemeContext';
 import logoInstituto from "../assets/login-images/logoInstituto2.png";
+import { getAuthToken } from "../utils/auth";
 
 export default function Navbar() {
   const [menuAberto, setMenuAberto] = useState(false);
@@ -18,7 +19,7 @@ export default function Navbar() {
   const isPasswordResetPage = location.pathname === '/reset-password' || location.pathname === '/first-access';
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = getAuthToken();
     setIsLoggedIn(token !== null);
     
     // Inicializar estados dos checkboxes
@@ -36,7 +37,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleStorage = () => {
-      const token = localStorage.getItem("token");
+      const token = getAuthToken();
       setIsLoggedIn(token !== null);
     };
     window.addEventListener("storage", handleStorage);

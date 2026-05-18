@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { occupationEnum } from "../enums/occupationEnum";
 import { useLanguage } from './LanguageContext';
 import API from "../api";
+import { clearAuthToken, getAuthToken } from "../utils/auth";
 
 export default function Sidebar({ isOpen, onClose }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -20,12 +21,12 @@ export default function Sidebar({ isOpen, onClose }) {
   };
 
   const handleLogout = () => {
-    localStorage.clear();
+    clearAuthToken();
     window.location.href = "/";
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = getAuthToken();
     setIsLoggedIn(token !== null);
     if (token) {
       loadUserPermissions();

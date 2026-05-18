@@ -25,9 +25,10 @@ npm install
 Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
 ```env
 DB_HOST=localhost
+DB_PORT=3306
 DB_USER=seu_usuario
-DB_PASS=sua_senha
-DB_NAME=sisa_db
+DB_PASSWORD=sua_senha
+DB_NAME=sisa
 JWT_SECRET=sua_chave_secreta
 PORT=3000
 ```
