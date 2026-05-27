@@ -1,0 +1,21 @@
+[debug] [2026-05-27T18:29:45.795Z] ----------------------------------------------------------------------
+[debug] [2026-05-27T18:29:45.799Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\T-GAMER\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js -P sisa-project-app
+[debug] [2026-05-27T18:29:45.799Z] CLI Version:   15.18.0
+[debug] [2026-05-27T18:29:45.799Z] Platform:      win32
+[debug] [2026-05-27T18:29:45.800Z] Node Version:  v24.16.0
+[debug] [2026-05-27T18:29:45.800Z] Time:          Wed May 27 2026 15:29:45 GMT-0300 (Horário Padrão de Brasília)
+[debug] [2026-05-27T18:29:45.800Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-05-27T18:29:45.803Z] TypeError: Cannot read properties of undefined (reading '0')
+    at Command.<anonymous> (C:\Users\T-GAMER\AppData\Roaming\npm\node_modules\firebase-tools\lib\index.js:78:21)
+    at Command.listener [as _actionHandler] (C:\Users\T-GAMER\AppData\Roaming\npm\node_modules\firebase-tools\node_modules\commander\index.js:413:31)
+    at Command._parseCommand (C:\Users\T-GAMER\AppData\Roaming\npm\node_modules\firebase-tools\node_modules\commander\index.js:914:14)
+    at Command.parse (C:\Users\T-GAMER\AppData\Roaming\npm\node_modules\firebase-tools\node_modules\commander\index.js:717:10)
+    at cli (C:\Users\T-GAMER\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\cli.js:123:26)
+    at Object.<anonymous> (C:\Users\T-GAMER\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js:27:5)
+    at Module._compile (node:internal/modules/cjs/loader:1854:14)
+    at Object..js (node:internal/modules/cjs/loader:1985:10)
+    at Module.load (node:internal/modules/cjs/loader:1577:32)
+    at Module._load (node:internal/modules/cjs/loader:1379:12)
+[error] 
+[error] Error: An unexpected error has occurred.

@@ -5,7 +5,7 @@ import LayoutsList from './LayoutsList';
 import DocumentForm from './DocumentForm';
 import AllDocuments from './AllDocuments';
 import TemplateCompletion from './TemplateCompletion';
-import '../../styles/documents.css';
+import '../../styles/Documents.css';
 import { useLanguage } from '../../components/LanguageContext';
 import { useDocumentPermissions } from '../../hooks/useDocumentPermissions_simple';
 
