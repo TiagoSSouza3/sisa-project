@@ -3,6 +3,7 @@ import API from "../../api";
 import { useNavigate } from "react-router-dom";
 import { occupationEnum } from "../../enums/occupationEnum";
 import { useLanguage } from '../../components/LanguageContext';
+import { getAuthToken } from "../../utils/auth";
 
 import '../../styles/global.css';
 import '../../styles/subjects.css';
