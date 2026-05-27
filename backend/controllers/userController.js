@@ -1,7 +1,7 @@
 const userService = require("../services/userService");
-const bcrypt = require("bcryptjs");
-const crypto = require("crypto");
 const { sendPasswordResetEmail, sendFirstAccessEmail, testConnection } = require("../utils/emailService");
+require("../config/firebase");
+const admin = require("firebase-admin");
 
 exports.getUserById = async (req, res) => {
   const { id } = req.params;
@@ -44,10 +44,18 @@ exports.editUser = async (req, res) => {
     occupation_id
   };
 
-  // Só atualizar senha se foi fornecida
-  if (password && password.trim() !== '') {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    updateData.password = hashedPassword;
+  if (user.firebase_uid) {
+    const authUpdateData = {};
+    if (email && email !== user.email) authUpdateData.email = email;
+    if (name && name !== user.name) authUpdateData.displayName = name;
+    if (password && password.trim() !== "") authUpdateData.password = password;
+    if (Object.keys(authUpdateData).length > 0) {
+      await admin.auth().updateUser(user.firebase_uid, authUpdateData);
+    }
+  }
+
+  if (password && password.trim() !== "") {
+    updateData.first_login = false;
   }
 
   await userService.update(user, updateData);
@@ -58,27 +66,31 @@ exports.editUser = async (req, res) => {
 exports.createUser = async (req, res) => {
   try {
     const { name, email, occupation_id } = req.body;
-    
-    // Senha padrão para novos usuários
-    const defaultPassword = "123456";
-    const hashedPassword = await bcrypt.hash(defaultPassword, 10);
-    
-    // Gerar token para primeiro acesso
-    const resetToken = crypto.randomBytes(32).toString('hex');
-    const resetTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 horas
+
+    const existingUser = await userService.findOneByEmail(email);
+    if (existingUser) {
+      return res.status(409).json({ error: "Já existe um usuário com este email" });
+    }
+
+    const temporaryPassword = Math.random().toString(36).slice(-12) + "A1!";
+
+    const authUser = await admin.auth().createUser({
+      email,
+      password: temporaryPassword,
+      displayName: name,
+      emailVerified: false
+    });
 
     const user = await userService.create({
       name,
       email,
-      password: hashedPassword,
       occupation_id,
       first_login: true,
-      reset_token: resetToken,
-      reset_token_expires: resetTokenExpires
+      firebase_uid: authUser.uid
     });
 
     // Disparar email de primeiro acesso em background (não bloquear a resposta)
-    sendFirstAccessEmail(email, resetToken, name)
+    sendFirstAccessEmail(email)
       .then((emailResult) => {
         if (!emailResult.success) {
           console.error('Erro ao enviar email de primeiro acesso:', emailResult.error);
@@ -93,9 +105,12 @@ exports.createUser = async (req, res) => {
       name: user.name,
       email: user.email,
       occupation_id: user.occupation_id,
-      message: 'Usuário criado com sucesso. Email de primeiro acesso enviado.'
+      message: 'Usuário criado com sucesso. Email de definição de senha enviado pelo Firebase.'
     });
   } catch (error) {
+    if (error.code === "auth/email-already-exists") {
+      return res.status(409).json({ error: "Email já cadastrado no Firebase Authentication" });
+    }
     console.error('Erro ao criar usuário:', error);
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
@@ -117,23 +132,13 @@ exports.requestPasswordReset = async (req, res) => {
       return res.status(404).json({ error: 'Email não encontrado' });
     }
 
-    // Gerar token de redefinição
-    const resetToken = crypto.randomBytes(32).toString('hex');
-    const resetTokenExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
-
-    await user.update({
-      reset_token: resetToken,
-      reset_token_expires: resetTokenExpires
-    });
-
-    // Enviar email de redefinição
-    const emailResult = await sendPasswordResetEmail(email, resetToken, user.name);
+    const emailResult = await sendPasswordResetEmail(email);
     
     if (!emailResult.success) {
       return res.status(500).json({ error: 'Erro ao enviar email de redefinição' });
     }
 
-    res.json({ message: 'Email de redefinição enviado com sucesso' });
+    res.json({ message: 'Email de redefinição enviado com sucesso via Firebase' });
   } catch (error) {
     console.error('Erro ao solicitar redefinição de senha:', error);
     res.status(500).json({ error: 'Erro interno do servidor' });
@@ -143,57 +148,11 @@ exports.requestPasswordReset = async (req, res) => {
 // Redefinir senha com token
 exports.resetPassword = async (req, res) => {
   try {
-    const { token, newPassword } = req.body;
-    
-    console.log('🔄 Tentativa de redefinição de senha:', {
-      tokenLength: token ? token.length : 0,
-      passwordLength: newPassword ? newPassword.length : 0,
-      timestamp: new Date().toISOString()
-    });
-    
-    const user = await userService.findOne({ 
-      where: { 
-        reset_token: token,
-        reset_token_expires: { [require('sequelize').Op.gt]: new Date() }
-      } 
-    });
-
-    if (!user) {
-      console.log('❌ Token não encontrado ou expirado:', {
-        token: token ? token.substring(0, 10) + '...' : 'null',
-        currentTime: new Date().toISOString()
-      });
-      return res.status(400).json({ error: 'Token inválido ou expirado' });
-    }
-
-    console.log('✅ Usuário encontrado para redefinição:', {
-      userId: user.id,
-      email: user.email,
-      first_login: user.first_login
-    });
-
-    // Hash da nova senha
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    // Atualizar senha e limpar token
-    await userService.update(user, {
-      password: hashedPassword,
-      first_login: false,
-      reset_token: null,
-      reset_token_expires: null
-    });
-
-    console.log('✅ Senha redefinida com sucesso para usuário:', user.email);
-
-    res.json({ 
-      message: 'Senha redefinida com sucesso',
-      user: {
-        email: user.email,
-        name: user.name
-      }
+    return res.status(410).json({
+      error: "Este endpoint foi descontinuado. Use o link de redefinição de senha enviado pelo Firebase."
     });
   } catch (error) {
-    console.error('�� Erro ao redefinir senha:', error);
+    console.error("Erro ao redefinir senha:", error);
     res.status(500).json({ error: 'Erro interno do servidor', details: error.message });
   }
 };
@@ -201,26 +160,8 @@ exports.resetPassword = async (req, res) => {
 // Verificar se é primeiro acesso
 exports.checkFirstLogin = async (req, res) => {
   try {
-    const { token } = req.params;
-    
-    const user = await userService.findOne({ 
-      where: { 
-        reset_token: token,
-        reset_token_expires: { [require('sequelize').Op.gt]: new Date() }
-      } 
-    });
-
-    if (!user) {
-      return res.status(400).json({ error: 'Token inválido ou expirado' });
-    }
-
-    res.json({ 
-      valid: true, 
-      user: { 
-        name: user.name, 
-        email: user.email,
-        first_login: user.first_login 
-      } 
+    return res.status(410).json({
+      error: "Validação por token local foi descontinuada. Use o fluxo de reset do Firebase."
     });
   } catch (error) {
     console.error('Erro ao verificar token:', error);

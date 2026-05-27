@@ -124,7 +124,7 @@ export default function Login() {
     try {
       await API.post("/users/request-password-reset", { email: forgotEmail });
       setNotification({ 
-        message: "Email enviado! Verifique sua caixa de entrada nos próximos minutos.", 
+        message: "Email enviado pelo Firebase. Verifique sua caixa de entrada e spam para redefinir sua senha.", 
         type: 'success' 
       });
       setForgotEmail("");
@@ -161,7 +161,7 @@ export default function Login() {
                 />
               </div>
               <button className="login-button" type="submit" disabled={loading}>
-                {loading ? "Processando..." : "Enviar email de redefinição"}
+                {loading ? "Processando..." : "Enviar email de redefinição (Firebase)"}
               </button>
               <button 
                 type="button" 

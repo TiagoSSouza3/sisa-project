@@ -14,8 +14,6 @@ import SubjectInscription from "./pages/SubjectsPages/SubjectInscription";
 import UsersForm from "./pages/UserPages/UsersForm";
 import Summary_data from "./pages/StudentPages/SummaryData";
 import Documents from "./pages/Documents/Documents";
-import ResetPassword from "./pages/ResetPassword";
-import FirstAccess from "./pages/FirstAccess";
 // import Storage from "./pages/Storage/Storage";
 // import StorageLog from "./pages/Storage/StorageLog";
 // import CashFlow from "./pages/Storage/CashFlow";
@@ -43,9 +41,6 @@ function AppContent() {
       <Routes>
         <Route path='*' exact={true} element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/" element={<Login />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/first-access/:token" element={<FirstAccess />} />
-        <Route path="/first-access" element={<FirstAccess />} />
         <Route path="/dashboard" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_dashboard"><Dashboard /></PermissionProtectedRoute></ProtectedRoute>} />
         <Route path="/users" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_users"><Users /></PermissionProtectedRoute></ProtectedRoute>} />
         <Route path="/users_form" element={<ProtectedRoute><PermissionProtectedRoute requiredPermission="can_access_users"><UsersForm /></PermissionProtectedRoute></ProtectedRoute>} />
