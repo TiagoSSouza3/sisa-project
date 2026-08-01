@@ -97,8 +97,10 @@ router.post("/login", async (req, res) => {
     if (firebaseErrorMessage === "USER_DISABLED") {
       return res.status(403).json({ error: "Conta desabilitada" });
     }
-
-    console.error('❌ Erro no login:', error);
+    
+    console.error("Status:", error.response?.status);
+    console.error("Firebase:", error.response?.data);
+    console.error("Mensagem:", error.response?.data?.error?.message);
     res.status(500).json({ 
       error: "Erro interno do servidor",
       details: error.message 

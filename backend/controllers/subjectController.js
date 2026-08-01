@@ -180,6 +180,10 @@ const updateSubjectAndStudent = async (subject, student, remove = false) => {
     if(student.subjects && (student.subjects.filter(sub => sub.id === subject.id)).length === 0){
       await studentsService.update(student.id, {subjects: [...student.subjects, {id: subject.id, name: subject.name}]})
     }
+
+    if(!student.subjects){
+      await studentsService.update(student.id, {subjects: [{id: subject.id, name: subject.name}]})
+    }
   }
 
   await verifyActivity(student.id);

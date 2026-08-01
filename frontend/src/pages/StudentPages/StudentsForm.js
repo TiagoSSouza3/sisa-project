@@ -824,13 +824,16 @@ export default function StudentsForm() {
                 ? `${student.address}, ${student.address_number}`.trim()
                 : student.address;
             
+            // e add campo subjects
             const studentData = {
                 ...student,
                 address: fullAddress,
                 parent: parent1,
                 second_parent: parent2,
-                responsible_parent: responsibleParent
+                responsible_parent: responsibleParent,
+                subjects: []
             };
+
 
             if(id){
                 showConfirmation({

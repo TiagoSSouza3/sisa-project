@@ -1,7 +1,7 @@
 const permissionService = require("../services/permissionService");
 const globalPermissionService = require("../services/globalPermissionService");
+const globalDocumentPermissionService = require("../services/globalDocumentPermissionService");
 const userService = require("../services/userService");
-const sequelize = require("../config/config");
 
 exports.getAll = async (req, res) => {
   try {
@@ -358,23 +358,7 @@ exports.resetIndividualPermissions = async (req, res) => {
       return acc;
     }, {});
 
-    // Carregar permissões globais de documentos/layouts para a role
-    const [docRows] = await sequelize.query(
-      `SELECT * FROM global_document_permissions WHERE role = ? LIMIT 1`,
-      { replacements: [role] }
-    );
-
-    const docPerms = (docRows && docRows[0]) ? docRows[0] : {
-      can_view_documents: true,
-      can_edit_documents: false,
-      can_upload_documents: false,
-      can_view_layouts: true,
-      can_edit_layouts: false,
-      can_upload_layouts: false,
-      can_view_all_documents: true,
-      can_edit_all_documents: false,
-      can_upload_all_documents: false,
-    };
+    const docPerms = await globalDocumentPermissionService.getByRoleOrDefault(role);
 
     const buildRoleArray = (enabled, r) => (enabled ? [r] : []);
 
@@ -483,23 +467,7 @@ exports.resetToGlobal = async (req, res) => {
       return acc;
     }, {});
 
-    // Carregar permissões globais de documentos/layouts para a role
-    const [docRows] = await sequelize.query(
-      `SELECT * FROM global_document_permissions WHERE role = ? LIMIT 1`,
-      { replacements: [role] }
-    );
-
-    const docPerms = (docRows && docRows[0]) ? docRows[0] : {
-      can_view_documents: true,
-      can_edit_documents: false,
-      can_upload_documents: false,
-      can_view_layouts: true,
-      can_edit_layouts: false,
-      can_upload_layouts: false,
-      can_view_all_documents: true,
-      can_edit_all_documents: false,
-      can_upload_all_documents: false,
-    };
+    const docPerms = await globalDocumentPermissionService.getByRoleOrDefault(role);
 
     const buildRoleArray = (enabled, r) => (enabled ? [r] : []);
 
